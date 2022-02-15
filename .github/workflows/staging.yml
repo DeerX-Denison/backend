@@ -1,0 +1,39 @@
+name: Staging deployment
+on:
+  push:
+    branches:
+      - staging
+
+env:
+  NODE_ENV: staging
+  PROJECT_ID: ${{secrets.STAGE_PROJECT_ID}}
+  FIREBASE_TOKEN: ${{secrets.FIREBASE_TOKEN}}
+  STAGE_PASSPHRASE: ${{secrets.STAGE_PASSPHRASE}}
+  USER_INFO_FILE_PASSPHRASE: ${{secrets.USER_INFO_FILE_PASSPHRASE}}
+
+jobs:
+  staging_build_test_deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install Dependencies
+        run: |
+          sudo yarn global add firebase-tools
+          sudo apt-get install xvfb
+          yarn install
+      - name: Decrypt Secrets
+        run: yarn decrypt:ci
+      - name: Change To Staging Firebase Project
+        run: firebase use default
+      - name: Build Staging
+        run: yarn build
+      - name: Test
+        run: firebase emulators:exec 'yarn test'
+      - name: Deploy
+        run: firebase deploy --project $PROJECT_ID

@@ -1,0 +1,35 @@
+{
+	"name": "backend",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"devDependencies": {
+		"pre-commit": "^1.2.2",
+		"prettier": "^2.5.1",
+		"prettier-plugin-organize-imports": "^2.3.4",
+		"typescript": "^4.5.5"
+	},
+	"scripts": {
+		"dev": "yarn --cwd functions dev",
+		"build": "yarn --cwd functions build",
+		"install": "yarn --cwd functions install",
+		"test": "yarn --cwd functions test",
+		"lint": "yarn --cwd functions lint",
+		"format": "yarn --cwd functions format",
+		"encrypt": "./bin/encrypt",
+		"decrypt": "./bin/decrypt",
+		"decrypt:ci": "./bin/decrypt-ci"
+	},
+	"pre-commit": [
+		"lint",
+		"format",
+		"test"
+	],
+	"prettier": {
+		"trailingComma": "es5",
+		"tabWidth": 2,
+		"useTabs": true,
+		"semi": true,
+		"singleQuote": true
+	}
+}

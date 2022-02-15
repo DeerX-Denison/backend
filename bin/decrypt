@@ -1,0 +1,32 @@
+#!/bin/bash
+
+source .env
+
+
+# Regardless of env
+
+# USER_INFO_FILE_PASSPHRASE
+USER_INFO_INPUT=functions/src/user/users.gpg
+USER_INFO_OUTPUT=functions/src/user/users.json
+gpg --quiet --batch --yes --decrypt --passphrase "$USER_INFO_FILE_PASSPHRASE" --output "$USER_INFO_OUTPUT" "$USER_INFO_INPUT"
+
+if [[ $NODE_ENV = "development" ]]
+then
+	DEV_INPUT=functions/src/secrets.dev.gpg
+	DEV_OUTPUT=functions/src/secrets.json
+	gpg --quiet --batch --yes --decrypt --passphrase "$DEV_PASSPHRASE" --output "$DEV_OUTPUT" "$DEV_INPUT"
+fi
+
+if [[ $NODE_ENV = "staging" ]]
+then
+	STAGE_INPUT=functions/src/secrets.stage.gpg
+	STAGE_OUTPUT=functions/src/secrets.json
+	gpg --quiet --batch --yes --decrypt --passphrase "$STAGE_PASSPHRASE" --output "$STAGE_OUTPUT" "$STAGE_INPUT"
+fi
+
+if [[ $NODE_ENV = "production" ]]
+then
+	PROD_OUTPUT=functions/src/secrets.json
+	PROD_INPUT=functions/src/secrets.prod.gpg
+	gpg --quiet --batch --yes --decrypt --passphrase "$PROD_PASSPHRASE" --output "$PROD_OUTPUT" "$PROD_INPUT"
+fi

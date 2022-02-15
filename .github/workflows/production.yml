@@ -1,0 +1,36 @@
+name: Production deployment
+on:
+  push:
+    branches:
+      - production
+
+env:
+  NODE_ENV: production
+  PROJECT_ID: ${{secrets.PROD_PROJECT_ID}}
+  FIREBASE_TOKEN: ${{secrets.FIREBASE_TOKEN}}
+  PROD_PASSPHRASE: ${{secrets.PROD_PASSPHRASE}}
+  USER_INFO_FILE_PASSPHRASE: ${{secrets.USER_INFO_FILE_PASSPHRASE}}
+jobs:
+  production_build_deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install Dependencies
+        run: |
+          sudo yarn global add firebase-tools
+          sudo apt-get install xvfb
+          yarn install
+      - name: Decrypt Secrets
+        run: yarn decrypt:ci
+      - name: Change To Produciton Firebase Project
+        run: firebase use production
+      - name: Build Production
+        run: yarn build
+      - name: Deploy
+        run: firebase deploy --project $PROJECT_ID

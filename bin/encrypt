@@ -1,0 +1,19 @@
+#!/bin/bash
+source .env
+
+# USER_INFO_FILE_PASSPHRASE
+USER_INFO_INPUT=functions/src/user/users.json
+USER_INFO_OUTPUT=functions/src/user/users.gpg
+gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --output "$USER_INFO_OUTPUT" --passphrase "$USER_INFO_FILE_PASSPHRASE" "$USER_INFO_INPUT"
+
+DEV_INPUT="functions/src/secrets.dev.json"
+DEV_OUTPUT="functions/src/secrets.dev.gpg"
+gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --output "$DEV_OUTPUT" --passphrase "$DEV_PASSPHRASE" "$DEV_INPUT"
+
+STAGE_INPUT="functions/src/secrets.stage.json"
+STAGE_OUTPUTs="functions/src/secrets.stage.gpg"
+gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --output "$STAGE_OUTPUTs" --passphrase "$STAGE_PASSPHRASE" "$STAGE_INPUT"
+
+PROD_INPUT="functions/src/secrets.prod.json"
+PROD_OUTPUT="functions/src/secrets.prod.gpg"
+gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --output "$PROD_OUTPUT" --passphrase "$PROD_PASSPHRASE" "$PROD_INPUT"

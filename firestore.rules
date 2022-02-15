@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function loggedIn(){
+      return request.auth != null;
+    }
+
+    // store user info: UserInfoSv
+    match /users/{user} {
+      allow read:
+      if loggedIn();
+      allow write:
+      if false;
+      // store wishlist data: WishList
+      match /wishlist/{wishlist} {
+        allow create: 
+        if loggedIn() 
+          && get(/databases/$(database)/documents/users/$(user)).data.uid == request.auth.uid
+        allow delete: 
+        if loggedIn() 
+          && get(/databases/$(database)/documents/users/$(user)).data.uid == request.auth.uid
+          && resource.data.seller.uid != request.auth.uid;    
+        allow read:
+        if loggedIn() 
+          && get(/databases/$(database)/documents/users/$(user)).data.uid == request.auth.uid
+      }
+      match /threads/{thread} {
+        allow read:
+        if loggedIn() 
+          && get(/databases/$(database)/documents/users/$(user)).data.uid == request.auth.uid;
+        allow write: 
+        if loggedIn();
+      }
+
+      match /fcm_tokens/{token} {
+        allow read, write: if false;
+      }
+    }
+
+    // store listings info: ListingData
+    match /listings/{listing} {
+      allow read: 
+      if loggedIn() 
+        && (resource.data.status == "posted" 
+        || resource.data.seller.uid == request.auth.uid
+        || resource == null);
+      allow create: 
+      if loggedIn();
+      allow delete:
+      if loggedIn() && resource.data.seller.uid == request.auth.uid;
+      allow update:
+      if loggedIn() && resource.data.seller.uid == request.auth.uid;
+    }
+
+    // store thread data (messages and stuff): ThreadData
+    match /threads/{thread}{
+      allow read, write:
+      if loggedIn() 
+        && (request.auth.uid in resource.data.membersUid 
+        || resource == null);
+      match /messages/{message}{
+        allow read:
+        if loggedIn() 
+          && request.auth.uid in resource.data.membersUid;
+        allow write:
+        if loggedIn() 
+          && request.resource.data.membersUid.hasOnly(get(/databases/$(database)/documents/threads/$(thread)).data.membersUid);
+      }
+    }
+  }
+}

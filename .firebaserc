@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "deerx-dev",
+    "production": "deerx-prod"
+  },
+  "targets": {}
+}
