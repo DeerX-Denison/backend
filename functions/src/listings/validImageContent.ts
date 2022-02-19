@@ -17,12 +17,12 @@ const initGoogleCredentials = () => {
 /**
  * validate input detection from google vision api
  * there are 6 levels of likelihood:
- * UNKNOWN: Unknown likelihood.
- * VERY_UNLIKELY: It is very unlikely.
- * UNLIKELY:It is unlikely.
- * POSSIBLE: It is possible.
- * LIKELY: It is likely.
- * VERY_LIKELY: It is very likely.
+ * UNKNOWN
+ * VERY_UNLIKELY
+ * UNLIKELY
+ * POSSIBLE
+ * LIKELY
+ * VERY_LIKELY
  */
 const validDetection: (
 	detections: google.cloud.vision.v1.ISafeSearchAnnotation

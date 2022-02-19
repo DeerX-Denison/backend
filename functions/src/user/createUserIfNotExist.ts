@@ -168,5 +168,3 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 	}
 });
 export default createUserIfNotExist;
-
-// eegTH9goM0UNlSTud10fqp:APA91bFXlHppTub2WUDdABSxS-ycQ0KdQEVKQzPxFkbU345beJz-aDE9thd2GS1cRjYoLX0zlmIZFYt_iVwTmauq3CnFh5RR2ICcUaIl3_yPTEgS8HsZRr5BVNIak1T8jWoJkVvlcDd1
