@@ -1,15 +1,21 @@
-class Logger {
-	log(str: unknown) {
-		console.log(str);
+interface ILogger {
+	log: (x: unknown) => void;
+	error: (x: unknown) => void;
+	debug: (x: unknown) => void;
+	warn: (x: unknown) => void;
+}
+class Logger implements ILogger {
+	log(x: unknown) {
+		console.log(x);
 	}
-	error(str: unknown) {
-		console.error(str);
+	error(x: unknown) {
+		console.error(x);
 	}
-	debug(str: unknown) {
-		console.debug(str);
+	debug(x: unknown) {
+		console.debug(x);
 	}
-	ward(str: unknown) {
-		console.warn(str);
+	warn(x: unknown) {
+		console.warn(x);
 	}
 }
 

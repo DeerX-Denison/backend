@@ -74,11 +74,7 @@ export type ListingCategory =
 	| 'JEWELRIES'
 	| 'ELECTRONIC'
 	| 'INSTRUMENT';
-export type ListingSeller = {
-	displayName: string | null;
-	photoURL: string | null;
-	uid: string;
-};
+export type ListingSeller = UserInfo;
 export type ListingCondition =
 	| undefined
 	| 'BRAND NEW'

@@ -14,6 +14,7 @@
 		"build": "yarn --cwd functions build",
 		"install": "yarn --cwd functions install",
 		"test": "yarn --cwd functions test",
+		"test:watch": "yarn --cwd functions test:watch",
 		"lint": "yarn --cwd functions lint",
 		"format": "yarn --cwd functions format",
 		"encrypt": "./bin/encrypt",
@@ -30,6 +31,7 @@
 		"tabWidth": 2,
 		"useTabs": true,
 		"semi": true,
-		"singleQuote": true
+		"singleQuote": true,
+		"printWidth": 80
 	}
 }
