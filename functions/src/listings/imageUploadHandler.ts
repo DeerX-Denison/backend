@@ -2,10 +2,12 @@ import * as functions from 'firebase-functions';
 import { ListingData, ListingImageMetadata } from 'types';
 import { INVALID_IMAGE_CONTENT_IMAGE_URL } from '../constants';
 import { db, storage } from '../firebase.config';
-import logger from '../logger';
+import Logger from '../Logger';
 import resizeImage from './resizeImage';
 import validImageContent from './validImageContent';
 import validMetadata from './validMetadata';
+
+const logger = new Logger();
 
 /**
  * function that triggers to verify newly added image has valid metadata. This should prevent malicious user to abuse REST end points to programatically upload image. Normal user that uploads image through the app should pass this function.

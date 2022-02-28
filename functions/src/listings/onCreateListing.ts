@@ -1,10 +1,10 @@
 import * as functions from 'firebase-functions';
 import { ListingData } from 'types';
-import logger from '../logger';
+import Logger from '../Logger';
 import formatListingData from './formatListingData';
 import listingDataChanged from './listingDataChanged';
 import validListingData from './validListingData';
-
+const logger = new Logger();
 /**
  * handles when a listing document is created. Validate => format => resize
  * error codes:

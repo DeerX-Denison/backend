@@ -5,7 +5,9 @@ import sharp from 'sharp';
 import { ListingImageMetadata } from 'types';
 import { LISTING_IMAGE_HEIGHT } from '../constants';
 import { storage } from '../firebase.config';
-import logger from '../logger';
+import Logger from '../Logger';
+
+const logger = new Logger();
 
 const resizeImage: (imageRef: string) => Promise<void> = async (imageRef) => {
 	const imageFile = storage.file(imageRef);

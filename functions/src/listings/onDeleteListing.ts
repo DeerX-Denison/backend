@@ -1,7 +1,9 @@
 import * as functions from 'firebase-functions';
 import { ListingData } from 'types';
 import { storage } from '../firebase.config';
-import logger from '../logger';
+import Logger from '../Logger';
+
+const logger = new Logger();
 
 /**
  * handles when a listing document is deleted

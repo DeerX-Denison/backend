@@ -2,7 +2,9 @@ import { messaging } from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { MessageData, MessageId, ThreadId, UserFCMTokenData } from 'types';
 import { db, msg } from '../firebase.config';
-import logger from '../logger';
+import Logger from '../Logger';
+
+const logger = new Logger();
 
 /**
  * function to fetch all fcm token of the provided uid

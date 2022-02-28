@@ -4,6 +4,7 @@ import { ListingData } from 'types';
 import { db, testEnv } from '../firebase.config';
 import * as myFunctions from '../index';
 import * as fetchUser from '../utils/fetchUser';
+
 const mockFetchUser = fetchUser.default as jest.Mock;
 jest.mock('../utils/fetchUser', () => ({
 	__esModule: true,
@@ -56,9 +57,19 @@ describe('Testing create Listings', () => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { updatedAt, createdAt, ...listing } = docSnap.data() as ListingData;
 		expect(listing).toEqual(mockListing);
+		mockFetchUser.mockReturnValue(mockListing.seller);
+		expect(wrapped(mockListing, { auth: mockListing.seller })).resolves.toEqual(
+			'ok'
+		);
 	});
 
-	it.todo('empty id');
+	it('empty id', () => {
+		mockListing['id'] = '';
+		mockFetchUser.mockReturnValue(mockListing.seller);
+		expect(wrapped(mockListing, { auth: mockListing.seller })).rejects.toEqual(
+			new Error('Fail to create new listing')
+		);
+	});
 	it.todo('invalid image url');
 	it.todo('empty name');
 	it.todo('invalid price');

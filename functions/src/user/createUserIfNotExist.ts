@@ -5,8 +5,10 @@ import {
 	DEFAULT_USER_PHOTO_URL,
 } from '../constants';
 import { db } from '../firebase.config';
-import logger from '../logger';
+import Logger from '../Logger';
 import userNameAndPhoto from './users.json';
+
+const logger = new Logger();
 
 // updated users must have this type
 type UpdatedUser = {

@@ -2,7 +2,9 @@ import { messaging } from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { UserFCMTokenData } from 'types';
 import { db, msg } from '../firebase.config';
-import logger from '../logger';
+import Logger from '../Logger';
+
+const logger = new Logger();
 
 const sendManualMessage = functions.https.onCall(
 	async (data: { delay: number }, context: functions.https.CallableContext) => {

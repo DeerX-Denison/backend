@@ -1,7 +1,9 @@
 import * as functions from 'firebase-functions';
 import Stripe from 'stripe';
-import logger from '../logger';
+import Logger from '../Logger';
 import secrets from '../secrets.json';
+
+const logger = new Logger();
 
 const confirmPayment = functions.https.onCall(async () => {
 	const stripe = new Stripe(secrets.stripe_sv_key, {

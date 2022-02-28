@@ -1,8 +1,10 @@
 import * as functions from 'firebase-functions';
 import { ListingData, UserInfo } from 'types';
 import { db, svTime } from '../firebase.config';
-import logger from '../logger';
+import Logger from '../Logger';
 import { fetchUser } from '../utils';
+
+const logger = new Logger();
 
 const createListing = functions.https.onCall(
 	async (listingData: ListingData, context) => {
@@ -23,7 +25,7 @@ const createListing = functions.https.onCall(
 		try {
 			await db.collection('listings').doc(listingData.id).set(newListingData);
 		} catch (error) {
-			logger.log(error);
+			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
 				'Fail to create new listing',

@@ -4,7 +4,9 @@ import os from 'os';
 import path from 'path';
 import { ListingImageMetadata } from 'types';
 import { storage } from '../firebase.config';
-import logger from '../logger';
+import Logger from '../Logger';
+
+const logger = new Logger();
 
 /**
  * initialize google api credential

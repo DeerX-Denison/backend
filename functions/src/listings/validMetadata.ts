@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions';
-import logger from '../logger';
+import Logger from '../Logger';
 import secrets from '../secrets.json';
+
+const logger = new Logger();
 
 /**
  * verify if metadata of newly uploaded image is valid

@@ -1,7 +1,6 @@
 /* eslint-disable */
 const fs = require('fs/promises');
 const users = require('./users.json');
-import logger from '../logger';
 
 const updateFile = (users) => {
 	const emails = [];

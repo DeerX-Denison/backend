@@ -2,8 +2,10 @@ import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { WishlistDataSV } from 'types';
 import { db } from '../firebase.config';
-import logger from '../logger';
+import Logger from '../Logger';
 import validWishlistData from './validWishlishData';
+
+const logger = new Logger();
 
 const onDeleteWishlist = functions.firestore
 	.document('users/{userId}/wishlist/{listingId}')

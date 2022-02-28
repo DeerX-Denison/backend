@@ -3,4 +3,5 @@ module.exports = {
 	testRegex: '((\\.|/)(test|spec))\\.[jt]sx?$',
 	testEnvironment: 'node',
 	rootDir: 'src',
+	setupFiles: ['./setupTest.ts'],
 };

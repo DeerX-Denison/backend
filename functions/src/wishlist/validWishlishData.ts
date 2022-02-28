@@ -1,5 +1,7 @@
 import { WishlistDataSV } from 'types';
-import logger from '../logger';
+import Logger from '../Logger';
+
+const logger = new Logger();
 
 const validWishlistData: (
 	wishlist: WishlistDataSV,

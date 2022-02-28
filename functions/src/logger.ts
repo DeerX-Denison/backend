@@ -19,6 +19,4 @@ class Logger implements ILogger {
 	}
 }
 
-const logger = new Logger();
-
-export default logger;
+export default Logger;
