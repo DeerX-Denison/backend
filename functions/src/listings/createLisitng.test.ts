@@ -1,18 +1,11 @@
 import { WrappedFunction } from 'firebase-functions-test/lib/main';
 import 'ts-jest';
 import { ListingData } from 'types';
+import * as myFunctions from '..';
 import { db, testEnv } from '../firebase.config';
-import * as myFunctions from '../index';
-import * as fetchUser from '../utils/fetchUser';
-
-const mockFetchUser = fetchUser.default as jest.Mock;
-jest.mock('../utils/fetchUser', () => ({
-	__esModule: true,
-	default: jest.fn(),
-}));
 
 const mockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
-	id: 'mock id',
+	id: 'mock-id-1',
 	images: ['mock image url'],
 	name: 'mock listing name',
 	price: 'mock listing price',
@@ -36,7 +29,6 @@ describe('Testing create Listings', () => {
 	});
 
 	afterEach(() => {
-		mockFetchUser.mockReset();
 		testEnv.cleanup();
 	});
 
@@ -47,25 +39,19 @@ describe('Testing create Listings', () => {
 	});
 
 	it('authorized call', async () => {
-		mockFetchUser.mockReturnValue(mockListing.seller);
 		expect(wrapped(mockListing, { auth: mockListing.seller })).resolves.toEqual(
 			'ok'
 		);
-
+		await wrapped(mockListing, { auth: mockListing.seller });
 		const docSnap = await db.collection('listings').doc(mockListing.id).get();
-
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { updatedAt, createdAt, ...listing } = docSnap.data() as ListingData;
 		expect(listing).toEqual(mockListing);
-		mockFetchUser.mockReturnValue(mockListing.seller);
-		expect(wrapped(mockListing, { auth: mockListing.seller })).resolves.toEqual(
-			'ok'
-		);
+		await db.collection('listings').doc(mockListing.id).delete();
 	});
 
 	it('empty id', () => {
 		mockListing['id'] = '';
-		mockFetchUser.mockReturnValue(mockListing.seller);
 		expect(wrapped(mockListing, { auth: mockListing.seller })).rejects.toEqual(
 			new Error('Fail to create new listing')
 		);

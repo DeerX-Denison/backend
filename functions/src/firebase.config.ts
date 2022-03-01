@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import testFunctions from 'firebase-functions-test';
-import { default as secrets, default as serviceAccount } from './secrets.json';
+import { default as secrets } from './secrets.json';
 
 const projectConfig = {
 	projectId: secrets.projectId,
@@ -13,7 +13,7 @@ const testEnv = testFunctions(projectConfig);
 // useful for stripe api key testings
 
 const app = admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+	credential: admin.credential.cert(secrets as admin.ServiceAccount),
 });
 
 const db = app.firestore();

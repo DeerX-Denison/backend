@@ -13,9 +13,9 @@ const formatListingData: (oldListingData: ListingData) => ListingData = (
 		price: oldListingData.price.trim(),
 		category: oldListingData.category,
 		seller: {
-			email: oldListingData.seller.email,
-			displayName: oldListingData.seller.displayName,
-			photoURL: oldListingData.seller.photoURL,
+			email: oldListingData.seller.email?.trim(),
+			displayName: oldListingData.seller.displayName?.trim(),
+			photoURL: oldListingData.seller.photoURL?.trim(),
 			uid: oldListingData.seller.uid.trim(),
 		},
 		condition: oldListingData.condition,
