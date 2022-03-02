@@ -1,15 +1,5 @@
 import 'ts-jest';
 
-// overwrite Logger's methods to do nothing. This will suppress logger when testing
-// jest.mock('./Logger', () =>
-// 	jest.fn().mockImplementation(() => ({
-// 		error: jest.fn(),
-// 		log: jest.fn(),
-// 		warn: jest.fn(),
-// 		info: jest.fn(),
-// 	}))
-// );
-
 // mock fetchUser to return the following mock user info
 jest.mock('./utils/fetchUser', () => jest.fn().mockReturnValue(mockUserInfo));
 export const mockUserInfo = {

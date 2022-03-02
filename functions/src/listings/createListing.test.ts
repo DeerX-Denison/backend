@@ -2,7 +2,7 @@ import { WrappedFunction } from 'firebase-functions-test/lib/main';
 import 'ts-jest';
 import { ListingData } from 'types';
 import * as myFunctions from '..';
-import { db, testEnv } from '../firebase.config';
+import { testEnv } from '../firebase.config';
 
 const mockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
 	id: 'mock-id-1',
@@ -33,28 +33,28 @@ describe('Testing create Listings', () => {
 	});
 
 	it('unauthorized call', async () => {
-		expect(wrapped(mockListing)).rejects.toEqual(
+		await expect(wrapped(mockListing)).rejects.toEqual(
 			new Error('User unauthenticated')
 		);
 	});
 
 	it('authorized call', async () => {
-		expect(wrapped(mockListing, { auth: mockListing.seller })).resolves.toEqual(
-			'ok'
-		);
-		await wrapped(mockListing, { auth: mockListing.seller });
-		const docSnap = await db.collection('listings').doc(mockListing.id).get();
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { updatedAt, createdAt, ...listing } = docSnap.data() as ListingData;
-		expect(listing).toEqual(mockListing);
-		await db.collection('listings').doc(mockListing.id).delete();
+		await expect(
+			wrapped(mockListing, { auth: mockListing.seller })
+		).resolves.toEqual('ok');
 	});
 
-	it('empty id', () => {
+	it('empty id', async () => {
 		mockListing['id'] = '';
-		expect(wrapped(mockListing, { auth: mockListing.seller })).rejects.toEqual(
-			new Error('Fail to create new listing')
-		);
+		// suppress console.error, since console.error is expected to run
+		const mockConsoleError = jest
+			.spyOn(console, 'error')
+			.mockImplementation(jest.fn());
+		await expect(
+			wrapped(mockListing, { auth: mockListing.seller })
+		).rejects.toEqual(new Error('Fail to create new listing'));
+		expect(mockConsoleError).toHaveBeenCalledTimes(1);
+		jest.spyOn(console, 'error').mockRestore();
 	});
 	it.todo('invalid image url');
 	it.todo('empty name');

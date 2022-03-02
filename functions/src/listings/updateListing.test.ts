@@ -2,11 +2,11 @@ import { WrappedFunction } from 'firebase-functions-test/lib/main';
 import 'ts-jest';
 import { ListingData } from 'types';
 import * as myFunctions from '..';
-import { testEnv } from '../firebase.config';
+import { db, testEnv } from '../firebase.config';
 import { mockUserInfo as seller } from '../setupTest';
 
-const mockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
-	id: 'mock-id-2',
+const baseMockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
+	id: 'mock-id',
 	images: ['mock image url'],
 	name: 'mock listing name',
 	price: 'mock listing price',
@@ -17,8 +17,6 @@ const mockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
 	savedBy: 0,
 	status: 'posted',
 };
-
-const updatedMockListing = { ...mockListing, name: 'updated mock listing' };
 
 describe('Testing update listing', () => {
 	let wrapped: WrappedFunction;
@@ -31,15 +29,36 @@ describe('Testing update listing', () => {
 	});
 
 	it('unauthorized call', async () => {
-		expect(wrapped(updatedMockListing)).rejects.toEqual(
+		await expect(wrapped({})).rejects.toEqual(
 			new Error('User unauthenticated')
 		);
 	});
 
 	it('authorized call', async () => {
-		await testEnv.wrap(myFunctions.createListing)(mockListing, {
-			auth: mockListing.seller,
-		});
+		const mockListing = { ...baseMockListing, id: 'authorized-call' };
+
+		const updatedMockListing = { ...mockListing, name: 'updated mock listing' };
+
+		await db.collection('listings').doc(mockListing.id).set(mockListing);
+		await expect(
+			wrapped(updatedMockListing, { auth: mockListing.seller })
+		).resolves.toEqual('ok');
+		await db.collection('listings').doc(mockListing.id).delete();
+	});
+
+	it.skip('listing is updated', async () => {
+		const mockListing = { ...baseMockListing, id: 'listing-is-updated' };
+		const updatedMockListing = { ...mockListing, name: 'updated mock listing' };
+		await db.collection('listings').doc(mockListing.id).set(mockListing);
 		await wrapped(updatedMockListing, { auth: mockListing.seller });
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const dbListing = (
+			await db.collection('listings').doc(mockListing.id).get()
+		).data() as ListingData;
+
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { updatedAt, createdAt, ...dbListingg } = dbListing;
+		expect(dbListingg).toEqual(updatedMockListing);
+		await db.collection('listings').doc(mockListing.id).delete();
 	});
 });
