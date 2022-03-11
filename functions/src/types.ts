@@ -91,7 +91,7 @@ export type ListingData = {
 	images: ListingImageURL[];
 	name: ListingName;
 	price: ListingPrice;
-	category: ListingCategory;
+	category: ListingCategory[];
 	seller: ListingSeller;
 	condition: ListingCondition;
 	description: ListingDescription;

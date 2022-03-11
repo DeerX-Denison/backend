@@ -33,9 +33,6 @@ const validType: (ListingData: ListingData) => boolean = (listingData) => {
 	if (typeof listingData.price !== 'string') return false;
 	if (isNaN(parseFloat(listingData.price))) return false;
 
-	// TODO: engineer a way to dynamically add to validCategory when more category is added
-	// valid category
-	if (typeof listingData.category !== 'string') return false;
 	const validCategory = [
 		'FURNITURE',
 		'FASHION',
@@ -46,7 +43,14 @@ const validType: (ListingData: ListingData) => boolean = (listingData) => {
 		'ELECTRONIC',
 		'INSTRUMENT',
 	];
-	if (!validCategory.includes(listingData.category)) return false;
+	if (typeof listingData.category !== 'object') return false;
+	if (!Array.isArray(listingData.category)) return false;
+	for (let i = 0; i < listingData.category.length; i++) {
+		const category = listingData.category[i];
+		if (!category) return false;
+		if (typeof category !== 'string') return false;
+		if (!validCategory.includes(category)) return false;
+	}
 
 	// valid condition
 	if (typeof listingData.condition !== 'string') return false;

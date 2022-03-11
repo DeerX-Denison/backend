@@ -10,7 +10,7 @@ const baseMockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
 	images: ['mock image url'],
 	name: 'mock listing name',
 	price: 'mock listing price',
-	category: 'BOOKS',
+	category: ['BOOKS'],
 	seller,
 	condition: 'BARELY FUNCTIONAL',
 	description: 'mock listing description',

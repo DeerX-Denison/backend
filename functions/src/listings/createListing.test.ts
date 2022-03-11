@@ -9,7 +9,7 @@ const mockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
 	images: ['mock image url'],
 	name: 'mock listing name',
 	price: 'mock listing price',
-	category: 'BOOKS',
+	category: ['BOOKS'],
 	seller: {
 		email: 'mock email',
 		displayName: 'mock display name',
