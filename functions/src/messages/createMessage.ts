@@ -16,6 +16,7 @@ const createMessage = functions.https.onCall(
 			);
 		}
 		const sender = await fetchUser(message.sender.uid);
+
 		const newMessage: MessageData = {
 			...message,
 			sender,
