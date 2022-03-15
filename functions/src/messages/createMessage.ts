@@ -21,6 +21,10 @@ const createMessage = functions.https.onCall(
 			...message,
 			sender,
 			time: svTime() as Timestamp,
+			seenAt: {
+				...message.seenAt,
+				[sender.uid]: svTime() as Timestamp,
+			},
 		};
 		const batch = db.batch();
 		batch.set(

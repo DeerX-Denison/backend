@@ -131,6 +131,9 @@ export type ThreadPreviewDataSv = Omit<ThreadPreviewData, 'name'>;
 export type MessageId = string;
 export type MessageSender = Omit<UserInfo, 'email'>;
 export type MessageTime = FirebaseFirestore.Timestamp;
+export type MessageSeenAt = {
+	[key: string]: FirebaseFirestore.Timestamp | null;
+};
 
 //add below more further on: image, listing reference, etc.
 export type MessageContentType = 'text';
@@ -143,6 +146,7 @@ export type MessageData = {
 	content: MessageContent;
 	membersUid: string[];
 	threadName: ThreadName;
+	seenAt: MessageSeenAt;
 };
 export type MessageBlockData = {
 	id: MessageId;
