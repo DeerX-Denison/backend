@@ -1,47 +1,65 @@
 {
-  "indexes": [
-    {
-      "collectionGroup": "listings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "messages",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "membersUid",
-          "arrayConfig": "CONTAINS"
-        },
-        {
-          "fieldPath": "time",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "threads",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "membersUid",
-          "arrayConfig": "CONTAINS"
-        },
-        {
-          "fieldPath": "latestTime",
-          "order": "DESCENDING"
-        }
-      ]
-    }
-  ],
-  "fieldOverrides": []
+	"indexes": [
+		{
+			"collectionGroup": "listings",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "category",
+					"arrayConfig": "CONTAINS"
+				},
+				{
+					"fieldPath": "status",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "createdAt",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "listings",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "status",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "createdAt",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "messages",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "membersUid",
+					"arrayConfig": "CONTAINS"
+				},
+				{
+					"fieldPath": "time",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "threads",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "membersUid",
+					"arrayConfig": "CONTAINS"
+				},
+				{
+					"fieldPath": "latestTime",
+					"order": "DESCENDING"
+				}
+			]
+		}
+	],
+	"fieldOverrides": []
 }
