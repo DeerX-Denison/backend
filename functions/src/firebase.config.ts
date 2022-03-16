@@ -20,6 +20,7 @@ const db = app.firestore();
 const storage = app.storage().bucket(secrets.storageBucket);
 const msg = app.messaging();
 const svTime = admin.firestore.FieldValue.serverTimestamp;
+
 export { db, svTime, storage, msg, testEnv };
 
 export type Timestamp = admin.firestore.Timestamp;
