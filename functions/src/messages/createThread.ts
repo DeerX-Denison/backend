@@ -34,6 +34,7 @@ const createThread = functions.https.onCall(
 				error
 			);
 		}
+		return 'ok';
 	}
 );
 
