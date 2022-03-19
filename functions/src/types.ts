@@ -120,6 +120,10 @@ export type ThreadThumbnail = { [uid: string]: string | undefined };
 export type ThreadLatestMessages = string | undefined | null;
 export type ThreadLatestTime = FirebaseFirestore.Timestamp | undefined | null;
 export type ThreadName = { [key: string]: string | undefined };
+export type ThreadLatestSenderUid = string | null | undefined;
+export type ThreadLatestSeenAt = {
+	[uid: string]: FirebaseFirestore.Timestamp | undefined | null;
+};
 export type ThreadPreviewData = {
 	id: ThreadId;
 	members: ThreadMembers[];
@@ -128,6 +132,8 @@ export type ThreadPreviewData = {
 	name: ThreadName;
 	latestMessage: ThreadLatestMessages;
 	latestTime: ThreadLatestTime;
+	latestSenderUid: ThreadLatestSenderUid;
+	latestSeenAt: ThreadLatestSeenAt;
 };
 export type ThreadPreviewDataSv = Omit<ThreadPreviewData, 'name'>;
 

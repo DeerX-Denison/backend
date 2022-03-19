@@ -1,8 +1,9 @@
 import * as functions from 'firebase-functions';
 import { MessageData, ThreadPreviewData } from 'types';
 import { db, svTime, Timestamp } from '../firebase.config';
+import Logger from '../Logger';
 import { fetchUser } from '../utils';
-
+const logger = new Logger();
 type Data = {
 	threadPreviewData: ThreadPreviewData;
 	message: MessageData;
@@ -26,22 +27,23 @@ const createMessage = functions.https.onCall(
 				[sender.uid]: svTime() as Timestamp,
 			},
 		};
-		const batch = db.batch();
-		batch.set(
-			db
+
+		try {
+			await db
 				.collection('threads')
 				.doc(threadPreviewData.id)
 				.collection('messages')
-				.doc(message.id),
-			newMessage
-		);
-
-		batch.update(db.collection('threads').doc(threadPreviewData.id), {
-			latestMessage: newMessage.content,
-			latestTime: newMessage.time,
-		});
-
-		await batch.commit();
+				.doc(message.id)
+				.set(newMessage);
+		} catch (error) {
+			logger.error(error);
+			throw new functions.https.HttpsError(
+				'internal',
+				`Fail to create new message with id: ${newMessage.id}`,
+				error
+			);
+		}
+		return 'ok';
 	}
 );
 

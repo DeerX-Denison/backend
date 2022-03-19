@@ -88,6 +88,33 @@ const sendNotification = async (
 	}
 };
 
+const updateThreadPreview = async (
+	newMessage: MessageData,
+	threadId: string
+) => {
+	// update threads/
+	// const latestSeenAt: ThreadLatestSeenAt = {};
+	// newMessage.membersUid.forEach((uid) => {
+	// 	console.log(newMessage.seenAt);
+	// 	const seconds = newMessage.seenAt[uid]?.seconds;
+	// 	const nanoseconds = newMessage.seenAt[uid]?.nanoseconds;
+	// 	// console.log(seconds, nanoseconds);
+	// 	if (seconds && nanoseconds) {
+	// 		latestSeenAt[uid] = new admin.firestore.Timestamp(seconds, nanoseconds);
+	// 	}
+	// });
+	try {
+		await db.collection('threads').doc(threadId).update({
+			latestMessage: newMessage.content,
+			latestTime: newMessage.time,
+			latestSenderUid: newMessage.sender.uid,
+			latestSeenAt: newMessage.seenAt,
+		});
+	} catch (error) {
+		throw logger.error(error);
+	}
+};
+
 /**
  * handles when a message is created
  */
@@ -100,7 +127,12 @@ const onCreateMessage = functions.firestore
 		) => {
 			const message = snapshot.data() as MessageData;
 			const { threadId, messageId } = context.params;
-
+			try {
+				await updateThreadPreview(message, threadId);
+			} catch (error) {
+				logger.error(error);
+				return 'error';
+			}
 			try {
 				await sendNotification(message, threadId, messageId);
 			} catch (error) {
