@@ -1,5 +1,6 @@
+import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { ListingData, UserInfo } from 'types';
+import { ListingDataCl, UserInfo } from 'types';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
 import { fetchUser } from '../utils';
@@ -7,18 +8,33 @@ import { fetchUser } from '../utils';
 const logger = new Logger();
 
 const updateListing = functions.https.onCall(
-	async (listingData: ListingData, context) => {
+	async (listingData: ListingDataCl, context) => {
 		if (!context.auth) {
+			logger.error('User unauthenticated');
 			throw new functions.https.HttpsError(
 				'unauthenticated',
 				'User unauthenticated'
 			);
 		}
 		const seller: UserInfo = await fetchUser(listingData.seller.uid);
+		const createdAtSeconds = listingData.createdAt?._seconds;
+		const createdAtNanoseconds = listingData.createdAt?._nanoseconds;
+
+		if (!createdAtSeconds || !createdAtNanoseconds) {
+			logger.error('listing data time created was missing');
+			throw new functions.https.HttpsError(
+				'failed-precondition',
+				'listing data time created was missing'
+			);
+		}
 		const updatedListing = {
 			...listingData,
 			seller,
 			updatedAt: svTime(),
+			createdAt: new admin.firestore.Timestamp(
+				createdAtSeconds,
+				createdAtNanoseconds
+			),
 		};
 		try {
 			await db

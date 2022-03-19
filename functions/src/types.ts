@@ -100,7 +100,10 @@ export type ListingData = {
 	readonly updatedAt: FirebaseFirestore.Timestamp | undefined;
 	status: ListingStatus;
 };
-
+export type ListingDataCl = ListingData & {
+	createdAt: { _seconds: number; _nanoseconds: number };
+	updatedAt: { _seconds: number; _nanoseconds: number };
+};
 export type MyListingData = ListingData;
 
 // app types

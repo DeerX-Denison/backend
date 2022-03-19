@@ -1,3 +1,4 @@
+import * as admin from 'firebase-admin';
 import { WrappedFunction } from 'firebase-functions-test/lib/main';
 import 'ts-jest';
 import { ListingData } from 'types';
@@ -5,7 +6,7 @@ import * as myFunctions from '..';
 import { db, testEnv } from '../firebase.config';
 import { mockUserInfo as seller } from '../setupTest';
 
-const baseMockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
+const baseMockListing: ListingData = {
 	id: 'mock-id',
 	images: ['mock image url'],
 	name: 'mock listing name',
@@ -16,6 +17,8 @@ const baseMockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
 	description: 'mock listing description',
 	savedBy: 0,
 	status: 'posted',
+	createdAt: new admin.firestore.Timestamp(1000, 1000),
+	updatedAt: new admin.firestore.Timestamp(1000, 1000),
 };
 
 describe('Testing update listing', () => {
