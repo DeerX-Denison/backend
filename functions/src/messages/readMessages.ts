@@ -83,7 +83,7 @@ const readMessages = functions.https.onCall(
 			);
 		}
 		const sortedSeenMsgs: MessageData[] = seenMessages.sort((a, b) =>
-			a.time.valueOf() > b.time.valueOf() ? 1 : -1
+			a.time.valueOf() > b.time.valueOf() ? -1 : 1
 		);
 		if (sortedSeenMsgs && sortedSeenMsgs.length > 0) {
 			const latestMsg = sortedSeenMsgs[0];

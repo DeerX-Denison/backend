@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import { MessageData, MessageId, ThreadId, UserFCMTokenData } from 'types';
 import { db, msg } from '../firebase.config';
 import Logger from '../Logger';
+import updateThreadPreview from './updateThreadPreview';
 
 const logger = new Logger();
 
@@ -100,7 +101,12 @@ const onCreateMessage = functions.firestore
 		) => {
 			const newMessage = snapshot.data() as MessageData;
 			const { threadId, messageId } = context.params;
-
+			try {
+				await updateThreadPreview(newMessage, threadId);
+			} catch (error) {
+				logger.error(error);
+				return 'error';
+			}
 			try {
 				await sendNotification(newMessage, threadId, messageId);
 			} catch (error) {
