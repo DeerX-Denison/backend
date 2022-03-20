@@ -2,9 +2,11 @@ import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { MessageData, MessageId, MessageSeenAt, ThreadId } from 'types';
 import { db, svTime, Timestamp } from '../firebase.config';
+import Logger from '../Logger';
 import fetchMessage from '../utils/fetchMessage';
+import updateThreadPreview from './updateThreadPreview';
 export type ReadMessageData = { messageIds: MessageId[]; threadId: ThreadId };
-
+const logger = new Logger();
 const readMessages = functions.https.onCall(
 	async ({ messageIds, threadId }: ReadMessageData, context) => {
 		if (!context.auth) {
@@ -73,11 +75,28 @@ const readMessages = functions.https.onCall(
 			});
 			await batch.commit();
 		} catch (error) {
+			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
 				'Fail to read to-be-read messages',
 				error
 			);
+		}
+		const sortedSeenMsgs: MessageData[] = seenMessages.sort((a, b) =>
+			a.time.valueOf() > b.time.valueOf() ? 1 : -1
+		);
+		if (sortedSeenMsgs && sortedSeenMsgs.length > 0) {
+			const latestMsg = sortedSeenMsgs[0];
+			try {
+				await updateThreadPreview(latestMsg, threadId);
+			} catch (error) {
+				logger.error(error);
+				throw new functions.https.HttpsError(
+					'internal',
+					`Fail to update thread preview: ${threadId}`,
+					error
+				);
+			}
 		}
 		return 'ok';
 	}
