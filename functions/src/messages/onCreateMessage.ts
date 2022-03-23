@@ -1,8 +1,15 @@
 import { messaging } from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { MessageData, MessageId, ThreadId, UserFCMTokenData } from 'types';
+import {
+	MessageData,
+	MessageId,
+	ThreadId,
+	UserFCMTokenData,
+	UserInfo,
+} from 'types';
 import { db, msg } from '../firebase.config';
 import Logger from '../Logger';
+import { fetchUser } from '../utils';
 import updateThreadPreview from './updateThreadPreview';
 
 const logger = new Logger();
@@ -30,23 +37,31 @@ const fetchFCMTokensFromUid = async (uid: string) => {
 /**
  * construct and return a multicast message to be sent from input message data, all token of the provided uid
  */
-const constructNoti = (message: MessageData, tokens: string[], uid: string) => {
+const constructNoti = (
+	message: MessageData,
+	tokens: string[],
+	members: UserInfo[],
+	uid: string
+) => {
 	if (message.contentType === 'text') {
 		const title = message.threadName[uid];
 		const body = message.content;
 		const noti: messaging.MulticastMessage = {
-			notification: { title, body },
+			notification: {
+				title,
+				body,
+			},
 			apns: {
 				payload: {
 					aps: {
-						alert: {
-							body,
-							title,
-						},
 						badge: 0,
-						sound: ' default',
+						sound: 'default',
 					},
 				},
+			},
+			data: {
+				type: 'inbox message',
+				members: JSON.stringify(members),
 			},
 			tokens,
 		};
@@ -68,12 +83,15 @@ const sendNotification = async (
 	messageId: MessageId
 ) => {
 	const { membersUid, sender } = message;
+	const members = await Promise.all(
+		membersUid.map(async (uid) => await fetchUser(uid))
+	);
 	const notSelfUids = membersUid.filter((uid) => uid !== sender.uid);
 	if (notSelfUids.length > 0) {
 		notSelfUids.forEach(async (uid) => {
 			const tokensData = await fetchFCMTokensFromUid(uid);
 			const tokens = tokensData.map((tokenData) => tokenData.token);
-			const noti = constructNoti(message, tokens, uid);
+			const noti = constructNoti(message, tokens, members, uid);
 			try {
 				const { responses, successCount, failureCount } =
 					await msg.sendMulticast(noti);
