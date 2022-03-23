@@ -44,32 +44,28 @@ const createMessage = functions.https.onCall(
 			latestSenderUid: newMessage.sender.uid,
 			latestSeenAt: newMessage.seenAt,
 		});
-		await Promise.all([
-			async () => {
-				try {
-					await batch.commit();
-				} catch (error) {
-					logger.error(error);
-					throw new functions.https.HttpsError(
-						'internal',
-						`Fail to create new message with id: ${newMessage.id}`,
-						error
-					);
-				}
-			},
-			async () => {
-				try {
-					await sendNoti(newMessage, threadPreviewData.id, newMessage.id);
-				} catch (error) {
-					logger.error(error);
-					throw new functions.https.HttpsError(
-						'internal',
-						`Fail to send notification for message id: ${newMessage.id}`,
-						error
-					);
-				}
-			},
-		]);
+
+		try {
+			await batch.commit();
+		} catch (error) {
+			logger.error(error);
+			throw new functions.https.HttpsError(
+				'internal',
+				`Fail to create new message with id: ${newMessage.id}`,
+				error
+			);
+		}
+		try {
+			await sendNoti(newMessage, threadPreviewData.id, newMessage.id);
+		} catch (error) {
+			logger.error(error);
+			throw new functions.https.HttpsError(
+				'internal',
+				`Fail to send notification for message id: ${newMessage.id}`,
+				error
+			);
+		}
+
 		return 'ok';
 	}
 );
