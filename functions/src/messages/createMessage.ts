@@ -3,6 +3,7 @@ import { MessageData, ThreadPreviewData } from 'types';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
 import { fetchUser } from '../utils';
+import sendNoti from './sendNoti';
 const logger = new Logger();
 type Data = {
 	threadPreviewData: ThreadPreviewData;
@@ -28,21 +29,47 @@ const createMessage = functions.https.onCall(
 			},
 		};
 
-		try {
-			await db
+		const batch = db.batch();
+		batch.set(
+			db
 				.collection('threads')
 				.doc(threadPreviewData.id)
 				.collection('messages')
-				.doc(message.id)
-				.set(newMessage);
-		} catch (error) {
-			logger.error(error);
-			throw new functions.https.HttpsError(
-				'internal',
-				`Fail to create new message with id: ${newMessage.id}`,
-				error
-			);
-		}
+				.doc(message.id),
+			newMessage
+		);
+		batch.update(db.collection('threads').doc(threadPreviewData.id), {
+			latestMessage: newMessage.content,
+			latestTime: newMessage.time,
+			latestSenderUid: newMessage.sender.uid,
+			latestSeenAt: newMessage.seenAt,
+		});
+		await Promise.all([
+			async () => {
+				try {
+					await batch.commit();
+				} catch (error) {
+					logger.error(error);
+					throw new functions.https.HttpsError(
+						'internal',
+						`Fail to create new message with id: ${newMessage.id}`,
+						error
+					);
+				}
+			},
+			async () => {
+				try {
+					await sendNoti(newMessage, threadPreviewData.id, newMessage.id);
+				} catch (error) {
+					logger.error(error);
+					throw new functions.https.HttpsError(
+						'internal',
+						`Fail to send notification for message id: ${newMessage.id}`,
+						error
+					);
+				}
+			},
+		]);
 		return 'ok';
 	}
 );
