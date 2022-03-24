@@ -1,8 +1,18 @@
 import * as functions from 'firebase-functions';
-import { DEFAULT_MESSAGE_NAME, DEFAULT_SELF_MESSAGE_NAME } from '../constants';
+import {
+	DEFAULT_MESSAGE_NAME,
+	DEFAULT_MESSAGE_THUMBNAIL,
+	DEFAULT_SELF_MESSAGE_NAME,
+} from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
-import { MessageData, ThreadName, ThreadPreviewData, UserInfo } from '../types';
+import {
+	MessageData,
+	ThreadName,
+	ThreadPreviewData,
+	ThreadThumbnail,
+	UserInfo,
+} from '../types';
 import { fetchUser } from '../utils';
 import sendNoti from './sendNoti';
 const logger = new Logger();
@@ -22,6 +32,7 @@ const createMessage = functions.https.onCall(
 		const otherMemberUid = membersUid.filter((x) => x !== sender.uid)[0];
 
 		const name: ThreadName = {};
+		const thumbnail: ThreadThumbnail = {};
 		let members: UserInfo[] = [];
 
 		if (otherMemberUid && otherMemberUid.length > 0) {
@@ -33,6 +44,12 @@ const createMessage = functions.https.onCall(
 			name[otherMember.uid] = sender.displayName
 				? sender.displayName
 				: DEFAULT_MESSAGE_NAME;
+			thumbnail[sender.uid] = otherMember.photoURL
+				? otherMember.photoURL
+				: DEFAULT_MESSAGE_THUMBNAIL;
+			thumbnail[otherMember.uid] = sender.photoURL
+				? sender.photoURL
+				: DEFAULT_MESSAGE_THUMBNAIL;
 			members = [sender, otherMember];
 		} else {
 			name[sender.uid] = DEFAULT_SELF_MESSAGE_NAME;
@@ -64,6 +81,7 @@ const createMessage = functions.https.onCall(
 			latestSenderUid: newMessage.sender.uid,
 			latestSeenAt: newMessage.seenAt,
 			name,
+			thumbnail,
 		});
 
 		try {

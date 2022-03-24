@@ -6,3 +6,5 @@ export const INVALID_IMAGE_CONTENT_IMAGE_URL =
 	'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg';
 export const DEFAULT_MESSAGE_NAME = 'New conversation';
 export const DEFAULT_SELF_MESSAGE_NAME = 'Message to self';
+export const DEFAULT_MESSAGE_THUMBNAIL =
+	'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg';
