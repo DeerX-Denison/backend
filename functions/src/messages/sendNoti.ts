@@ -1,7 +1,6 @@
-import { MessageData, MessageId, ThreadId } from 'types';
+import { MessageData, MessageId, ThreadId, UserInfo } from 'types';
 import { msg } from '../firebase.config';
 import Logger from '../Logger';
-import { fetchUser } from '../utils';
 import constructNoti from './constructNoti';
 import fetchFCMTokensFromUid from './fetchFCMTokens';
 
@@ -16,12 +15,11 @@ const logger = new Logger();
 const sendNoti = async (
 	message: MessageData,
 	threadId: ThreadId,
-	messageId: MessageId
+	messageId: MessageId,
+	members: UserInfo[]
 ) => {
 	const { membersUid, sender } = message;
-	const members = await Promise.all(
-		membersUid.map(async (uid) => await fetchUser(uid))
-	);
+
 	const notSelfUids = membersUid.filter((uid) => uid !== sender.uid);
 	if (notSelfUids.length > 0) {
 		notSelfUids.forEach(async (uid) => {

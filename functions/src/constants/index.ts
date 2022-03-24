@@ -4,3 +4,5 @@ export const DEFAULT_USER_PHOTO_URL =
 export const DEFAULT_USER_DISPLAY_NAME = 'New User';
 export const INVALID_IMAGE_CONTENT_IMAGE_URL =
 	'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg';
+export const DEFAULT_MESSAGE_NAME = 'New conversation';
+export const DEFAULT_SELF_MESSAGE_NAME = 'Message to self';

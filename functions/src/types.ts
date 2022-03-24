@@ -138,7 +138,7 @@ export type ThreadPreviewData = {
 export type ThreadPreviewDataSv = Omit<ThreadPreviewData, 'name'>;
 
 export type MessageId = string;
-export type MessageSender = Omit<UserInfo, 'email'>;
+export type MessageSender = UserInfo;
 export type MessageTime = FirebaseFirestore.Timestamp;
 export type MessageSeenAt = {
 	[key: string]: FirebaseFirestore.Timestamp | null;

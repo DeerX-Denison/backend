@@ -1,7 +1,8 @@
 import * as functions from 'firebase-functions';
-import { MessageData, ThreadPreviewData } from 'types';
+import { DEFAULT_MESSAGE_NAME, DEFAULT_SELF_MESSAGE_NAME } from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
+import { MessageData, ThreadName, ThreadPreviewData, UserInfo } from '../types';
 import { fetchUser } from '../utils';
 import sendNoti from './sendNoti';
 const logger = new Logger();
@@ -17,8 +18,17 @@ const createMessage = functions.https.onCall(
 				'User unauthenticated'
 			);
 		}
-		const sender = await fetchUser(message.sender.uid);
-
+		const { sender, membersUid } = message;
+		const otherMemberUid = membersUid.filter((x) => x !== sender.uid)[0];
+		const otherMember = await fetchUser(otherMemberUid);
+		const name: ThreadName = {};
+		name[sender.uid] = otherMember.displayName
+			? otherMember.displayName
+			: DEFAULT_SELF_MESSAGE_NAME;
+		name[otherMember.uid] = sender.displayName
+			? sender.displayName
+			: DEFAULT_MESSAGE_NAME;
+		const members: UserInfo[] = [sender, otherMember];
 		const newMessage: MessageData = {
 			...message,
 			sender,
@@ -43,6 +53,7 @@ const createMessage = functions.https.onCall(
 			latestTime: newMessage.time,
 			latestSenderUid: newMessage.sender.uid,
 			latestSeenAt: newMessage.seenAt,
+			name,
 		});
 
 		try {
@@ -56,7 +67,7 @@ const createMessage = functions.https.onCall(
 			);
 		}
 		try {
-			await sendNoti(newMessage, threadPreviewData.id, newMessage.id);
+			await sendNoti(newMessage, threadPreviewData.id, newMessage.id, members);
 		} catch (error) {
 			logger.error(error);
 			throw new functions.https.HttpsError(
