@@ -20,15 +20,25 @@ const createMessage = functions.https.onCall(
 		}
 		const { sender, membersUid } = message;
 		const otherMemberUid = membersUid.filter((x) => x !== sender.uid)[0];
-		const otherMember = await fetchUser(otherMemberUid);
+
 		const name: ThreadName = {};
-		name[sender.uid] = otherMember.displayName
-			? otherMember.displayName
-			: DEFAULT_SELF_MESSAGE_NAME;
-		name[otherMember.uid] = sender.displayName
-			? sender.displayName
-			: DEFAULT_MESSAGE_NAME;
-		const members: UserInfo[] = [sender, otherMember];
+		let members: UserInfo[] = [];
+
+		if (otherMemberUid && otherMemberUid.length > 0) {
+			const otherMember = await fetchUser(otherMemberUid);
+
+			name[sender.uid] = otherMember.displayName
+				? otherMember.displayName
+				: DEFAULT_SELF_MESSAGE_NAME;
+			name[otherMember.uid] = sender.displayName
+				? sender.displayName
+				: DEFAULT_MESSAGE_NAME;
+			members = [sender, otherMember];
+		} else {
+			name[sender.uid] = DEFAULT_SELF_MESSAGE_NAME;
+			members = [sender, sender];
+		}
+
 		const newMessage: MessageData = {
 			...message,
 			sender,
