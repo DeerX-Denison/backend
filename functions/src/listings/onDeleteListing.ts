@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { ListingData } from 'types';
-import { storage } from '../firebase.config';
+import { db, storage } from '../firebase.config';
 import Logger from '../Logger';
 
 const logger = new Logger();
@@ -10,6 +10,7 @@ const logger = new Logger();
  * error codes:
  * 0: Document that triggers onDelete does not exist
  * 1: Could not delete image when listing data is deleted
+ * 2: Could not delete wishlist when listing data is deleted
  */
 const onDeleteListing = functions.firestore
 	.document('listings/{listingId}')
@@ -53,6 +54,27 @@ const onDeleteListing = functions.firestore
 				return 'error';
 			}
 
+			const { likedBy } = listingData;
+
+			const batch = db.batch();
+			likedBy.forEach((uid) => {
+				batch.delete(
+					db
+						.collection('users')
+						.doc(uid)
+						.collection('wishlist')
+						.doc(listingData.id)
+				);
+			});
+			try {
+				await batch.commit();
+			} catch (error) {
+				logger.error(
+					`[ERROR 2]: Could not delete wishlist when listing data is deleted: ${context.params.listingId}`
+				);
+				logger.error(error);
+				return 'error';
+			}
 			return 'ok';
 		}
 	);
