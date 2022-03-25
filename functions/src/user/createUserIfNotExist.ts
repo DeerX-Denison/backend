@@ -6,6 +6,7 @@ import {
 } from '../constants';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
+import { getAllSubstrings } from '../utils';
 import userNameAndPhoto from './users.json';
 
 const logger = new Logger();
@@ -22,18 +23,6 @@ type UpdatedUser = {
 // typing of the user file that maps displayName and photoURL
 type UserFile = {
 	[key: string]: { img: string; name: string; email: string };
-};
-
-const getAllSubstrings = (str: string | undefined) => {
-	const substrings: string[] = [];
-	if (str) {
-		for (let i = 0; i < str.length; i++) {
-			for (let j = i + 1; j < str.length + 1; j++) {
-				substrings.push(str.slice(i, j).toLocaleLowerCase());
-			}
-		}
-	}
-	return substrings;
 };
 
 /**

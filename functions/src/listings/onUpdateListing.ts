@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions';
 import { ListingData } from 'types';
+import { db } from '../firebase.config';
 import Logger from '../Logger';
+import { getAllSubstrings } from '../utils';
 import formatListingData from './formatListingData';
 import listingDataChanged from './listingDataChanged';
 import validListingData from './validListingData';
@@ -76,6 +78,48 @@ const onUpdateListing = functions.firestore
 			} catch (error) {
 				logger.error(
 					`[ERROR 3]: Could not delete from storage images that were removed from listing data: ${snapshot.after.id}`
+				);
+				logger.error(error);
+			}
+
+			// update name and searchable keywords on all the people who added the listing to wishlist
+			const oldName = (snapshot.before.data() as ListingData).name;
+			const newName = (snapshot.after.data() as ListingData).name;
+			const oldPrice = (snapshot.before.data() as ListingData).price;
+			const newPrice = (snapshot.after.data() as ListingData).price;
+
+			const batch = db.batch();
+			const { likedBy } = listingData;
+			if (newName !== oldName) {
+				const searchableKeyword = getAllSubstrings(newName);
+				likedBy.forEach((uid) => {
+					batch.update(
+						db
+							.collection('users')
+							.doc(uid)
+							.collection('wishlist')
+							.doc(listingData.id),
+						{ searchableKeyword, name: newName }
+					);
+				});
+			}
+			if (newPrice !== oldPrice) {
+				likedBy.forEach((uid) => {
+					batch.update(
+						db
+							.collection('users')
+							.doc(uid)
+							.collection('wishlist')
+							.doc(listingData.id),
+						{ price: newPrice }
+					);
+				});
+			}
+			try {
+				await batch.commit();
+			} catch (error) {
+				logger.error(
+					`[ERROR 4]: Could not batch update users' wishlist: ${snapshot.after.id}`
 				);
 				logger.error(error);
 			}

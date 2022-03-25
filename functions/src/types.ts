@@ -99,6 +99,7 @@ export type ListingData = {
 	readonly createdAt: FirebaseFirestore.Timestamp | undefined;
 	readonly updatedAt: FirebaseFirestore.Timestamp | undefined;
 	status: ListingStatus;
+	likedBy: string[];
 };
 export type ListingDataCl = ListingData & {
 	createdAt: { _seconds: number; _nanoseconds: number };
@@ -172,16 +173,16 @@ export type ThreadData = ThreadPreviewData & {
 };
 export type ThreadDataSv = ThreadData;
 
-export type WishlistDataSV = {
+export type WishlistData = {
 	id: ListingId;
 	thumbnail: ListingImageURL;
 	name: ListingName;
 	price: ListingPrice;
 	seller: ListingSeller;
 	addedAt: FirebaseFirestore.Timestamp;
+	searchableKeyword: string[];
 };
 
-export type WishlistDataCL = Omit<WishlistDataSV, 'addedAt'>;
 export type UserFCMTokenData = {
 	token: string;
 	device: string;

@@ -20,6 +20,7 @@ const mockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
 	description: 'mock listing description',
 	savedBy: 0,
 	status: 'posted',
+	likedBy: [],
 };
 
 describe('Testing create Listings', () => {

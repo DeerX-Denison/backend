@@ -17,5 +17,5 @@ export { default as deleteFCMToken } from './user/deleteFCMToken';
 export { default as updateFCMToken } from './user/updateFCMToken';
 export { default as createWishlist } from './wishlist/createWishlist';
 export { default as deleteWishlist } from './wishlist/deleteWishlist';
-export { default as onCreateWishlist } from './wishlist/onCreateWishlist';
-export { default as onDeleteWishlist } from './wishlist/onDeleteWishlist';
+// export { default as onCreateWishlist } from './wishlist/onCreateWishlist';
+// export { default as onDeleteWishlist } from './wishlist/onDeleteWishlist';

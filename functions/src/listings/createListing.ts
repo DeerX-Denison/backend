@@ -21,6 +21,7 @@ const createListing = functions.https.onCall(
 			seller,
 			createdAt: svTime() as FirebaseFirestore.Timestamp,
 			updatedAt: svTime() as FirebaseFirestore.Timestamp,
+			likedBy: [],
 		};
 		try {
 			await db.collection('listings').doc(listingData.id).set(newListingData);

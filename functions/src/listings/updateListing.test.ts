@@ -19,6 +19,7 @@ const baseMockListing: ListingData = {
 	status: 'posted',
 	createdAt: new admin.firestore.Timestamp(1000, 1000),
 	updatedAt: new admin.firestore.Timestamp(1000, 1000),
+	likedBy: [],
 };
 
 describe('Testing update listing', () => {

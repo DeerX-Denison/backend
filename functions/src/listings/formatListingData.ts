@@ -24,6 +24,7 @@ const formatListingData: (oldListingData: ListingData) => ListingData = (
 		status: oldListingData.status,
 		createdAt: oldListingData.createdAt,
 		updatedAt: oldListingData.updatedAt,
+		likedBy: oldListingData.likedBy,
 	};
 	return newListingData;
 };
