@@ -1,3 +1,4 @@
+import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { UserPronoun } from 'types';
 import { db } from '../firebase.config';
@@ -24,6 +25,9 @@ const updateUserProfile = functions.https.onCall(
 
 		try {
 			await db.collection('users').doc(context.auth.uid).update(updateValue);
+			if (imageUrl) {
+				await admin.auth().updateUser(context.auth.uid, { photoURL: imageUrl });
+			}
 		} catch (error) {
 			throw new functions.https.HttpsError(
 				'internal',
