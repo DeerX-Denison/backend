@@ -4,6 +4,19 @@ export type UserInfo = {
 	photoURL: string | undefined | null;
 	displayName: string | undefined | null;
 };
+export type UserPronoun = 'HE' | 'HIM' | undefined;
+export type UserProfile = UserInfo & {
+	pronouns: UserPronoun[] | undefined | null;
+	bio: string | null;
+};
+
+export type ProfilePhotoURL = string;
+export type ProfilePhotoMetadata = {
+	uploaderUid: string;
+	imgId: string;
+	resized: 'true' | 'false';
+	contentValidated: 'true' | 'false';
+};
 // Params/Props types list for tabs and stacks
 export type TabsParamList = {
 	Listings: undefined;

@@ -16,6 +16,6 @@ export { default as createFCMToken } from './user/createFCMToken';
 export { default as createUserIfNotExist } from './user/createUserIfNotExist';
 export { default as deleteFCMToken } from './user/deleteFCMToken';
 export { default as updateFCMToken } from './user/updateFCMToken';
-export { default as updateUserPhoto } from './user/updateUserPhoto';
+export { default as updateUserProfile } from './user/updateUserProfile';
 export { default as createWishlist } from './wishlist/createWishlist';
 export { default as deleteWishlist } from './wishlist/deleteWishlist';
