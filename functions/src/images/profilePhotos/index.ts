@@ -1,3 +1,4 @@
+import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { DEFAULT_USER_PHOTO_URL } from '../../constants';
 import { db, storage } from '../../firebase.config';
@@ -81,9 +82,14 @@ const uploadProfileImageHandler = functions.storage
 					await db.collection('users').doc(uid).update({ photoURL });
 				} catch (error) {
 					logger.error(error);
-					logger.error(
-						`[ERROR 1]: Can't update with invalid metadata: ${imageRef}`
-					);
+					logger.error(`[ERROR 1]: Can't update firestore: ${imageRef}`);
+					return 'error';
+				}
+				try {
+					await admin.auth().updateUser(uid, { photoURL: photoURL });
+				} catch (error) {
+					logger.error(error);
+					logger.error(`[ERROR 1]: Can't update user profile: ${imageRef}`);
 					return 'error';
 				}
 				return 'ok';
