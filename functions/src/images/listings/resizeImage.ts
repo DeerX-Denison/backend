@@ -3,9 +3,9 @@ import os from 'os';
 import path from 'path';
 import sharp from 'sharp';
 import { ListingImageMetadata } from 'types';
-import { LISTING_IMAGE_HEIGHT } from '../constants';
-import { storage } from '../firebase.config';
-import Logger from '../Logger';
+import { LISTING_IMAGE_HEIGHT } from '../../constants';
+import { storage } from '../../firebase.config';
+import Logger from '../../Logger';
 
 const logger = new Logger();
 

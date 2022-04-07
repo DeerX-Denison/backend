@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
-import Logger from '../Logger';
-import secrets from '../secrets.json';
+import Logger from '../../Logger';
+import secrets from '../../secrets.json';
 
 const logger = new Logger();
 

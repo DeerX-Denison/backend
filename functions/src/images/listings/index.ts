@@ -1,24 +1,26 @@
 import * as functions from 'firebase-functions';
 import { ListingData, ListingImageMetadata } from 'types';
-import { INVALID_IMAGE_CONTENT_IMAGE_URL } from '../constants';
-import { db, storage } from '../firebase.config';
-import Logger from '../Logger';
+import { INVALID_IMAGE_CONTENT_IMAGE_URL } from '../../constants';
+import { db, storage } from '../../firebase.config';
+import Logger from '../../Logger';
 import resizeImage from './resizeImage';
-import validImageContent from './validImageContent';
+import validImageContent from '../validImageContent';
 import validMetadata from './validMetadata';
 
 const logger = new Logger();
 
 /**
- * function that triggers to verify newly added image has valid metadata. This should prevent malicious user to abuse REST end points to programatically upload image. Normal user that uploads image through the app should pass this function.
+ * function that triggers to verify newly added listing image has valid metadata. This should prevent malicious user to abuse REST end points to programatically upload image. Normal user that uploads image through the app should pass this function.
  */
-const imageUploadHandler = functions.storage
+const uploadListingImageHandler = functions.storage
 	.object()
 	.onFinalize(async (obj: functions.storage.ObjectMetadata) => {
 		const imageRef = obj.id.substring(
 			obj.id.indexOf('/') + 1,
 			obj.id.lastIndexOf('/')
 		);
+		if (imageRef.split('/')[0] !== 'listings') return 'ok';
+
 		const listingId = imageRef.split('/')[1];
 		const imageFile = storage.file(imageRef);
 		const metaRes = await imageFile.getMetadata();
@@ -95,4 +97,4 @@ const imageUploadHandler = functions.storage
 		return 'ok';
 	});
 
-export default imageUploadHandler;
+export default uploadListingImageHandler;

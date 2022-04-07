@@ -1,6 +1,7 @@
+export { default as uploadListingImageHandler } from './images/listings';
+export { default as uploadProfileImageHandler } from './images/profilePhotos';
 export { default as createListing } from './listings/createListing';
 export { default as deleteListing } from './listings/deleteListing';
-export { default as imageUploadHandler } from './listings/imageUploadHandler';
 export { default as onCreateListing } from './listings/onCreateListing';
 export { default as onDeleteListing } from './listings/onDeleteListing';
 export { default as onUpdateListing } from './listings/onUpdateListing';
@@ -17,5 +18,3 @@ export { default as deleteFCMToken } from './user/deleteFCMToken';
 export { default as updateFCMToken } from './user/updateFCMToken';
 export { default as createWishlist } from './wishlist/createWishlist';
 export { default as deleteWishlist } from './wishlist/deleteWishlist';
-// export { default as onCreateWishlist } from './wishlist/onCreateWishlist';
-// export { default as onDeleteWishlist } from './wishlist/onDeleteWishlist';
