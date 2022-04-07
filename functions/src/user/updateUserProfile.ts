@@ -18,7 +18,7 @@ const updateUserProfile = functions.https.onCall(
 		}
 
 		const updateValue: { [key: string]: string | UserPronoun[] } = {};
-		if (imageUrl) updateValue['imageUrl'] = imageUrl;
+		if (imageUrl) updateValue['photoURL'] = imageUrl;
 		if (bio) updateValue['bio'] = bio;
 		if (pronouns) updateValue['pronouns'] = pronouns;
 
