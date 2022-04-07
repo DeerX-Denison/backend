@@ -1,8 +1,15 @@
 import * as functions from 'firebase-functions';
-import { UserProfile } from 'types';
+import { UserPronoun } from 'types';
 import { db } from '../firebase.config';
+
+type Data = {
+	imageUrl: string | undefined;
+	bio: string | undefined;
+	pronouns: UserPronoun[] | undefined;
+};
+
 const updateUserProfile = functions.https.onCall(
-	async (userProfile: UserProfile, context) => {
+	async ({ imageUrl, bio, pronouns }: Data, context) => {
 		if (!context.auth) {
 			throw new functions.https.HttpsError(
 				'unauthenticated',
@@ -10,12 +17,13 @@ const updateUserProfile = functions.https.onCall(
 			);
 		}
 
+		const updateValue: { [key: string]: string | UserPronoun[] } = {};
+		if (imageUrl) updateValue['imageUrl'] = imageUrl;
+		if (bio) updateValue['bio'] = bio;
+		if (pronouns) updateValue['pronouns'] = pronouns;
+
 		try {
-			await db.collection('users').doc(context.auth.uid).update({
-				photoURL: userProfile.photoURL,
-				bio: userProfile.bio,
-				pronouns: userProfile.pronouns,
-			});
+			await db.collection('users').doc(context.auth.uid).update(updateValue);
 		} catch (error) {
 			throw new functions.https.HttpsError(
 				'internal',
