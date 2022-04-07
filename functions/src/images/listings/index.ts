@@ -3,8 +3,8 @@ import { ListingData, ListingImageMetadata } from 'types';
 import { INVALID_IMAGE_CONTENT_IMAGE_URL } from '../../constants';
 import { db, storage } from '../../firebase.config';
 import Logger from '../../Logger';
-import resizeImage from './resizeImage';
 import validImageContent from '../validImageContent';
+import resizeImage from './resizeImage';
 import validMetadata from './validMetadata';
 
 const logger = new Logger();

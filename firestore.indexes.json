@@ -59,6 +59,20 @@
 					"order": "DESCENDING"
 				}
 			]
+		},
+		{
+			"collectionGroup": "wishlist",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "searchableKeyword",
+					"arrayConfig": "CONTAINS"
+				},
+				{
+					"fieldPath": "addedAt",
+					"order": "ASCENDING"
+				}
+			]
 		}
 	],
 	"fieldOverrides": []
