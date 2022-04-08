@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions';
 import { ListingDataCl, UserInfo } from 'types';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
-import { fetchUser } from '../utils';
+import { fetchUserInfo } from '../utils';
 
 const logger = new Logger();
 
@@ -16,7 +16,7 @@ const updateListing = functions.https.onCall(
 				'User unauthenticated'
 			);
 		}
-		const seller: UserInfo = await fetchUser(listingData.seller.uid);
+		const seller: UserInfo = await fetchUserInfo(listingData.seller.uid);
 		const createdAtSeconds = listingData.createdAt?._seconds;
 		const createdAtNanoseconds = listingData.createdAt?._nanoseconds;
 

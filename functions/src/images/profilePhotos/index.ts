@@ -5,7 +5,7 @@ import { db, storage } from '../../firebase.config';
 import Logger from '../../Logger';
 import { ListingImageMetadata, UserInfo } from '../../types';
 import userNameAndPhoto from '../../user/users.json';
-import { fetchUser } from '../../utils';
+import { fetchUserInfo } from '../../utils';
 import resizeImage from '../listings/resizeImage';
 import validImageContent from '../validImageContent';
 import validMetadata from './validMetadata';
@@ -57,7 +57,7 @@ const uploadProfileImageHandler = functions.storage
 				}
 				let userInfo: UserInfo | undefined;
 				try {
-					userInfo = await fetchUser(uid);
+					userInfo = await fetchUserInfo(uid);
 					if (!userInfo) throw 'User info is undefined after fetched';
 				} catch (error) {
 					logger.log(error);

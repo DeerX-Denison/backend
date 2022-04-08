@@ -13,7 +13,7 @@ import {
 	ThreadThumbnail,
 	UserInfo,
 } from '../types';
-import { fetchUser } from '../utils';
+import { fetchUserInfo } from '../utils';
 import sendNoti from './sendNoti';
 const logger = new Logger();
 type Data = {
@@ -36,7 +36,7 @@ const createMessage = functions.https.onCall(
 		let members: UserInfo[] = [];
 
 		if (otherMemberUid && otherMemberUid.length > 0) {
-			const otherMember = await fetchUser(otherMemberUid);
+			const otherMember = await fetchUserInfo(otherMemberUid);
 
 			name[sender.uid] = otherMember.displayName
 				? otherMember.displayName

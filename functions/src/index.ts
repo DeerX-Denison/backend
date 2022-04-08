@@ -15,6 +15,7 @@ export { default as getStripePubKey } from './stripe/getStripePubKey';
 export { default as createFCMToken } from './user/createFCMToken';
 export { default as createUserIfNotExist } from './user/createUserIfNotExist';
 export { default as deleteFCMToken } from './user/deleteFCMToken';
+export { default as getUserProfile } from './user/getUserProfile';
 export { default as updateFCMToken } from './user/updateFCMToken';
 export { default as updateUserProfile } from './user/updateUserProfile';
 export { default as createWishlist } from './wishlist/createWishlist';

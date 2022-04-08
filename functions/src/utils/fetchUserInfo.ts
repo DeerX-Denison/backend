@@ -6,9 +6,9 @@ export type UserData = {
 } & UserInfo;
 
 /**
- * utility function to fetch user info from a given uid
+ * utility function to fetch user info from a given uid, excluding pronouns and bio
  */
-const fetchUser: (uid: string) => Promise<UserInfo> = async (uid) => {
+const fetchUserInfo: (uid: string) => Promise<UserInfo> = async (uid) => {
 	const docSnap = await db.collection('users').doc(uid).get();
 	if (!docSnap.exists) {
 		throw `User not exist: ${uid}`;
@@ -17,4 +17,4 @@ const fetchUser: (uid: string) => Promise<UserInfo> = async (uid) => {
 	const { searchableKeyword, ...userInfo } = docSnap.data() as UserData;
 	return userInfo;
 };
-export default fetchUser;
+export default fetchUserInfo;

@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import { ThreadPreviewData } from 'types';
 import { db, svTime, Timestamp } from '../firebase.config';
-import { fetchUser } from '../utils';
+import { fetchUserInfo } from '../utils';
 
 const createThread = functions.https.onCall(
 	async (threadPreviewData: ThreadPreviewData, context) => {
@@ -13,7 +13,7 @@ const createThread = functions.https.onCall(
 		}
 
 		const members = await Promise.all(
-			threadPreviewData.membersUid.map(async (uid) => await fetchUser(uid))
+			threadPreviewData.membersUid.map(async (uid) => await fetchUserInfo(uid))
 		);
 
 		const newThreadPreviewData: ThreadPreviewData = {

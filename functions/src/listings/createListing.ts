@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import { ListingData, UserInfo } from 'types';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
-import { fetchUser } from '../utils';
+import { fetchUserInfo } from '../utils';
 
 const logger = new Logger();
 
@@ -15,7 +15,7 @@ const createListing = functions.https.onCall(
 			);
 		}
 
-		const seller: UserInfo = await fetchUser(listingData.seller.uid);
+		const seller: UserInfo = await fetchUserInfo(listingData.seller.uid);
 		const newListingData: ListingData = {
 			...listingData,
 			seller,
