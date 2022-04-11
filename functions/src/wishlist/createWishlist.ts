@@ -14,7 +14,7 @@ const createWishlist = functions.https.onCall(
 				'User unauthenticated'
 			);
 		}
-		if (!validWishlistData(wishlistData, context.auth.uid)) {
+		if (!validWishlistData(wishlistData)) {
 			throw new functions.https.HttpsError(
 				'invalid-argument',
 				'invalid wishlist data provided'

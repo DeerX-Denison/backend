@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import { DEFAULT_MESSAGE_NAME, DEFAULT_USER_PHOTO_URL } from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
-import { ThreadPreviewData } from '../types';
+import { ThreadName, ThreadPreviewData, ThreadThumbnail } from '../types';
 import { fetchUserInfo } from '../utils';
 
 const createThread = functions.https.onCall(
@@ -26,8 +26,8 @@ const createThread = functions.https.onCall(
 		);
 
 		// parse updated name and thumbnail from updated members info
-		const name: Record<string, string> = {};
-		const thumbnail: Record<string, string> = {};
+		const name: ThreadName = {};
+		const thumbnail: ThreadThumbnail = {};
 		members.forEach((member) => {
 			const otherMember = members.filter((x) => x.uid !== member.uid)[0];
 			name[member.uid] = otherMember.displayName

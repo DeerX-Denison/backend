@@ -1,11 +1,12 @@
 import * as functions from 'firebase-functions';
+import { ListingData } from 'types';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
 
 const logger = new Logger();
 
 const deleteListing = functions.https.onCall(
-	async (listingId: string, context) => {
+	async (listingData: ListingData, context) => {
 		if (!context.auth) {
 			throw new functions.https.HttpsError(
 				'unauthenticated',
@@ -13,8 +14,15 @@ const deleteListing = functions.https.onCall(
 			);
 		}
 
+		if (context.auth.uid !== listingData.seller.uid) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				`Invoker is not listing's seller: ${context.auth.uid}`
+			);
+		}
+
 		try {
-			await db.collection('listings').doc(listingId).delete();
+			await db.collection('listings').doc(listingData.id).delete();
 		} catch (error) {
 			logger.error(error);
 			throw new functions.https.HttpsError(

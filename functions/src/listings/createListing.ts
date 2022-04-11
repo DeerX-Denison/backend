@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
-import { ListingData, UserInfo } from 'types';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
+import { ListingData, UserInfo } from '../types';
 import { fetchUserInfo } from '../utils';
 
 const logger = new Logger();
@@ -14,8 +14,10 @@ const createListing = functions.https.onCall(
 				'User unauthenticated'
 			);
 		}
-
+		// fetch updated user data
 		const seller: UserInfo = await fetchUserInfo(listingData.seller.uid);
+
+		// create new listing from user input listingData
 		const newListingData: ListingData = {
 			...listingData,
 			seller,
@@ -23,6 +25,8 @@ const createListing = functions.https.onCall(
 			updatedAt: svTime() as FirebaseFirestore.Timestamp,
 			likedBy: [],
 		};
+
+		// update new listing data to db
 		try {
 			await db.collection('listings').doc(listingData.id).set(newListingData);
 		} catch (error) {

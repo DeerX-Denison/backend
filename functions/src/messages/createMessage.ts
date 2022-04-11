@@ -1,9 +1,5 @@
 import * as functions from 'firebase-functions';
-import {
-	DEFAULT_MESSAGE_NAME,
-	DEFAULT_MESSAGE_THUMBNAIL,
-	DEFAULT_SELF_MESSAGE_NAME,
-} from '../constants';
+import { DEFAULT_MESSAGE_NAME, DEFAULT_USER_PHOTO_URL } from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
 import {
@@ -11,7 +7,6 @@ import {
 	ThreadName,
 	ThreadPreviewData,
 	ThreadThumbnail,
-	UserInfo,
 } from '../types';
 import { fetchUserInfo } from '../utils';
 import sendNoti from './sendNoti';
@@ -28,41 +23,30 @@ const createMessage = functions.https.onCall(
 				'User unauthenticated'
 			);
 		}
-		const { sender, membersUid } = message;
-		const otherMemberUid = membersUid.filter((x) => x !== sender.uid)[0];
+
+		// fetch updated members from membersUid
+		const members = await Promise.all(
+			threadPreviewData.membersUid.map(async (uid) => await fetchUserInfo(uid))
+		);
 
 		const name: ThreadName = {};
 		const thumbnail: ThreadThumbnail = {};
-		let members: UserInfo[] = [];
-
-		if (otherMemberUid && otherMemberUid.length > 0) {
-			const otherMember = await fetchUserInfo(otherMemberUid);
-
-			name[sender.uid] = otherMember.displayName
+		members.forEach((member) => {
+			const otherMember = members.filter((x) => x.uid !== member.uid)[0];
+			name[member.uid] = otherMember.displayName
 				? otherMember.displayName
-				: DEFAULT_SELF_MESSAGE_NAME;
-			name[otherMember.uid] = sender.displayName
-				? sender.displayName
 				: DEFAULT_MESSAGE_NAME;
-			thumbnail[sender.uid] = otherMember.photoURL
+			thumbnail[member.uid] = otherMember.photoURL
 				? otherMember.photoURL
-				: DEFAULT_MESSAGE_THUMBNAIL;
-			thumbnail[otherMember.uid] = sender.photoURL
-				? sender.photoURL
-				: DEFAULT_MESSAGE_THUMBNAIL;
-			members = [sender, otherMember];
-		} else {
-			name[sender.uid] = DEFAULT_SELF_MESSAGE_NAME;
-			members = [sender, sender];
-		}
+				: DEFAULT_USER_PHOTO_URL;
+		});
 
 		const newMessage: MessageData = {
 			...message,
-			sender,
 			time: svTime() as Timestamp,
 			seenAt: {
 				...message.seenAt,
-				[sender.uid]: svTime() as Timestamp,
+				[message.sender.uid]: svTime() as Timestamp,
 			},
 		};
 
