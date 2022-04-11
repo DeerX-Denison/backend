@@ -24,11 +24,19 @@ const createMessage = functions.https.onCall(
 			);
 		}
 
+		if (message.membersUid.length !== 2) {
+			throw new functions.https.HttpsError(
+				'invalid-argument',
+				'membersUid does not have length 2'
+			);
+		}
+
 		// fetch updated members from membersUid
 		const members = await Promise.all(
 			threadPreviewData.membersUid.map(async (uid) => await fetchUserInfo(uid))
 		);
 
+		const sender = members.filter((x) => x.uid === context.auth?.uid)[0];
 		const name: ThreadName = {};
 		const thumbnail: ThreadThumbnail = {};
 		members.forEach((member) => {
@@ -43,6 +51,7 @@ const createMessage = functions.https.onCall(
 
 		const newMessage: MessageData = {
 			...message,
+			sender,
 			time: svTime() as Timestamp,
 			seenAt: {
 				...message.seenAt,
