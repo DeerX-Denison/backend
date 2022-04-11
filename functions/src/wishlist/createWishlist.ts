@@ -47,7 +47,6 @@ const createWishlist = functions.https.onCall(
 				.collection('listings')
 				.doc(wishlistData.id)
 				.update({
-					savedBy: admin.firestore.FieldValue.increment(1),
 					likedBy: admin.firestore.FieldValue.arrayUnion(context.auth.uid),
 				});
 		} catch (error) {

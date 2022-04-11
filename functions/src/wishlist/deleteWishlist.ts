@@ -30,7 +30,6 @@ const deleteWishlist = functions.https.onCall(
 				.collection('listings')
 				.doc(listingId)
 				.update({
-					savedBy: admin.firestore.FieldValue.increment(-1),
 					likedBy: admin.firestore.FieldValue.arrayRemove(context.auth.uid),
 				});
 		} catch (error) {
