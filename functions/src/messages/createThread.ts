@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
-import { ThreadPreviewData } from 'types';
+import { DEFAULT_MESSAGE_NAME, DEFAULT_USER_PHOTO_URL } from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
+import { ThreadPreviewData } from '../types';
 import { fetchUserInfo } from '../utils';
 
 const createThread = functions.https.onCall(
@@ -12,13 +13,37 @@ const createThread = functions.https.onCall(
 			);
 		}
 
+		if (threadPreviewData.membersUid.length !== 2) {
+			throw new functions.https.HttpsError(
+				'invalid-argument',
+				'membersUid does not have length 2'
+			);
+		}
+
+		// fetch updated members from membersUid
 		const members = await Promise.all(
 			threadPreviewData.membersUid.map(async (uid) => await fetchUserInfo(uid))
 		);
 
+		// parse updated name and thumbnail from updated members info
+		const name: Record<string, string> = {};
+		const thumbnail: Record<string, string> = {};
+		members.forEach((member) => {
+			const otherMember = members.filter((x) => x.uid !== member.uid)[0];
+			name[member.uid] = otherMember.displayName
+				? otherMember.displayName
+				: DEFAULT_MESSAGE_NAME;
+			thumbnail[member.uid] = otherMember.photoURL
+				? otherMember.photoURL
+				: DEFAULT_USER_PHOTO_URL;
+		});
+
+		// update new thread preview data to db
 		const newThreadPreviewData: ThreadPreviewData = {
 			...threadPreviewData,
 			members,
+			name,
+			thumbnail,
 			latestTime: svTime() as Timestamp,
 		};
 
