@@ -28,14 +28,31 @@ const createThread = functions.https.onCall(
 		// parse updated name and thumbnail from updated members info
 		const name: ThreadName = {};
 		const thumbnail: ThreadThumbnail = {};
+
 		members.forEach((member) => {
-			const otherMember = members.filter((x) => x.uid !== member.uid)[0];
-			name[member.uid] = otherMember.displayName
-				? otherMember.displayName
-				: DEFAULT_MESSAGE_NAME;
-			thumbnail[member.uid] = otherMember.photoURL
-				? otherMember.photoURL
-				: DEFAULT_USER_PHOTO_URL;
+			const otherMembers = members.filter((x) => x.uid !== member.uid);
+			if (otherMembers.length > 0) {
+				const otherMember = otherMembers[0];
+				name[member.uid] = otherMember.displayName
+					? otherMember.displayName
+					: DEFAULT_MESSAGE_NAME;
+				thumbnail[member.uid] = otherMember.photoURL
+					? otherMember.photoURL
+					: DEFAULT_USER_PHOTO_URL;
+			} else if (otherMembers.length === 0) {
+				const self = members.filter((x) => x.uid === context.auth?.uid)[0];
+				name[self.uid] = self.displayName
+					? self.displayName
+					: DEFAULT_MESSAGE_NAME;
+				thumbnail[self.uid] = self.photoURL
+					? self.photoURL
+					: DEFAULT_USER_PHOTO_URL;
+			} else {
+				throw new functions.https.HttpsError(
+					'invalid-argument',
+					'other members length is < 0'
+				);
+			}
 		});
 
 		// update new thread preview data to db
