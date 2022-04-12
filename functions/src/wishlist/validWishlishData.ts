@@ -9,7 +9,6 @@ const validType: (wishlistData: WishlistData) => boolean = (wishlistData) => {
 	if (typeof wishlistData.id !== 'string') return false;
 
 	// valid image array
-
 	if (typeof wishlistData.thumbnail !== 'string') return false;
 	if (!wishlistData.thumbnail.startsWith('http')) return false;
 	if (

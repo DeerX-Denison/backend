@@ -20,7 +20,6 @@ const formatListingData: (oldListingData: ListingData) => ListingData = (
 		},
 		condition: oldListingData.condition,
 		description: oldListingData.description.trim(),
-		savedBy: oldListingData.savedBy,
 		status: oldListingData.status,
 		createdAt: oldListingData.createdAt,
 		updatedAt: oldListingData.updatedAt,

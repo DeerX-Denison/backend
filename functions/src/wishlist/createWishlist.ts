@@ -14,6 +14,7 @@ const createWishlist = functions.https.onCall(
 				'User unauthenticated'
 			);
 		}
+		wishlistData['searchableKeyword'] = getAllSubstrings(wishlistData.name);
 		if (!validWishlistData(wishlistData)) {
 			throw new functions.https.HttpsError(
 				'invalid-argument',

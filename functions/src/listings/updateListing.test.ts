@@ -15,7 +15,6 @@ const baseMockListing: ListingData = {
 	seller,
 	condition: 'BARELY FUNCTIONAL',
 	description: 'mock listing description',
-	savedBy: 0,
 	status: 'posted',
 	createdAt: new admin.firestore.Timestamp(1000, 1000),
 	updatedAt: new admin.firestore.Timestamp(1000, 1000),
