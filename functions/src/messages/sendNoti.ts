@@ -24,6 +24,7 @@ const sendNoti = async (
 	if (notSelfUids.length > 0) {
 		notSelfUids.forEach(async (uid) => {
 			const tokensData = await fetchFCMTokensFromUid(uid);
+			if (tokensData.length === 0) return;
 			const tokens = tokensData.map((tokenData) => tokenData.token);
 			const noti = constructNoti(message, tokens, members, uid);
 			try {
@@ -33,6 +34,7 @@ const sendNoti = async (
 				logger.log(`failureCount: ${failureCount}`);
 				logger.log(responses);
 			} catch (error) {
+				logger.log(error);
 				throw logger.error(
 					`[ERROR 1]: Can't send notification to all receivers: ${threadId}/${messageId}`
 				);
