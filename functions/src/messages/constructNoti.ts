@@ -10,7 +10,7 @@ const constructNoti = (
 	members: UserInfo[],
 	uid: string
 ) => {
-	if (message.contentType === 'text') {
+	if (message.contentType.includes('text')) {
 		const title = message.threadName[uid];
 		const body = message.content;
 		const noti: messaging.MulticastMessage = {

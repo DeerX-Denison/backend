@@ -160,6 +160,27 @@ export type MessageSeenAt = {
 //add below more further on: image, listing reference, etc.
 export type MessageContentType = 'text';
 export type MessageContent = string;
+export type MessageReferenceData = {
+	begin: number;
+	end: number;
+	data: {
+		id: ListingId;
+		thumbnail: ListingImageURL;
+	};
+};
+export type InputTextRef = {
+	begin: number;
+	end: number;
+	data: Omit<WishlistData, 'addedAt' | 'searchableKeyword'>;
+};
+export type TextSelection = {
+	start: number;
+	end: number;
+};
+export type WithinRef = {
+	isWithinRef: boolean;
+	whichRef: InputTextRef | undefined;
+};
 export type MessageData = {
 	id: MessageId;
 	sender: MessageSender;
@@ -169,6 +190,7 @@ export type MessageData = {
 	membersUid: string[];
 	threadName: ThreadName;
 	seenAt: MessageSeenAt;
+	refs: MessageReferenceData[];
 };
 export type MessageBlockData = {
 	id: MessageId;
