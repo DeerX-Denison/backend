@@ -29,6 +29,7 @@ const resizeImage: (imageRef: string) => Promise<void> = async (imageRef) => {
 	try {
 		newImageBuffer = await sharp(imageBuffer)
 			.resize({ height: LISTING_IMAGE_HEIGHT })
+			.jpeg()
 			.toBuffer();
 	} catch (error) {
 		throw logger.error(
