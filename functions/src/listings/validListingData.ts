@@ -25,6 +25,7 @@ const validType: (ListingData: ListingData) => boolean = (listingData) => {
 		)
 			return false;
 	}
+	if (listingData.images.length > 5) return false;
 
 	// valid name
 	if (typeof listingData.name !== 'string') return false;
