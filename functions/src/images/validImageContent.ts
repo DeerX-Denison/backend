@@ -31,10 +31,10 @@ const validDetection: (
 ) => boolean = (detections) => {
 	let valid = true;
 	switch (detections.adult) {
-		case 'LIKELY':
-			logger.log('LIKELY ADULT CONTENT');
-			valid = false;
-			break;
+		// case 'LIKELY':
+		// 	logger.log('LIKELY ADULT CONTENT');
+		// 	valid = false;
+		// 	break;
 		case 'VERY_LIKELY':
 			logger.log('VERY_LIKELY ADULT CONTENT');
 			valid = false;
@@ -43,10 +43,10 @@ const validDetection: (
 			break;
 	}
 	switch (detections.spoof) {
-		case 'LIKELY':
-			logger.log('LIKELY SPOOF CONTENT');
-			valid = false;
-			break;
+		// case 'LIKELY':
+		// 	logger.log('LIKELY SPOOF CONTENT');
+		// 	valid = false;
+		// 	break;
 		case 'VERY_LIKELY':
 			logger.log('VERY_LIKELY SPOOF CONTENT');
 			valid = false;
@@ -55,10 +55,10 @@ const validDetection: (
 			break;
 	}
 	switch (detections.medical) {
-		case 'LIKELY':
-			logger.log('LIKELY MEDICAL CONTENT');
-			valid = false;
-			break;
+		// case 'LIKELY':
+		// 	logger.log('LIKELY MEDICAL CONTENT');
+		// 	valid = false;
+		// 	break;
 		case 'VERY_LIKELY':
 			logger.log('VERY_LIKELY MEDICAL CONTENT');
 			valid = false;
@@ -67,10 +67,10 @@ const validDetection: (
 			break;
 	}
 	switch (detections.violence) {
-		case 'POSSIBLE':
-			logger.log('POSSIBLE VIOLENCE CONTENT');
-			valid = false;
-			break;
+		// case 'POSSIBLE':
+		// 	logger.log('POSSIBLE VIOLENCE CONTENT');
+		// 	valid = false;
+		// 	break;
 		case 'LIKELY':
 			logger.log('LIKELY VIOLENCE CONTENT');
 			valid = false;
@@ -83,10 +83,10 @@ const validDetection: (
 			break;
 	}
 	switch (detections.racy) {
-		case 'LIKELY':
-			logger.log('LIKELY RACY CONTENT');
-			valid = false;
-			break;
+		// case 'LIKELY':
+		// 	logger.log('LIKELY RACY CONTENT');
+		// 	valid = false;
+		// 	break;
 		case 'VERY_LIKELY':
 			logger.log('VERY_LIKELY RACY CONTENT');
 			valid = false;
@@ -113,6 +113,7 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 		const res = await imageFile.getMetadata();
 		imageMetadata = res[0].metadata;
 	} catch (error) {
+		logger.error(error);
 		throw logger.error(`[ERROR 0]: Can't fetch metadata: ${imageRef}`);
 	}
 
@@ -125,6 +126,7 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 	try {
 		await imageFile.download({ destination: imagePath, validation: false });
 	} catch (error) {
+		logger.error(error);
 		throw logger.error(
 			`[ERROR 1]: Cant' download image to temp path: ${imageRef}`
 		);
@@ -139,6 +141,7 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 		const [result] = await client.safeSearchDetection(imagePath);
 		detections = result.safeSearchAnnotation;
 	} catch (error) {
+		logger.error(error);
 		throw logger.error(`[ERROR 2]: Can't validate input image: ${imageRef}`);
 	}
 	if (!detections) {
