@@ -14,6 +14,14 @@ const createListing = functions.https.onCall(
 				'User unauthenticated'
 			);
 		}
+
+		if (context.auth.uid !== listingData.seller.uid) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				`Invoker is not listing's seller: ${context.auth.uid}`
+			);
+		}
+
 		// fetch updated user data
 		const seller: UserInfo = await fetchUserInfo(listingData.seller.uid);
 
@@ -29,6 +37,7 @@ const createListing = functions.https.onCall(
 		// update new listing data to db
 		try {
 			await db.collection('listings').doc(listingData.id).set(newListingData);
+			logger.log(`Created listing: ${listingData.id}`);
 		} catch (error) {
 			logger.error(error);
 			throw new functions.https.HttpsError(
