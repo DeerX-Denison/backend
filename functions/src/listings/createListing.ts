@@ -39,7 +39,6 @@ const createListing = functions.https.onCall(
 			await db.collection('listings').doc(listingData.id).set(newListingData);
 			logger.log(`Created listing: ${listingData.id}`);
 		} catch (error) {
-			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
 				'Fail to create new listing',

@@ -112,6 +112,7 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 	try {
 		const res = await imageFile.getMetadata();
 		imageMetadata = res[0].metadata;
+		logger.log(`Fetched image metadata for content validation: ${imageRef}`);
 	} catch (error) {
 		logger.error(error);
 		throw logger.error(`[ERROR 0]: Can't fetch metadata: ${imageRef}`);
@@ -125,6 +126,7 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 	// download image to temp path
 	try {
 		await imageFile.download({ destination: imagePath, validation: false });
+		logger.log(`Read downloaded image for validation: ${imageRef}`);
 	} catch (error) {
 		logger.error(error);
 		throw logger.error(
@@ -139,6 +141,7 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 	try {
 		const client = new vision.ImageAnnotatorClient();
 		const [result] = await client.safeSearchDetection(imagePath);
+		logger.log(`Validated images: ${imageRef}`);
 		detections = result.safeSearchAnnotation;
 	} catch (error) {
 		logger.error(error);
@@ -149,7 +152,6 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 	}
 
 	if (!validDetection(detections)) {
-		logger.log('Invalid image content');
 		return false;
 	}
 
@@ -161,6 +163,7 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 				contentValidated: 'true',
 			} as ListingImageMetadata,
 		});
+		logger.log(`Updated image with validated image: ${imageRef}`);
 	} catch (error) {
 		throw logger.error(
 			`[ERROR 4]: Can't set metadata of validated image to cloud storage: ${imageRef}`

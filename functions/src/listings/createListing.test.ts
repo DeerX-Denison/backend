@@ -46,15 +46,9 @@ describe('Testing create Listings', () => {
 
 	it('empty id', async () => {
 		mockListing['id'] = '';
-		// suppress console.error, since console.error is expected to run
-		const mockConsoleError = jest
-			.spyOn(console, 'error')
-			.mockImplementation(jest.fn());
 		await expect(
 			wrapped(mockListing, { auth: mockListing.seller })
 		).rejects.toEqual(new Error('Fail to create new listing'));
-		expect(mockConsoleError).toHaveBeenCalledTimes(1);
-		jest.spyOn(console, 'error').mockRestore();
 	});
 	it.todo('invalid image url');
 	it.todo('empty name');

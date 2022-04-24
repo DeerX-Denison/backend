@@ -1,5 +1,7 @@
 import { UserInfo } from 'types';
 import { db } from '../firebase.config';
+import Logger from '../Logger';
+const logger = new Logger();
 
 export type UserData = {
 	searchableKeyword: string[];
@@ -13,6 +15,7 @@ const fetchUserInfo: (uid: string) => Promise<UserInfo> = async (uid) => {
 	if (!docSnap.exists) {
 		throw `User not exist: ${uid}`;
 	}
+	logger.log(`Fetched user info: ${uid}`);
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { searchableKeyword, ...userInfo } = docSnap.data() as UserData;
 	return userInfo;

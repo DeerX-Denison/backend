@@ -10,18 +10,22 @@ const logger = new Logger();
 const updateListing = functions.https.onCall(
 	async (listingData: ListingDataCl, context) => {
 		if (!context.auth) {
-			logger.error('User unauthenticated');
 			throw new functions.https.HttpsError(
 				'unauthenticated',
 				'User unauthenticated'
 			);
 		}
+		if (context.auth.uid !== listingData.seller.uid) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				`Invoker is not listing's seller: ${context.auth.uid}`
+			);
+		}
+
 		const seller: UserInfo = await fetchUserInfo(listingData.seller.uid);
 		const createdAtSeconds = listingData.createdAt?._seconds;
 		const createdAtNanoseconds = listingData.createdAt?._nanoseconds;
-
 		if (!createdAtSeconds || !createdAtNanoseconds) {
-			logger.error('listing data time created was missing');
 			throw new functions.https.HttpsError(
 				'failed-precondition',
 				'listing data time created was missing'
@@ -41,8 +45,8 @@ const updateListing = functions.https.onCall(
 				.collection('listings')
 				.doc(listingData.id)
 				.update(updatedListing);
+			logger.log(`Updated listing data: ${listingData.id}`);
 		} catch (error) {
-			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
 				'Fail to update listing',

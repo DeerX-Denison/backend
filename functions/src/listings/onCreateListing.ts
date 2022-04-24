@@ -7,33 +7,28 @@ import validListingData from './validListingData';
 const logger = new Logger();
 /**
  * handles when a listing document is created. Validate => format => resize
- * error codes:
- * 0: Document snapshot that triggers onCreate does not exist
- * 1: Could not delete document when listing data is invalid
- * 2: Could not update document when listing data is formatted
- * 3: Could not resize images
- * 4: Could not update document when image is resized
  */
 const onCreateListing = functions.firestore
 	.document('listings/{listingId}')
 	.onCreate(async (snapshot: functions.firestore.QueryDocumentSnapshot) => {
 		if (!snapshot.exists) {
-			return logger.error(
+			logger.error(
 				`[ERROR 0]: Document snapshot that triggers onCreate does not exist: ${snapshot.id}`
 			);
+			return 'error';
 		}
 		const listingData = snapshot.data() as ListingData;
 
 		// validate data, if not => delete
 		if (!validListingData(listingData)) {
 			try {
-				logger.log('Invalid listing data');
 				await snapshot.ref.delete();
+				logger.log(`Invalid listing data, deleted: ${listingData.id}`);
 			} catch (error) {
+				logger.error(error);
 				logger.error(
 					`[ERROR 1]: Could not delete document when listing data is invalid: ${snapshot.id}`
 				);
-				logger.error(error);
 				return 'error';
 			}
 		}
@@ -43,11 +38,12 @@ const onCreateListing = functions.firestore
 		if (listingDataChanged(listingData, newListingData)) {
 			try {
 				await snapshot.ref.set(newListingData);
+				logger.log(`Listing data formatted: ${listingData.id}`);
 			} catch (error) {
+				logger.error(error);
 				logger.error(
 					`[ERROR 2]: Could not update document when listing data is formatted: ${snapshot.id}`
 				);
-				logger.error(error);
 				return 'error';
 			}
 		}

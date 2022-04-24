@@ -7,10 +7,6 @@ const logger = new Logger();
 
 /**
  * handles when a listing document is deleted
- * error codes:
- * 0: Document that triggers onDelete does not exist
- * 1: Could not delete image when listing data is deleted
- * 2: Could not delete wishlist when listing data is deleted
  */
 const onDeleteListing = functions.firestore
 	.document('listings/{listingId}')
@@ -38,19 +34,20 @@ const onDeleteListing = functions.firestore
 					imagesRef.map(async (imageRef) => {
 						try {
 							await storage.file(imageRef).delete();
+							logger.log(`Deleted image: ${imageRef}`);
 						} catch (error) {
-							logger.error(
+							logger.error(error);
+							throw logger.error(
 								`[ERROR 1]: Could not delete image when listing data is deleted: ${imageRef}`
 							);
-							throw logger.error(error);
 						}
 					})
 				);
 			} catch (error) {
+				logger.error(error);
 				logger.error(
 					`[ERROR 1]: Could not delete image when listing data is deleted: ${context.params.listingId}`
 				);
-				logger.error(error);
 				return 'error';
 			}
 
@@ -68,11 +65,12 @@ const onDeleteListing = functions.firestore
 			});
 			try {
 				await batch.commit();
+				logger.log(`Updated user's wishlist data: [${likedBy.join(', ')}]`);
 			} catch (error) {
+				logger.error(error);
 				logger.error(
 					`[ERROR 2]: Could not delete wishlist when listing data is deleted: ${context.params.listingId}`
 				);
-				logger.error(error);
 				return 'error';
 			}
 			return 'ok';
