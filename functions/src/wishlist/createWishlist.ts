@@ -35,7 +35,9 @@ const createWishlist = functions.https.onCall(
 				.collection('wishlist')
 				.doc(wishlistData.id)
 				.set(newWishlistData);
+			logger.log(`Added to wishlist: ${context.auth.uid}/${wishlistData.id}`);
 		} catch (error) {
+			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
 				'Fail to add listing to wishlist',
@@ -50,10 +52,14 @@ const createWishlist = functions.https.onCall(
 				.update({
 					likedBy: admin.firestore.FieldValue.arrayUnion(context.auth.uid),
 				});
+			logger.log(`Updated listing likedBy: ${wishlistData.id}`);
 		} catch (error) {
-			logger.error(`[ERROR 2]: Can't increment listing's savedBy value`);
 			logger.error(error);
-			return 'error';
+			throw new functions.https.HttpsError(
+				'internal',
+				`Can't increment listing's savedBy value: ${wishlistData.id}`,
+				error
+			);
 		}
 
 		return 'ok';

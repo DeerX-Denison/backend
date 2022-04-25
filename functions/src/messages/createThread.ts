@@ -1,8 +1,10 @@
 import * as functions from 'firebase-functions';
 import { DEFAULT_MESSAGE_NAME, DEFAULT_USER_PHOTO_URL } from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
+import Logger from '../Logger';
 import { ThreadName, ThreadPreviewData, ThreadThumbnail } from '../types';
 import { fetchUserInfo } from '../utils';
+const logger = new Logger();
 
 const createThread = functions.https.onCall(
 	async (threadPreviewData: ThreadPreviewData, context) => {
@@ -17,6 +19,20 @@ const createThread = functions.https.onCall(
 			throw new functions.https.HttpsError(
 				'invalid-argument',
 				'membersUid does not have length 2'
+			);
+		}
+
+		if (!threadPreviewData.membersUid.includes(context.auth.uid)) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				"Invoker is not thread's member"
+			);
+		}
+
+		if (!threadPreviewData.id.includes(context.auth.uid)) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				"Invoker is not thread's member (id)"
 			);
 		}
 
@@ -69,6 +85,7 @@ const createThread = functions.https.onCall(
 				.collection('threads')
 				.doc(threadPreviewData.id)
 				.set(newThreadPreviewData);
+			logger.log(`Created new thread: ${threadPreviewData.id}`);
 		} catch (error) {
 			throw new functions.https.HttpsError(
 				'internal',

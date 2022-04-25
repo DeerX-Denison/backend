@@ -1,5 +1,8 @@
 import * as functions from 'firebase-functions';
 import { db, svTime } from '../firebase.config';
+import Logger from '../Logger';
+const logger = new Logger();
+
 type Data = {
 	deviceId: string;
 	token: string;
@@ -22,7 +25,9 @@ const updateFCMToken = functions.https.onCall(
 					token,
 					updatedAt: svTime(),
 				});
+			logger.log(`Updated FCM Token: ${context.auth.uid}/${deviceId}`);
 		} catch (error) {
+			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
 				'Fail to update fcm token',

@@ -30,11 +30,13 @@ const uploadProfileImageHandler = functions.storage
 		const uid = imageRef.split('/')[1];
 		const imageFile = storage.file(imageRef);
 		const metaRes = await imageFile.getMetadata();
+		logger.log(`Fetched image metadata: ${imageRef}`);
 		const imageMetadata: ListingImageMetadata = metaRes[0].metadata;
 
 		if (!validMetadata(obj)) {
 			try {
 				await storage.file(imageRef).delete();
+				logger.log(`Deleted image: ${imageRef}`);
 			} catch (error) {
 				logger.error(error);
 				logger.error(
@@ -49,6 +51,7 @@ const uploadProfileImageHandler = functions.storage
 			if (!(await validImageContent(imageRef))) {
 				try {
 					await storage.file(imageRef).delete();
+					logger.log(`Invalid image content, deleted: ${imageRef}`);
 				} catch (error) {
 					logger.error(
 						`[ERROR 1]: Can't delete image with invalid content: ${imageRef}`
@@ -60,7 +63,7 @@ const uploadProfileImageHandler = functions.storage
 					userInfo = await fetchUserInfo(uid);
 					if (!userInfo) throw 'User info is undefined after fetched';
 				} catch (error) {
-					logger.log(error);
+					logger.error(error);
 					logger.error(`[ERROR 2]: Can't fetch user with uid: ${uid}`);
 					return 'error';
 				}
@@ -80,16 +83,20 @@ const uploadProfileImageHandler = functions.storage
 
 				try {
 					await db.collection('users').doc(uid).update({ photoURL });
+					logger.log(`Updated user profile photo in database: ${imageRef}`);
 				} catch (error) {
 					logger.error(error);
-					logger.error(`[ERROR 1]: Can't update firestore: ${imageRef}`);
+					logger.error(`[ERROR 3]: Can't update firestore: ${imageRef}`);
 					return 'error';
 				}
 				try {
 					await admin.auth().updateUser(uid, { photoURL: photoURL });
+					logger.log(`Updated user profile photo in firebase: ${imageRef}`);
 				} catch (error) {
 					logger.error(error);
-					logger.error(`[ERROR 1]: Can't update user profile: ${imageRef}`);
+					logger.error(
+						`[ERROR 4]: Can't update user profile in firebase: ${imageRef}`
+					);
 					return 'error';
 				}
 				return 'ok';
@@ -99,8 +106,9 @@ const uploadProfileImageHandler = functions.storage
 		if (imageMetadata.resized === 'false') {
 			try {
 				await resizeImage(imageRef);
+				logger.log(`Successfully resized image: ${imageRef}`);
 			} catch (error) {
-				logger.error(`[ERROR 4]: Can't resize image: ${imageRef}`);
+				logger.error(`[ERROR 5]: Can't resize image: ${imageRef}`);
 				return 'error';
 			}
 		}

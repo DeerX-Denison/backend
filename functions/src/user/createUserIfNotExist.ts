@@ -136,10 +136,11 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 	if (!docSnap.exists) {
 		try {
 			await db.collection('users').doc(context.auth.uid).set(updatedUser);
+			logger.log(`Created user: ${context.auth.uid}`);
 			return 'created';
 		} catch (error) {
-			logger.error('Fail to create user in database');
 			logger.error(error);
+			logger.error('Fail to create user in database');
 			return 'error';
 		}
 	} else {
@@ -147,10 +148,11 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 		if (userNeedsUpdate(user)) {
 			try {
 				await db.collection('users').doc(context.auth.uid).set(updatedUser);
+				logger.log(`Updated user: ${context.auth.uid}`);
 				return 'updated';
 			} catch (error) {
-				logger.error('Fail to update user in database');
 				logger.log(error);
+				logger.error('Fail to update user in database');
 				return 'error';
 			}
 		} else {

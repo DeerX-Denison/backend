@@ -23,8 +23,8 @@ const deleteListing = functions.https.onCall(
 
 		try {
 			await db.collection('listings').doc(listingData.id).delete();
+			logger.log(`Deleted listing: ${listingData.id}`);
 		} catch (error) {
-			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
 				'Fail to delete listing',

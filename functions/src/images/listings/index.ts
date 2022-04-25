@@ -24,11 +24,15 @@ const uploadListingImageHandler = functions.storage
 		const listingId = imageRef.split('/')[1];
 		const imageFile = storage.file(imageRef);
 		const metaRes = await imageFile.getMetadata();
+		logger.log(
+			`Fetched image metadata for content validation and resize: ${imageRef}`
+		);
 		const imageMetadata: ListingImageMetadata = metaRes[0].metadata;
 
 		if (!validMetadata(obj)) {
 			try {
 				await storage.file(imageRef).delete();
+				logger.log(`Deleted image: ${imageRef}`);
 			} catch (error) {
 				logger.error(
 					`[ERROR 0]: Can't delete image with invalid metadata: ${imageRef}`
@@ -42,6 +46,7 @@ const uploadListingImageHandler = functions.storage
 			if (!(await validImageContent(imageRef))) {
 				try {
 					await storage.file(imageRef).delete();
+					logger.log(`Invalid image content, deleted: ${imageRef}`);
 				} catch (error) {
 					logger.error(
 						`[ERROR 1]: Can't delete image with invalid content: ${imageRef}`
@@ -52,9 +57,15 @@ const uploadListingImageHandler = functions.storage
 				let images: string[];
 				try {
 					const docSnap = await db.collection('listings').doc(listingId).get();
-					const listingData = docSnap.data() as ListingData;
-					images = listingData.images;
+					if (docSnap.exists) {
+						const listingData = docSnap.data() as ListingData;
+						images = listingData.images;
+						logger.log(`Fetch current listing data's images: ${imageRef}`);
+					} else {
+						throw `DocSnap does not exist: ${listingId}`;
+					}
 				} catch (error) {
+					logger.log(error);
 					logger.error(`[ERROR 2]: Can't fetch current listing data to update`);
 					return 'error';
 				}
@@ -75,9 +86,10 @@ const uploadListingImageHandler = functions.storage
 						.collection('listings')
 						.doc(listingId)
 						.update({ images: newImages });
+					logger.log(`Updated content validated image: ${imageRef}`);
 				} catch (error) {
 					logger.error(
-						`[ERROR 3]: Can't udpate current listing data with updated images`
+						`[ERROR 3]: Can't update current listing data with updated images`
 					);
 					return 'error';
 				}
@@ -88,6 +100,7 @@ const uploadListingImageHandler = functions.storage
 		if (imageMetadata.resized === 'false') {
 			try {
 				await resizeImage(imageRef);
+				logger.log(`Successfully resized image: ${imageRef}`);
 			} catch (error) {
 				logger.error(`[ERROR 4]: Can't resize image: ${imageRef}`);
 				return 'error';

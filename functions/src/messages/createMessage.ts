@@ -30,6 +30,19 @@ const createMessage = functions.https.onCall(
 				'membersUid does not have length 2'
 			);
 		}
+		if (!threadPreviewData.membersUid.includes(context.auth.uid)) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				"Invoker is not thread's member"
+			);
+		}
+
+		if (!threadPreviewData.id.includes(context.auth.uid)) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				"Invoker is not thread's member (id)"
+			);
+		}
 
 		// fetch updated members from membersUid
 		const members = await Promise.all(
@@ -95,16 +108,22 @@ const createMessage = functions.https.onCall(
 
 		try {
 			await batch.commit();
+			logger.log(
+				`Created message and updated thread preview data: ${threadPreviewData.id}/${newMessage.id}`
+			);
 		} catch (error) {
 			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
-				`Fail to create new message with id: ${newMessage.id}`,
+				`Fail to create new message and update thread preview data: ${threadPreviewData.id}/${newMessage.id}`,
 				error
 			);
 		}
 		try {
 			await sendNoti(newMessage, threadPreviewData.id, newMessage.id, members);
+			logger.log(
+				`Sent notification to [${members.map((x) => x.uid).join(', ')}]`
+			);
 		} catch (error) {
 			logger.error(error);
 			throw new functions.https.HttpsError(

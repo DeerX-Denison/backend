@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { ListingData } from 'types';
-import { db } from '../firebase.config';
+import { db, storage } from '../firebase.config';
 import Logger from '../Logger';
 import { getAllSubstrings } from '../utils';
 import formatListingData from './formatListingData';
@@ -11,19 +11,13 @@ const logger = new Logger();
 
 /**
  * handles when a listing document is created
- * error codes:
- * 0: After document snapshot that triggers onUpdate does not exist
- * 1: Could not delete document when listing data is invalid
- * 2: Could not update document when listing data is formatted
- * 3: Could not delete from storage images that were removed from listing data
- * 4: Could not resize images
- * 5: Could not update document when image is resized
  */
 const onUpdateListing = functions.firestore
 	.document('listings/{listingId}')
 	.onUpdate(
 		async (
-			snapshot: functions.Change<functions.firestore.QueryDocumentSnapshot>
+			snapshot: functions.Change<functions.firestore.QueryDocumentSnapshot>,
+			context: functions.EventContext
 		) => {
 			if (!snapshot.after.exists) {
 				logger.error(
@@ -36,13 +30,13 @@ const onUpdateListing = functions.firestore
 			// validate data, if not => delete
 			if (!validListingData(listingData)) {
 				try {
-					logger.log('Invalid listing data');
-					return await snapshot.after.ref.delete();
+					await snapshot.after.ref.delete();
+					logger.log(`Invalid listing data, deleted: ${listingData.id}`);
 				} catch (error) {
+					logger.error(error);
 					logger.error(
 						`[ERROR 1]: Could not delete document when listing data is invalid: ${snapshot.after.id}`
 					);
-					logger.error(error);
 					return 'error';
 				}
 			}
@@ -52,12 +46,13 @@ const onUpdateListing = functions.firestore
 			if (listingDataChanged(listingData, newListingData)) {
 				try {
 					await snapshot.after.ref.set(newListingData);
+					logger.log(`Listing data formatted: ${listingData.id}`);
 					return;
 				} catch (error) {
+					logger.error(error);
 					logger.error(
 						`[ERROR 2]: Could not update document when listing data is formatted: ${snapshot.after.id}`
 					);
-					logger.error(error);
 					return 'error';
 				}
 			}
@@ -68,18 +63,31 @@ const onUpdateListing = functions.firestore
 			const deletedImagesUrl = oldImagesUrl.filter(
 				(url) => !newImagesUrl.includes(url)
 			);
+			const deletedImageRef = deletedImagesUrl.map((imageUrl) =>
+				imageUrl
+					.substring(imageUrl.lastIndexOf('/') + 1, imageUrl.lastIndexOf('?'))
+					.replace(/%2F/g, '/')
+			);
 			try {
-				deletedImagesUrl.forEach(async (imageUrl) => {
-					const imageRef = imageUrl
-						.substring(imageUrl.lastIndexOf('/') + 1, imageUrl.lastIndexOf('?'))
-						.replace(/%2F/g, '/');
-					logger.log(imageRef);
-				});
-			} catch (error) {
-				logger.error(
-					`[ERROR 3]: Could not delete from storage images that were removed from listing data: ${snapshot.after.id}`
+				await Promise.all(
+					deletedImageRef.map(async (imageRef) => {
+						try {
+							await storage.file(imageRef).delete();
+							logger.log(`Deleted image: ${imageRef}`);
+						} catch (error) {
+							logger.error(error);
+							throw logger.error(
+								`[ERROR 3]: Could not delete image when listing data is deleted: ${imageRef}`
+							);
+						}
+					})
 				);
+			} catch (error) {
 				logger.error(error);
+				logger.error(
+					`[ERROR 3]: Could not delete image when listing data is deleted: ${context.params.listingId}`
+				);
+				return 'error';
 			}
 
 			// update name and searchable keywords on all the people who added the listing to wishlist
@@ -117,11 +125,12 @@ const onUpdateListing = functions.firestore
 			}
 			try {
 				await batch.commit();
+				logger.log(`Updated user's wishlist data: [${likedBy.join(', ')}]`);
 			} catch (error) {
+				logger.error(error);
 				logger.error(
 					`[ERROR 4]: Could not batch update users' wishlist: ${snapshot.after.id}`
 				);
-				logger.error(error);
 			}
 			return 'ok';
 		}

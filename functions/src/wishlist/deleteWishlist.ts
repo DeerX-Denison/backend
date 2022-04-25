@@ -18,7 +18,9 @@ const deleteWishlist = functions.https.onCall(
 				.collection('wishlist')
 				.doc(listingId)
 				.delete();
+			logger.log(`Removed to wishlist: ${context.auth.uid}/${listingId}`);
 		} catch (error) {
+			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
 				'Fail to remove listing from wishlist',
@@ -32,10 +34,14 @@ const deleteWishlist = functions.https.onCall(
 				.update({
 					likedBy: admin.firestore.FieldValue.arrayRemove(context.auth.uid),
 				});
+			logger.log(`Updated listing likedBy: ${listingId}`);
 		} catch (error) {
-			logger.error(`[ERROR 2]: Can't increment listing's savedBy value`);
 			logger.error(error);
-			return 'error';
+			throw new functions.https.HttpsError(
+				'internal',
+				`Can't decrement listing's savedBy value: ${listingId}`,
+				error
+			);
 		}
 		return 'ok';
 	}
