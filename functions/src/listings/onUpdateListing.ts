@@ -72,8 +72,23 @@ const onUpdateListing = functions.firestore
 				await Promise.all(
 					deletedImageRef.map(async (imageRef) => {
 						try {
-							await storage.file(imageRef).delete();
-							logger.log(`Deleted image: ${imageRef}`);
+							const fileRef = storage.file(imageRef);
+							try {
+								const [exists] = await fileRef.exists();
+								logger.log(`Checked for image existence: ${imageRef}`);
+
+								if (exists) {
+									await storage.file(imageRef).delete();
+									logger.log(`Deleted image: ${imageRef}`);
+								} else {
+									logger.log(`Image does not exist: ${imageRef}`);
+								}
+							} catch (error) {
+								logger.error(error);
+								throw logger.error(
+									`[ERROR 3]: Could not check for image reference existence: ${imageRef}`
+								);
+							}
 						} catch (error) {
 							logger.error(error);
 							throw logger.error(

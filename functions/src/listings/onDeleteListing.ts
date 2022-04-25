@@ -33,8 +33,21 @@ const onDeleteListing = functions.firestore
 				await Promise.all(
 					imagesRef.map(async (imageRef) => {
 						try {
-							await storage.file(imageRef).delete();
-							logger.log(`Deleted image: ${imageRef}`);
+							const fileRef = storage.file(imageRef);
+							try {
+								const [exists] = await fileRef.exists();
+								if (exists) {
+									await storage.file(imageRef).delete();
+									logger.log(`Deleted image: ${imageRef}`);
+								} else {
+									logger.log(`Image does not exist: ${imageRef}`);
+								}
+							} catch (error) {
+								logger.error(error);
+								throw logger.error(
+									`[ERROR 1]: Could not check for image reference existence: ${imageRef}`
+								);
+							}
 						} catch (error) {
 							logger.error(error);
 							throw logger.error(
