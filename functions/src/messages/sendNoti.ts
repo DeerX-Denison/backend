@@ -28,11 +28,9 @@ const sendNoti = async (
 			const tokens = tokensData.map((tokenData) => tokenData.token);
 			const noti = constructNoti(message, tokens, members, uid);
 			try {
-				const { responses, successCount, failureCount } =
-					await msg.sendMulticast(noti);
+				const { successCount, failureCount } = await msg.sendMulticast(noti);
 				logger.log(`successCount: ${successCount}`);
 				logger.log(`failureCount: ${failureCount}`);
-				logger.log(responses);
 			} catch (error) {
 				logger.log(error);
 				throw logger.error(

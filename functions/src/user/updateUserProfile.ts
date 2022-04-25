@@ -2,6 +2,8 @@ import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { UserPronoun } from 'types';
 import { db } from '../firebase.config';
+import Logger from '../Logger';
+const logger = new Logger();
 
 type Data = {
 	imageUrl: string | undefined;
@@ -25,10 +27,13 @@ const updateUserProfile = functions.https.onCall(
 
 		try {
 			await db.collection('users').doc(context.auth.uid).update(updateValue);
+			logger.log(`Updated user profile in database: ${context.auth.uid}`);
 			if (imageUrl) {
 				await admin.auth().updateUser(context.auth.uid, { photoURL: imageUrl });
+				logger.log(`Updated user profile in firebase: ${context.auth.uid}`);
 			}
 		} catch (error) {
+			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
 				'Fail to update user photoURL',

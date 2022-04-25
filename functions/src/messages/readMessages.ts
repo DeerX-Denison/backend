@@ -99,6 +99,11 @@ const readMessages = functions.https.onCall(
 
 			try {
 				await batch.commit();
+				logger.log(
+					`Marked messages as seen and updated thread preview: ${threadId}/${seenMessages
+						.map((x) => x.id)
+						.join(', ')}`
+				);
 			} catch (error) {
 				logger.error(error);
 				throw new functions.https.HttpsError(
@@ -107,6 +112,8 @@ const readMessages = functions.https.onCall(
 					error
 				);
 			}
+		} else {
+			logger.log(`No messages to be seen`);
 		}
 
 		return 'ok';
