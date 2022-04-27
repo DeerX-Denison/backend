@@ -21,6 +21,16 @@ const deleteListing = functions.https.onCall(
 			);
 		}
 
+		if (
+			'disabled' in listingData.seller &&
+			listingData.seller.disabled === true
+		) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				`Invoker account is disabled: ${listingData.seller.uid}`
+			);
+		}
+
 		try {
 			await db.collection('listings').doc(listingData.id).delete();
 			logger.log(`Deleted listing: ${listingData.id}`);

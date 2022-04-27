@@ -1,11 +1,7 @@
-import { MessageData, UserInfo } from 'types';
+import { MessageData } from 'types';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
 const logger = new Logger();
-
-export type UserData = {
-	searchableKeyword: string[];
-} & UserInfo;
 
 /**
  * utility function to fetch user info from a given uid

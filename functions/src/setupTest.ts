@@ -15,6 +15,7 @@ export const mockUserInfo = {
 	displayName: 'mock display name',
 	photoURL: 'mock photo url',
 	uid: 'mock uid',
+	disabled: false,
 };
 
 export const mockUserProfile = {

@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import { AuthData } from 'firebase-functions/lib/common/providers/https';
+import { UserData } from 'types';
 import {
 	DEFAULT_USER_DISPLAY_NAME,
 	DEFAULT_USER_PHOTO_URL,
@@ -28,7 +29,7 @@ type UserFile = {
 /**
  * check if current user data in db needs update (old data, admin introduces new sattelite data)
  */
-const userNeedsUpdate = (user: { [key: string]: string }) => {
+const userNeedsUpdate = (user: UserData) => {
 	if (!('displayName' in user)) {
 		return true;
 	}
@@ -48,7 +49,16 @@ const userNeedsUpdate = (user: { [key: string]: string }) => {
 	}
 
 	// added on Jan 15, 2022
-	if (user['photoURL'].includes('=s36') || user['photoURL'].includes('/s36')) {
+	// modified on April 27, 2022
+	// add ? to supprose ts warning. Already check for "photoURL" in user above
+	if (
+		user['photoURL']?.includes('=s36') ||
+		user['photoURL']?.includes('/s36')
+	) {
+		return true;
+	}
+
+	if (!('disabled' in user)) {
 		return true;
 	}
 
@@ -135,7 +145,10 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 	const docSnap = await db.collection('users').doc(context.auth.uid).get();
 	if (!docSnap.exists) {
 		try {
-			await db.collection('users').doc(context.auth.uid).set(updatedUser);
+			await db
+				.collection('users')
+				.doc(context.auth.uid)
+				.set({ ...updatedUser, disabled: false });
 			logger.log(`Created user: ${context.auth.uid}`);
 			return 'created';
 		} catch (error) {
@@ -144,10 +157,16 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 			return 'error';
 		}
 	} else {
-		const user = docSnap.data() as { [key: string]: string };
+		const user = docSnap.data() as UserData;
 		if (userNeedsUpdate(user)) {
 			try {
-				await db.collection('users').doc(context.auth.uid).set(updatedUser);
+				await db
+					.collection('users')
+					.doc(context.auth.uid)
+					.set({
+						...updatedUser,
+						disabled: user.disabled ? user.disabled : false,
+					});
 				logger.log(`Updated user: ${context.auth.uid}`);
 				return 'updated';
 			} catch (error) {

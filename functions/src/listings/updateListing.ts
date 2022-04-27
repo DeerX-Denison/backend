@@ -23,6 +23,14 @@ const updateListing = functions.https.onCall(
 		}
 
 		const seller: UserInfo = await fetchUserInfo(listingData.seller.uid);
+
+		if ('disabled' in seller && seller.disabled === true) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				`Invoker account is disabled: ${seller.uid}`
+			);
+		}
+
 		const createdAtSeconds = listingData.createdAt?._seconds;
 		const createdAtNanoseconds = listingData.createdAt?._nanoseconds;
 		if (!createdAtSeconds || !createdAtNanoseconds) {

@@ -17,6 +17,9 @@ const formatListingData: (oldListingData: ListingData) => ListingData = (
 			displayName: oldListingData.seller.displayName?.trim(),
 			photoURL: oldListingData.seller.photoURL?.trim(),
 			uid: oldListingData.seller.uid.trim(),
+			disabled: oldListingData.seller.disabled
+				? oldListingData.seller.disabled
+				: false,
 		},
 		condition: oldListingData.condition,
 		description: oldListingData.description.trim(),
