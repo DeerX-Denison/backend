@@ -141,7 +141,6 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 	try {
 		const client = new vision.ImageAnnotatorClient();
 		const [result] = await client.safeSearchDetection(imagePath);
-		logger.log(`Validated images: ${imageRef}`);
 		detections = result.safeSearchAnnotation;
 	} catch (error) {
 		logger.error(error);
@@ -150,6 +149,9 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 	if (!detections) {
 		throw logger.error(`[ERROR 3]: Validated detection is falsy: ${imageRef}`);
 	}
+
+	logger.log(`Detected image features: ${imageRef}`);
+	logger.log(detections);
 
 	if (!validDetection(detections)) {
 		return false;
