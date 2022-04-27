@@ -44,6 +44,30 @@ const createMessage = functions.https.onCall(
 			);
 		}
 
+		const threadCreator = threadPreviewData.members.find(
+			(x) => x.uid === context.auth?.uid
+		);
+		if (!threadCreator) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				"Invoker is not thread's member (thread creator)"
+			);
+		}
+
+		if ('disabled' in threadCreator && threadCreator.disabled === false) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				`Invoker account is disabled (thread): ${threadCreator.uid}`
+			);
+		}
+
+		if ('disabled' in message.sender && message.sender.disabled === false) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				`Invoker account is disabled (message): ${message.sender.uid}`
+			);
+		}
+
 		// fetch updated members from membersUid
 		const members = await Promise.all(
 			threadPreviewData.membersUid.map(async (uid) => await fetchUserInfo(uid))

@@ -3,13 +3,16 @@ export type UserInfo = {
 	email: string | undefined | null;
 	photoURL: string | undefined | null;
 	displayName: string | undefined | null;
+	disabled: boolean | undefined | null;
 };
+export type UserData = {
+	searchableKeyword: string[];
+} & UserProfile;
 export type UserPronoun = 'HE' | 'HIM' | undefined;
 export type UserProfile = UserInfo & {
 	pronouns: UserPronoun[] | undefined | null;
 	bio: string | null;
 };
-
 export type ProfilePhotoURL = string;
 export type ProfilePhotoMetadata = {
 	uploaderUid: string;
@@ -25,7 +28,6 @@ export type TabsParamList = {
 	Menu: undefined;
 	Test: undefined;
 };
-
 export type ListingsStackParamList = {
 	Main: undefined;
 	Create: undefined;
@@ -33,7 +35,6 @@ export type ListingsStackParamList = {
 	MyListing: undefined;
 	Item: { listingId: ListingId };
 };
-
 export type MessageStackParamList = {
 	Threads: undefined;
 	Messages: { threadId: ThreadId };

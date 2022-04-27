@@ -25,6 +25,13 @@ const createListing = functions.https.onCall(
 		// fetch updated user data
 		const seller: UserInfo = await fetchUserInfo(listingData.seller.uid);
 
+		if ('disabled' in seller && seller.disabled === true) {
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				`Invoker account is disabled: ${seller.uid}`
+			);
+		}
+
 		// create new listing from user input listingData
 		const newListingData: ListingData = {
 			...listingData,

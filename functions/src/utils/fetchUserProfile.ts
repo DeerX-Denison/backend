@@ -1,11 +1,7 @@
-import { UserProfile } from 'types';
+import { UserData, UserProfile } from 'types';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
 const logger = new Logger();
-
-export type UserData = {
-	searchableKeyword: string[];
-} & UserProfile;
 
 /**
  * utility function to fetch user profile from a given uid including pronouns and bio

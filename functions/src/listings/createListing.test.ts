@@ -15,6 +15,7 @@ const mockListing: Omit<ListingData, 'createdAt' | 'updatedAt'> = {
 		displayName: 'mock display name',
 		photoURL: 'mock photo url',
 		uid: 'mock uid',
+		disabled: false,
 	},
 	condition: 'BARELY FUNCTIONAL',
 	description: 'mock listing description',
