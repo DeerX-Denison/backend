@@ -2,32 +2,19 @@ import * as functions from 'firebase-functions';
 import { ListingData } from 'types';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
+import { isLoggedIn, isNotBanned } from '../utils';
 
 const logger = new Logger();
 
 const deleteListing = functions.https.onCall(
 	async (listingData: ListingData, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
+		const invokerUid = isLoggedIn(context);
+		const invoker = await isNotBanned(invokerUid);
 
-		if (context.auth.uid !== listingData.seller.uid) {
+		if (invoker.uid !== listingData.seller.uid) {
 			throw new functions.https.HttpsError(
 				'permission-denied',
-				`Invoker is not listing's seller: ${context.auth.uid}`
-			);
-		}
-
-		if (
-			'disabled' in listingData.seller &&
-			listingData.seller.disabled === true
-		) {
-			throw new functions.https.HttpsError(
-				'permission-denied',
-				`Invoker account is disabled: ${listingData.seller.uid}`
+				`Invoker is not listing's seller: ${invokerUid}`
 			);
 		}
 

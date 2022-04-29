@@ -8,7 +8,7 @@ import {
 	ThreadPreviewData,
 	ThreadThumbnail,
 } from '../types';
-import { fetchUserInfo } from '../utils';
+import { fetchUserInfo, isLoggedIn, isNotBanned } from '../utils';
 import sendNoti from './sendNoti';
 const logger = new Logger();
 type Data = {
@@ -17,12 +17,8 @@ type Data = {
 };
 const createMessage = functions.https.onCall(
 	async ({ threadPreviewData, message }: Data, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
+		const invokerUid = isLoggedIn(context);
+		const invoker = await isNotBanned(invokerUid);
 
 		if (message.membersUid.length !== 2) {
 			throw new functions.https.HttpsError(
@@ -30,14 +26,14 @@ const createMessage = functions.https.onCall(
 				'membersUid does not have length 2'
 			);
 		}
-		if (!threadPreviewData.membersUid.includes(context.auth.uid)) {
+		if (!threadPreviewData.membersUid.includes(invoker.uid)) {
 			throw new functions.https.HttpsError(
 				'permission-denied',
 				"Invoker is not thread's member"
 			);
 		}
 
-		if (!threadPreviewData.id.includes(context.auth.uid)) {
+		if (!threadPreviewData.id.includes(invoker.uid)) {
 			throw new functions.https.HttpsError(
 				'permission-denied',
 				"Invoker is not thread's member (id)"
@@ -54,23 +50,12 @@ const createMessage = functions.https.onCall(
 			);
 		}
 
-		if ('disabled' in threadCreator && threadCreator.disabled === false) {
-			throw new functions.https.HttpsError(
-				'permission-denied',
-				`Invoker account is disabled (thread): ${threadCreator.uid}`
-			);
-		}
-
-		if ('disabled' in message.sender && message.sender.disabled === false) {
-			throw new functions.https.HttpsError(
-				'permission-denied',
-				`Invoker account is disabled (message): ${message.sender.uid}`
-			);
-		}
-
 		// fetch updated members from membersUid
 		const members = await Promise.all(
-			threadPreviewData.membersUid.map(async (uid) => await fetchUserInfo(uid))
+			threadPreviewData.membersUid.map(async (uid) => {
+				if (uid === invoker.uid) return invoker;
+				return await fetchUserInfo(uid);
+			})
 		);
 
 		const sender = members.filter((x) => x.uid === context.auth?.uid)[0];

@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
+import { isLoggedIn } from '../utils';
 const logger = new Logger();
 
 type Data = {
@@ -9,16 +10,11 @@ type Data = {
 };
 const createFCMToken = functions.https.onCall(
 	async ({ deviceId, token }: Data, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
+		const invokerUid = isLoggedIn(context);
 		try {
 			await db
 				.collection('users')
-				.doc(context.auth.uid)
+				.doc(invokerUid)
 				.collection('fcm_tokens')
 				.doc(deviceId)
 				.set({
@@ -27,7 +23,7 @@ const createFCMToken = functions.https.onCall(
 					updatedAt: svTime(),
 				});
 
-			logger.log(`Created FCM Token for user: ${context.auth.uid}/${deviceId}`);
+			logger.log(`Created FCM Token for user: ${invokerUid}/${deviceId}`);
 		} catch (error) {
 			logger.error(error);
 			throw new functions.https.HttpsError(

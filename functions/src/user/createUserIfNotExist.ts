@@ -125,7 +125,6 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 			'User is not authenticated'
 		);
 	}
-
 	if (
 		!context.auth.token.email ||
 		!(

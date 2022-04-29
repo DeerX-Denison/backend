@@ -120,6 +120,13 @@ export type ListingDataCl = ListingData & {
 };
 export type MyListingData = ListingData;
 
+export type ReportType = 'listing' | 'message';
+export type ReportData = {
+	type: ReportType;
+	detail: string;
+	id: string;
+};
+
 // app types
 export type Selection = {
 	id: string;

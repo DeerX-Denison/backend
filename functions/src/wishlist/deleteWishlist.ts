@@ -2,23 +2,20 @@ import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
+import { isLoggedIn, isNotBanned } from '../utils';
 const logger = new Logger();
 const deleteWishlist = functions.https.onCall(
 	async (listingId: string, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
+		const invokerUid = isLoggedIn(context);
+		const invoker = await isNotBanned(invokerUid);
 		try {
 			await db
 				.collection('users')
-				.doc(context.auth.uid)
+				.doc(invoker.uid)
 				.collection('wishlist')
 				.doc(listingId)
 				.delete();
-			logger.log(`Removed to wishlist: ${context.auth.uid}/${listingId}`);
+			logger.log(`Removed to wishlist: ${invoker.uid}/${listingId}`);
 		} catch (error) {
 			logger.error(error);
 			throw new functions.https.HttpsError(
@@ -32,7 +29,7 @@ const deleteWishlist = functions.https.onCall(
 				.collection('listings')
 				.doc(listingId)
 				.update({
-					likedBy: admin.firestore.FieldValue.arrayRemove(context.auth.uid),
+					likedBy: admin.firestore.FieldValue.arrayRemove(invoker.uid),
 				});
 			logger.log(`Updated listing likedBy: ${listingId}`);
 		} catch (error) {

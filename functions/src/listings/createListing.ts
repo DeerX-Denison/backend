@@ -2,36 +2,23 @@ import * as functions from 'firebase-functions';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
 import { ListingData, UserInfo } from '../types';
-import { fetchUserInfo } from '../utils';
+import { isLoggedIn, isNotBanned } from '../utils';
 
 const logger = new Logger();
 
 const createListing = functions.https.onCall(
 	async (listingData: ListingData, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
+		const invokerUid = isLoggedIn(context);
+		const invoker = await isNotBanned(invokerUid);
 
-		if (context.auth.uid !== listingData.seller.uid) {
+		if (invokerUid !== listingData.seller.uid) {
 			throw new functions.https.HttpsError(
 				'permission-denied',
-				`Invoker is not listing's seller: ${context.auth.uid}`
+				`Invoker is not listing's seller: ${invokerUid}`
 			);
 		}
 
-		// fetch updated user data
-		const seller: UserInfo = await fetchUserInfo(listingData.seller.uid);
-
-		if ('disabled' in seller && seller.disabled === true) {
-			throw new functions.https.HttpsError(
-				'permission-denied',
-				`Invoker account is disabled: ${seller.uid}`
-			);
-		}
-
+		const seller: UserInfo = invoker;
 		// create new listing from user input listingData
 		const newListingData: ListingData = {
 			...listingData,

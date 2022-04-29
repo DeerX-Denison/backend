@@ -3,17 +3,13 @@ import * as functions from 'firebase-functions';
 import { WishlistData } from 'types';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
-import { getAllSubstrings } from '../utils';
+import { getAllSubstrings, isLoggedIn, isNotBanned } from '../utils';
 import validWishlistData from './validWishlishData';
 const logger = new Logger();
 const createWishlist = functions.https.onCall(
 	async (wishlistData: WishlistData, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
+		const invokerUid = isLoggedIn(context);
+		const invoker = await isNotBanned(invokerUid);
 		wishlistData['searchableKeyword'] = getAllSubstrings(wishlistData.name);
 		if (!validWishlistData(wishlistData)) {
 			throw new functions.https.HttpsError(
@@ -31,11 +27,11 @@ const createWishlist = functions.https.onCall(
 			};
 			await db
 				.collection('users')
-				.doc(context.auth.uid)
+				.doc(invoker.uid)
 				.collection('wishlist')
 				.doc(wishlistData.id)
 				.set(newWishlistData);
-			logger.log(`Added to wishlist: ${context.auth.uid}/${wishlistData.id}`);
+			logger.log(`Added to wishlist: ${invoker.uid}/${wishlistData.id}`);
 		} catch (error) {
 			logger.error(error);
 			throw new functions.https.HttpsError(
@@ -50,7 +46,7 @@ const createWishlist = functions.https.onCall(
 				.collection('listings')
 				.doc(wishlistData.id)
 				.update({
-					likedBy: admin.firestore.FieldValue.arrayUnion(context.auth.uid),
+					likedBy: admin.firestore.FieldValue.arrayUnion(invoker.uid),
 				});
 			logger.log(`Updated listing likedBy: ${wishlistData.id}`);
 		} catch (error) {

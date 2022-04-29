@@ -3,17 +3,13 @@ import { DEFAULT_MESSAGE_NAME, DEFAULT_USER_PHOTO_URL } from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
 import { ThreadName, ThreadPreviewData, ThreadThumbnail } from '../types';
-import { fetchUserInfo } from '../utils';
+import { fetchUserInfo, isLoggedIn, isNotBanned } from '../utils';
 const logger = new Logger();
 
 const createThread = functions.https.onCall(
 	async (threadPreviewData: ThreadPreviewData, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
+		const invokerUid = isLoggedIn(context);
+		const invoker = await isNotBanned(invokerUid);
 
 		if (threadPreviewData.membersUid.length !== 2) {
 			throw new functions.https.HttpsError(
@@ -22,14 +18,14 @@ const createThread = functions.https.onCall(
 			);
 		}
 
-		if (!threadPreviewData.membersUid.includes(context.auth.uid)) {
+		if (!threadPreviewData.membersUid.includes(invoker.uid)) {
 			throw new functions.https.HttpsError(
 				'permission-denied',
 				"Invoker is not thread's member"
 			);
 		}
 
-		if (!threadPreviewData.id.includes(context.auth.uid)) {
+		if (!threadPreviewData.id.includes(invoker.uid)) {
 			throw new functions.https.HttpsError(
 				'permission-denied',
 				"Invoker is not thread's member (id)"
@@ -46,16 +42,12 @@ const createThread = functions.https.onCall(
 			);
 		}
 
-		if ('disabled' in threadCreator && threadCreator.disabled === false) {
-			throw new functions.https.HttpsError(
-				'permission-denied',
-				`Invoker account is disabled: ${threadCreator.uid}`
-			);
-		}
-
 		// fetch updated members from membersUid
 		const members = await Promise.all(
-			threadPreviewData.membersUid.map(async (uid) => await fetchUserInfo(uid))
+			threadPreviewData.membersUid.map(async (uid) => {
+				if (uid === invoker.uid) return invoker;
+				return await fetchUserInfo(uid);
+			})
 		);
 
 		// parse updated name and thumbnail from updated members info
