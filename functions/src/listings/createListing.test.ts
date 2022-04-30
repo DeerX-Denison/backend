@@ -49,7 +49,7 @@ describe('Testing create Listings', () => {
 		mockListing['id'] = '';
 		await expect(
 			wrapped(mockListing, { auth: mockListing.seller })
-		).rejects.toEqual(new Error('Fail To Create Listing, Try Again Later'));
+		).rejects.toEqual(new Error('Fail To Create Listing'));
 	});
 	it.todo('invalid image url');
 	it.todo('empty name');

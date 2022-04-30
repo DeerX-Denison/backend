@@ -10,18 +10,22 @@ const fetchMessage: (
 	messageId: string,
 	threadId: string
 ) => Promise<MessageData | undefined> = async (messageId, threadId) => {
-	const docSnap = await db
-		.collection('threads')
-		.doc(threadId)
-		.collection('messages')
-		.doc(messageId)
-		.get();
-	if (!docSnap.exists) {
-		logger.log(`message not exist: ${threadId}/${messageId}`);
+	try {
+		const docSnap = await db
+			.collection('threads')
+			.doc(threadId)
+			.collection('messages')
+			.doc(messageId)
+			.get();
+		if (!docSnap.exists) {
+			logger.log(`Message does not exist: ${threadId}/${messageId}`);
+			return undefined;
+		}
+		const messageData = docSnap.data() as MessageData;
+		return messageData;
+	} catch (error) {
+		logger.error(error);
 		return undefined;
 	}
-	const messageData = docSnap.data() as MessageData;
-	logger.log(`Fetched message: ${threadId}/${messageId}`);
-	return messageData;
 };
 export default fetchMessage;
