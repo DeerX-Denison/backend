@@ -125,7 +125,6 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 			'User is not authenticated'
 		);
 	}
-
 	if (
 		!context.auth.token.email ||
 		!(
@@ -153,7 +152,7 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 			return 'created';
 		} catch (error) {
 			logger.error(error);
-			logger.error('Fail to create user in database');
+			logger.error(`Fail to create user: ${context.auth.uid}`);
 			return 'error';
 		}
 	} else {
@@ -171,7 +170,7 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 				return 'updated';
 			} catch (error) {
 				logger.log(error);
-				logger.error('Fail to update user in database');
+				logger.error(`Fail to update user: ${context.auth.uid}`);
 				return 'error';
 			}
 		} else {

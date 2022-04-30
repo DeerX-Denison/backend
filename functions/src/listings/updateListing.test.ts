@@ -33,7 +33,7 @@ describe('Testing update listing', () => {
 
 	it('unauthorized call', async () => {
 		await expect(wrapped({})).rejects.toEqual(
-			new Error('User unauthenticated')
+			new Error('User Not Authenticated')
 		);
 	});
 

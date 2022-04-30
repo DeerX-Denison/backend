@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import { MessageData, MessageId, MessageSeenAt, ThreadId } from 'types';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
+import { isLoggedIn } from '../utils';
 import fetchMessage from '../utils/fetchMessage';
 
 export type ReadMessageData = { messageIds: MessageId[]; threadId: ThreadId };
@@ -11,25 +12,30 @@ const logger = new Logger();
 
 const readMessages = functions.https.onCall(
 	async ({ messageIds, threadId }: ReadMessageData, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
-		const readerUid = context.auth.uid;
+		const invokerUid = isLoggedIn(context);
+		const readerUid = invokerUid;
 		// messages that has not been read by function invoker
 		let tobeSeenMessages: MessageData[];
 		try {
-			tobeSeenMessages = await Promise.all(
-				messageIds.map((messageId) => fetchMessage(messageId, threadId))
-			);
+			tobeSeenMessages = (
+				await Promise.all(
+					messageIds.map(async (messageId) => {
+						try {
+							return await fetchMessage(messageId, threadId);
+						} catch (error) {
+							logger.error(error);
+							logger.error(`Fail to fetch message: ${threadId}/${messageId}`);
+							return undefined;
+						}
+					})
+				)
+			).filter((x) => x !== undefined) as MessageData[];
 		} catch (error) {
-			throw new functions.https.HttpsError(
-				'internal',
-				'Fail to fetch to-be-read messages',
-				error
+			logger.error(error);
+			logger.error(
+				`Fail to fetch to-be-read messages: [${messageIds.join(', ')}]`
 			);
+			return;
 		}
 
 		// transform messages that has not been read by function invoker

@@ -1,21 +1,22 @@
 import * as functions from 'firebase-functions';
-import { fetchUserProfile } from '../utils';
+import { ERROR_MESSAGES } from '../constants';
+import Logger from '../Logger';
+import { fetchUserProfile, isLoggedIn } from '../utils';
+const logger = new Logger();
 
-const getUserProfile = functions.https.onCall(async (uid: string, context) => {
-	if (!context.auth) {
-		throw new functions.https.HttpsError(
-			'unauthenticated',
-			'User unauthenticated'
-		);
+const getUserProfile = functions.https.onCall(
+	async (uid: string, context: functions.https.CallableContext) => {
+		isLoggedIn(context);
+		try {
+			return await fetchUserProfile(uid);
+		} catch (error) {
+			logger.error(error);
+			logger.error(`Fail to fetch user profile: ${uid}`);
+			throw new functions.https.HttpsError(
+				'internal',
+				ERROR_MESSAGES.failGetUserProfile
+			);
+		}
 	}
-	try {
-		return await fetchUserProfile(uid);
-	} catch (error) {
-		throw new functions.https.HttpsError(
-			'internal',
-			`Fail to fetch user profile: ${uid}`,
-			error
-		);
-	}
-});
+);
 export default getUserProfile;

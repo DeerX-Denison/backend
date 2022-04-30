@@ -19,11 +19,7 @@ const deleteFCMToken = functions.https.onCall(
 			logger.log(`Deleted FCM Token: ${uid}/${deviceId}`);
 		} catch (error) {
 			logger.error(error);
-			throw new functions.https.HttpsError(
-				'internal',
-				'Fail to create new fcm token',
-				error
-			);
+			logger.error(`Fail to delete FCM Token: ${uid}/${deviceId}`);
 		}
 	}
 );

@@ -1,33 +1,22 @@
 import * as functions from 'firebase-functions';
 import { ListingData } from 'types';
+import { ERROR_MESSAGES } from '../constants';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
+import { isLoggedIn, isNotBanned } from '../utils';
 
 const logger = new Logger();
 
 const deleteListing = functions.https.onCall(
 	async (listingData: ListingData, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
+		const invokerUid = isLoggedIn(context);
+		const invoker = await isNotBanned(invokerUid);
 
-		if (context.auth.uid !== listingData.seller.uid) {
+		if (invoker.uid !== listingData.seller.uid) {
+			logger.log(`Invoker is not listing's owner: ${invokerUid}`);
 			throw new functions.https.HttpsError(
 				'permission-denied',
-				`Invoker is not listing's seller: ${context.auth.uid}`
-			);
-		}
-
-		if (
-			'disabled' in listingData.seller &&
-			listingData.seller.disabled === true
-		) {
-			throw new functions.https.HttpsError(
-				'permission-denied',
-				`Invoker account is disabled: ${listingData.seller.uid}`
+				ERROR_MESSAGES.notListingOwner
 			);
 		}
 
@@ -35,10 +24,10 @@ const deleteListing = functions.https.onCall(
 			await db.collection('listings').doc(listingData.id).delete();
 			logger.log(`Deleted listing: ${listingData.id}`);
 		} catch (error) {
+			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
-				'Fail to delete listing',
-				error
+				ERROR_MESSAGES.failDeleteListing
 			);
 		}
 		return 'ok';

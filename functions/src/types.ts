@@ -120,6 +120,21 @@ export type ListingDataCl = ListingData & {
 };
 export type MyListingData = ListingData;
 
+export type ReportType = 'listing' | 'message';
+export type CreateReportParameter = {
+	type: ReportType;
+	detail: string;
+	id: string;
+};
+export type ReportData = {
+	id: string;
+	type: ReportType;
+	detail: string;
+	evidence: ListingData | MessageData;
+	reporter: UserInfo;
+	reportedUid: string;
+	createdAt: FirebaseFirestore.Timestamp;
+};
 // app types
 export type Selection = {
 	id: string;

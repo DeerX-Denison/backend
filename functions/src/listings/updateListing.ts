@@ -1,42 +1,35 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { ListingDataCl, UserInfo } from 'types';
+import { ERROR_MESSAGES } from '../constants';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
-import { fetchUserInfo } from '../utils';
+import { isLoggedIn, isNotBanned } from '../utils';
 
 const logger = new Logger();
 
 const updateListing = functions.https.onCall(
 	async (listingData: ListingDataCl, context) => {
-		if (!context.auth) {
-			throw new functions.https.HttpsError(
-				'unauthenticated',
-				'User unauthenticated'
-			);
-		}
-		if (context.auth.uid !== listingData.seller.uid) {
+		const invokerUid = isLoggedIn(context);
+		const invoker = await isNotBanned(invokerUid);
+
+		if (invoker.uid !== listingData.seller.uid) {
+			logger.log(`Invoker is not listing's owner: ${invoker.uid}`);
 			throw new functions.https.HttpsError(
 				'permission-denied',
-				`Invoker is not listing's seller: ${context.auth.uid}`
+				ERROR_MESSAGES.notListingOwner
 			);
 		}
 
-		const seller: UserInfo = await fetchUserInfo(listingData.seller.uid);
-
-		if ('disabled' in seller && seller.disabled === true) {
-			throw new functions.https.HttpsError(
-				'permission-denied',
-				`Invoker account is disabled: ${seller.uid}`
-			);
-		}
+		const seller: UserInfo = invoker;
 
 		const createdAtSeconds = listingData.createdAt?._seconds;
 		const createdAtNanoseconds = listingData.createdAt?._nanoseconds;
 		if (!createdAtSeconds || !createdAtNanoseconds) {
+			logger.log('listing data time created was missing');
 			throw new functions.https.HttpsError(
-				'failed-precondition',
-				'listing data time created was missing'
+				'invalid-argument',
+				ERROR_MESSAGES.invalidInput
 			);
 		}
 		const updatedListing = {
@@ -57,8 +50,7 @@ const updateListing = functions.https.onCall(
 		} catch (error) {
 			throw new functions.https.HttpsError(
 				'internal',
-				'Fail to update listing',
-				error
+				ERROR_MESSAGES.failUpdateListing
 			);
 		}
 		return 'ok';

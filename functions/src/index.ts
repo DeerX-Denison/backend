@@ -10,6 +10,7 @@ export { default as createMessage } from './messages/createMessage';
 export { default as createThread } from './messages/createThread';
 export { default as readMessages } from './messages/readMessages';
 export { default as sendManualMessage } from './messages/sendManualMessage';
+export { default as createReport } from './report/createReport';
 export { default as confirmPayment } from './stripe/confirmPayment';
 export { default as getStripePubKey } from './stripe/getStripePubKey';
 export { default as createFCMToken } from './user/createFCMToken';
