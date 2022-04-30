@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import { ERROR_MESSAGES } from '../constants';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
 import { ListingData, UserInfo } from '../types';
@@ -12,9 +13,10 @@ const createListing = functions.https.onCall(
 		const invoker = await isNotBanned(invokerUid);
 
 		if (invokerUid !== listingData.seller.uid) {
+			logger.log(`Invoker is not listing's owner: ${invokerUid}`);
 			throw new functions.https.HttpsError(
 				'permission-denied',
-				`Invoker is not listing's seller: ${invokerUid}`
+				ERROR_MESSAGES.notListingOwner
 			);
 		}
 
@@ -33,10 +35,10 @@ const createListing = functions.https.onCall(
 			await db.collection('listings').doc(listingData.id).set(newListingData);
 			logger.log(`Created listing: ${listingData.id}`);
 		} catch (error) {
+			logger.error(error);
 			throw new functions.https.HttpsError(
 				'internal',
-				'Fail to create new listing',
-				error
+				ERROR_MESSAGES.failCreateListing
 			);
 		}
 		return 'ok';

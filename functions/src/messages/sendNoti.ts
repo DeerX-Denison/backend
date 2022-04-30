@@ -32,7 +32,7 @@ const sendNoti = async (
 				logger.log(`successCount: ${successCount}`);
 				logger.log(`failureCount: ${failureCount}`);
 			} catch (error) {
-				logger.log(error);
+				logger.error(error);
 				throw logger.error(
 					`[ERROR 1]: Can't send notification to all receivers: ${threadId}/${messageId}`
 				);

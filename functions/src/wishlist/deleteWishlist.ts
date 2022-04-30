@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
+import { ERROR_MESSAGES } from '../constants';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
@@ -8,36 +9,32 @@ const deleteWishlist = functions.https.onCall(
 	async (listingId: string, context) => {
 		const invokerUid = isLoggedIn(context);
 		const invoker = await isNotBanned(invokerUid);
-		try {
-			await db
+
+		const batch = db.batch();
+
+		batch.delete(
+			db
 				.collection('users')
 				.doc(invoker.uid)
 				.collection('wishlist')
 				.doc(listingId)
-				.delete();
-			logger.log(`Removed to wishlist: ${invoker.uid}/${listingId}`);
-		} catch (error) {
-			logger.error(error);
-			throw new functions.https.HttpsError(
-				'internal',
-				'Fail to remove listing from wishlist',
-				error
-			);
-		}
+		);
+
+		batch.update(db.collection('listings').doc(listingId), {
+			likedBy: admin.firestore.FieldValue.arrayRemove(invoker.uid),
+		});
 		try {
-			await db
-				.collection('listings')
-				.doc(listingId)
-				.update({
-					likedBy: admin.firestore.FieldValue.arrayRemove(invoker.uid),
-				});
-			logger.log(`Updated listing likedBy: ${listingId}`);
+			await batch.commit();
+			logger.log(`Remove listing from wishlist: ${invoker.uid}/${listingId}`);
+			logger.log(`Remove from listing's likedBy array: ${listingId}`);
 		} catch (error) {
 			logger.error(error);
+			logger.error(
+				`Fail to remove listing from wishlist or remove from listing's likedBy array: ${invoker.uid}/${listingId}`
+			);
 			throw new functions.https.HttpsError(
 				'internal',
-				`Can't decrement listing's savedBy value: ${listingId}`,
-				error
+				ERROR_MESSAGES.failAddWishlist
 			);
 		}
 		return 'ok';

@@ -1,5 +1,9 @@
 import * as functions from 'firebase-functions';
-import { DEFAULT_MESSAGE_NAME, DEFAULT_USER_PHOTO_URL } from '../constants';
+import {
+	DEFAULT_MESSAGE_NAME,
+	DEFAULT_USER_PHOTO_URL,
+	ERROR_MESSAGES,
+} from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
 import {
@@ -21,22 +25,31 @@ const createMessage = functions.https.onCall(
 		const invoker = await isNotBanned(invokerUid);
 
 		if (message.membersUid.length !== 2) {
+			logger.log(
+				`membersUid does not have length 2: ${threadPreviewData.id}/${message.id}`
+			);
 			throw new functions.https.HttpsError(
 				'invalid-argument',
-				'membersUid does not have length 2'
+				ERROR_MESSAGES.invalidInput
 			);
 		}
 		if (!threadPreviewData.membersUid.includes(invoker.uid)) {
+			logger.log(
+				`Invoker (${invoker.uid}) is not thread's member: ${threadPreviewData.id}`
+			);
 			throw new functions.https.HttpsError(
 				'permission-denied',
-				"Invoker is not thread's member"
+				ERROR_MESSAGES.notThreadMember
 			);
 		}
 
 		if (!threadPreviewData.id.includes(invoker.uid)) {
+			logger.log(
+				`Invoker (${invoker.uid}) is not thread's member (id): ${threadPreviewData.id}`
+			);
 			throw new functions.https.HttpsError(
 				'permission-denied',
-				"Invoker is not thread's member (id)"
+				ERROR_MESSAGES.notThreadMember
 			);
 		}
 
@@ -44,9 +57,12 @@ const createMessage = functions.https.onCall(
 			(x) => x.uid === context.auth?.uid
 		);
 		if (!threadCreator) {
+			logger.log(
+				`Invoker (${invoker.uid}) is not thread's member (thread creator): ${threadPreviewData.id}`
+			);
 			throw new functions.https.HttpsError(
 				'permission-denied',
-				"Invoker is not thread's member (thread creator)"
+				ERROR_MESSAGES.notThreadMember
 			);
 		}
 
@@ -80,9 +96,10 @@ const createMessage = functions.https.onCall(
 					? self.photoURL
 					: DEFAULT_USER_PHOTO_URL;
 			} else {
+				logger.error('other members length is < 0');
 				throw new functions.https.HttpsError(
 					'invalid-argument',
-					'other members length is < 0'
+					ERROR_MESSAGES.invalidInput
 				);
 			}
 		});
@@ -122,10 +139,12 @@ const createMessage = functions.https.onCall(
 			);
 		} catch (error) {
 			logger.error(error);
+			logger.error(
+				`Fail to create new message and update thread preview data: ${threadPreviewData.id}/${newMessage.id}`
+			);
 			throw new functions.https.HttpsError(
 				'internal',
-				`Fail to create new message and update thread preview data: ${threadPreviewData.id}/${newMessage.id}`,
-				error
+				ERROR_MESSAGES.failCreateMessage
 			);
 		}
 		try {
@@ -135,11 +154,10 @@ const createMessage = functions.https.onCall(
 			);
 		} catch (error) {
 			logger.error(error);
-			throw new functions.https.HttpsError(
-				'internal',
-				`Fail to send notification for message id: ${newMessage.id}`,
-				error
+			logger.error(
+				`Fail to send notification for message id: ${newMessage.id}`
 			);
+			// throw new functions.https.HttpsError('internal', ERROR_MESSAGES.internal);
 		}
 
 		return 'ok';

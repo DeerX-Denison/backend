@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { WishlistData } from 'types';
+import { ERROR_MESSAGES } from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
 import { getAllSubstrings, isLoggedIn, isNotBanned } from '../utils';
@@ -10,54 +11,50 @@ const createWishlist = functions.https.onCall(
 	async (wishlistData: WishlistData, context) => {
 		const invokerUid = isLoggedIn(context);
 		const invoker = await isNotBanned(invokerUid);
+
 		wishlistData['searchableKeyword'] = getAllSubstrings(wishlistData.name);
 		if (!validWishlistData(wishlistData)) {
+			logger.log(
+				`Invalid wishlist data provided: ${JSON.stringify(wishlistData)}`
+			);
 			throw new functions.https.HttpsError(
 				'invalid-argument',
-				'invalid wishlist data provided'
+				ERROR_MESSAGES.invalidInput
 			);
 		}
 
 		const searchableKeyword = getAllSubstrings(wishlistData.name);
-		try {
-			const newWishlistData: WishlistData = {
-				...wishlistData,
-				addedAt: svTime() as Timestamp,
-				searchableKeyword,
-			};
-			await db
+		const batch = db.batch();
+		const newWishlistData: WishlistData = {
+			...wishlistData,
+			addedAt: svTime() as Timestamp,
+			searchableKeyword,
+		};
+		batch.set(
+			db
 				.collection('users')
 				.doc(invoker.uid)
 				.collection('wishlist')
-				.doc(wishlistData.id)
-				.set(newWishlistData);
-			logger.log(`Added to wishlist: ${invoker.uid}/${wishlistData.id}`);
-		} catch (error) {
-			logger.error(error);
-			throw new functions.https.HttpsError(
-				'internal',
-				'Fail to add listing to wishlist',
-				error
-			);
-		}
-
+				.doc(wishlistData.id),
+			newWishlistData
+		);
+		batch.update(db.collection('listings').doc(wishlistData.id), {
+			likedBy: admin.firestore.FieldValue.arrayUnion(invoker.uid),
+		});
 		try {
-			await db
-				.collection('listings')
-				.doc(wishlistData.id)
-				.update({
-					likedBy: admin.firestore.FieldValue.arrayUnion(invoker.uid),
-				});
-			logger.log(`Updated listing likedBy: ${wishlistData.id}`);
+			await batch.commit();
+			logger.log(`Add listing to wishlist: ${invoker.uid}/${wishlistData.id}`);
+			logger.log(`Add to listing's likedBy array: ${wishlistData.id}`);
 		} catch (error) {
 			logger.error(error);
+			logger.error(
+				`Fail to add listing to wishlist or add to listing's likedBy array: ${invoker.uid}/${wishlistData.id}`
+			);
 			throw new functions.https.HttpsError(
 				'internal',
-				`Can't increment listing's savedBy value: ${wishlistData.id}`,
-				error
+				ERROR_MESSAGES.failAddWishlist
 			);
 		}
-
 		return 'ok';
 	}
 );

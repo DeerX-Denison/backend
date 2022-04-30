@@ -12,7 +12,6 @@ const fetchFCMTokensFromUid = async (uid: string) => {
 			.doc(uid)
 			.collection('fcm_tokens')
 			.get();
-
 		logger.log(`Fetched FCM tokens of user: ${uid}`);
 		if (querySnap.empty) return [];
 		const tokens: UserFCMTokenData[] = querySnap.docs.map(

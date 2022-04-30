@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { ListingDataCl, UserInfo } from 'types';
+import { ERROR_MESSAGES } from '../constants';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
@@ -13,9 +14,10 @@ const updateListing = functions.https.onCall(
 		const invoker = await isNotBanned(invokerUid);
 
 		if (invoker.uid !== listingData.seller.uid) {
+			logger.log(`Invoker is not listing's owner: ${invoker.uid}`);
 			throw new functions.https.HttpsError(
 				'permission-denied',
-				`Invoker is not listing's seller: ${invoker.uid}`
+				ERROR_MESSAGES.notListingOwner
 			);
 		}
 
@@ -24,9 +26,10 @@ const updateListing = functions.https.onCall(
 		const createdAtSeconds = listingData.createdAt?._seconds;
 		const createdAtNanoseconds = listingData.createdAt?._nanoseconds;
 		if (!createdAtSeconds || !createdAtNanoseconds) {
+			logger.log('listing data time created was missing');
 			throw new functions.https.HttpsError(
-				'failed-precondition',
-				'listing data time created was missing'
+				'invalid-argument',
+				ERROR_MESSAGES.invalidInput
 			);
 		}
 		const updatedListing = {
@@ -47,8 +50,7 @@ const updateListing = functions.https.onCall(
 		} catch (error) {
 			throw new functions.https.HttpsError(
 				'internal',
-				'Fail to update listing',
-				error
+				ERROR_MESSAGES.failUpdateListing
 			);
 		}
 		return 'ok';

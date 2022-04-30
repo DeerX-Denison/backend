@@ -22,15 +22,11 @@ const createFCMToken = functions.https.onCall(
 					token,
 					updatedAt: svTime(),
 				});
-
 			logger.log(`Created FCM Token for user: ${invokerUid}/${deviceId}`);
 		} catch (error) {
 			logger.error(error);
-			throw new functions.https.HttpsError(
-				'internal',
-				'Fail to create new fcm token',
-				error
-			);
+			logger.error(`Fail to create new fcm token:	${invokerUid}/${deviceId}`);
+			return;
 		}
 	}
 );

@@ -35,7 +35,7 @@ describe('Testing create Listings', () => {
 
 	it('unauthorized call', async () => {
 		await expect(wrapped(mockListing)).rejects.toEqual(
-			new Error('User unauthenticated')
+			new Error('User Not Authenticated')
 		);
 	});
 
@@ -49,7 +49,7 @@ describe('Testing create Listings', () => {
 		mockListing['id'] = '';
 		await expect(
 			wrapped(mockListing, { auth: mockListing.seller })
-		).rejects.toEqual(new Error('Fail to create new listing'));
+		).rejects.toEqual(new Error('Fail To Create Listing, Try Again Later'));
 	});
 	it.todo('invalid image url');
 	it.todo('empty name');

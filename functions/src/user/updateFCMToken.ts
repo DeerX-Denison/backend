@@ -29,11 +29,8 @@ const updateFCMToken = functions.https.onCall(
 			logger.log(`Updated FCM Token: ${invokerUid}/${deviceId}`);
 		} catch (error) {
 			logger.error(error);
-			throw new functions.https.HttpsError(
-				'internal',
-				'Fail to update fcm token',
-				error
-			);
+			logger.error(`Fail to update fcm token: ${invokerUid}/${deviceId}`);
+			return;
 		}
 	}
 );

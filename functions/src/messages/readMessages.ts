@@ -19,15 +19,23 @@ const readMessages = functions.https.onCall(
 		try {
 			tobeSeenMessages = (
 				await Promise.all(
-					messageIds.map((messageId) => fetchMessage(messageId, threadId))
+					messageIds.map(async (messageId) => {
+						try {
+							return await fetchMessage(messageId, threadId);
+						} catch (error) {
+							logger.error(error);
+							logger.error(`Fail to fetch message: ${threadId}/${messageId}`);
+							return undefined;
+						}
+					})
 				)
 			).filter((x) => x !== undefined) as MessageData[];
 		} catch (error) {
-			throw new functions.https.HttpsError(
-				'internal',
-				'Fail to fetch to-be-read messages',
-				error
+			logger.error(error);
+			logger.error(
+				`Fail to fetch to-be-read messages: [${messageIds.join(', ')}]`
 			);
+			return;
 		}
 
 		// transform messages that has not been read by function invoker

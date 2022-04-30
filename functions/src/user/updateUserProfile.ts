@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { UserPronoun } from 'types';
+import { ERROR_MESSAGES } from '../constants';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
@@ -30,10 +31,10 @@ const updateUserProfile = functions.https.onCall(
 			}
 		} catch (error) {
 			logger.error(error);
+			logger.error(`Fail to update user profile: ${invoker.uid}`);
 			throw new functions.https.HttpsError(
 				'internal',
-				'Fail to update user photoURL',
-				error
+				ERROR_MESSAGES.failUpdateUserProfile
 			);
 		}
 	}

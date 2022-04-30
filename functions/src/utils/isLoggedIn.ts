@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import { ERROR_MESSAGES } from '../constants';
 import Logger from '../Logger';
 
 const logger = new Logger();
@@ -10,7 +11,7 @@ const isLoggedIn: IsLoggedIn = (context) => {
 		logger.log(`User unauthenticated`);
 		throw new functions.https.HttpsError(
 			'unauthenticated',
-			'User unauthenticated'
+			ERROR_MESSAGES.unauthenticated
 		);
 	}
 	return context.auth.uid;
