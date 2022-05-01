@@ -7,9 +7,9 @@ const logger = new Logger();
  * utility function to fetch user info from a given uid
  */
 const fetchMessage: (
-	messageId: string,
-	threadId: string
-) => Promise<MessageData | undefined> = async (messageId, threadId) => {
+	threadId: string,
+	messageId: string
+) => Promise<MessageData | undefined> = async (threadId, messageId) => {
 	try {
 		const docSnap = await db
 			.collection('threads')
