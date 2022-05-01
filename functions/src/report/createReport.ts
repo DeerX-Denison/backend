@@ -25,7 +25,6 @@ const createReport = functions.https.onCall(
 	) => {
 		const invokerUid = isLoggedIn(context);
 		const invoker = await isNotBanned(invokerUid);
-
 		let evidenceData: ListingData | MessageData;
 		let reportedUid: string;
 		if (data.type === 'listing') {
