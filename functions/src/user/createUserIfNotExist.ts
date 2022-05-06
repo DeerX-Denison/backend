@@ -129,7 +129,8 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 		!context.auth.token.email ||
 		!(
 			context.auth.token.email.endsWith('@denison.edu') ||
-			context.auth.token.email === 'deerx.test@gmail.com'
+			context.auth.token.email === 'deerx.test@gmail.com' ||
+			context.auth.token.email === 'deerx.dev@gmail.com'
 		) ||
 		!context.auth.token.email_verified
 	) {
