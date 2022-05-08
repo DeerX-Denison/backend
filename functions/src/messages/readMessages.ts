@@ -21,7 +21,7 @@ const readMessages = functions.https.onCall(
 				await Promise.all(
 					messageIds.map(async (messageId) => {
 						try {
-							return await fetchMessage(messageId, threadId);
+							return await fetchMessage(threadId, messageId);
 						} catch (error) {
 							logger.error(error);
 							logger.error(`Fail to fetch message: ${threadId}/${messageId}`);
