@@ -23,7 +23,10 @@ const getUserProfile = functions.https.onCall(
 
 		if (context.auth?.token.firebase.sign_in_provider === 'anonymous') {
 			if ('email' in userProfile && userProfile.email) {
-				if (!CORE_TEAM_EMAILS.includes(userProfile.email)) {
+				if (
+					!CORE_TEAM_EMAILS.includes(userProfile.email) &&
+					context.auth.uid !== userProfile.uid
+				) {
 					logger.log(
 						`Anonymous user (${context.auth.uid}) attempt to fetch: ${uid}`
 					);

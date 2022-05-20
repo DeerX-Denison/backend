@@ -20,11 +20,11 @@ const deleteAnonymousUser = functions.https.onCall(
 		}
 
 		try {
-			await db.collection('users').doc(uid).delete();
-			logger.log(`Deleted user from db: ${uid}`);
+			await admin.firestore().recursiveDelete(db.collection('users').doc(uid));
+			logger.log(`Recursively deleted member id ${uid}`);
 		} catch (error) {
 			logger.error(error);
-			logger.error(`Fail to delete anonymous user from db: ${uid}`);
+			logger.error(`Fail to recursively delete anonymous user from db: ${uid}`);
 			throw new functions.https.HttpsError(
 				'internal',
 				ERROR_MESSAGES.failDeleteAnonUser
