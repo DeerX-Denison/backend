@@ -1,6 +1,38 @@
 {
 	"indexes": [
 		{
+			"collectionGroup": "guest_listings",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "category",
+					"arrayConfig": "CONTAINS"
+				},
+				{
+					"fieldPath": "status",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "createdAt",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "guest_listings",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "status",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "createdAt",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
 			"collectionGroup": "listings",
 			"queryScope": "COLLECTION",
 			"fields": [
