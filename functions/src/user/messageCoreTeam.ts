@@ -24,7 +24,9 @@ const genThumbnail = (invoker: UserInfo, members: UserInfo[]) => {
 	const thumbnail: ThreadThumbnail = {};
 	if (members.length === 2) {
 		if (members[0].uid === members[1].uid) {
-			thumbnail[invoker.uid] = invoker.photoURL ? invoker.photoURL : undefined;
+			thumbnail[invoker.uid] = invoker.photoURL
+				? invoker.photoURL
+				: DEFAULT_MESSAGE_THUMBNAIL;
 		} else {
 			const otherMember = members.filter(
 				(member) => member.uid !== invoker.uid
@@ -159,10 +161,6 @@ const messageCoreTeam = functions.https.onCall(
 				logger.error(
 					`Fail to create new thread for guest (${invokerUid}): ${threadPreviewData.id}`
 				);
-				// throw new functions.https.HttpsError(
-				// 	'internal',
-				// 	ERROR_MESSAGES.failCreateThread
-				// );
 			}
 		});
 		return 'ok';
