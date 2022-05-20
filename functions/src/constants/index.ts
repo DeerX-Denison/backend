@@ -2,6 +2,15 @@ export const LISTING_IMAGE_HEIGHT = 720;
 export const DEFAULT_USER_PHOTO_URL =
 	'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg';
 export const DEFAULT_USER_DISPLAY_NAME = 'New User';
+export const DEFAULT_GUEST_PHOTO_URL =
+	'https://i.ibb.co/JKS8DzC/default-profile-photo.jpg';
+
+// make sure this match FE
+export const DEFAULT_GUEST_DISPLAY_NAME = 'Guest User';
+
+// make sure this match FE
+export const DEFAULT_GUEST_EMAIL = 'guest-user-email';
+
 export const INVALID_IMAGE_CONTENT_IMAGE_URL =
 	'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg';
 export const DEFAULT_MESSAGE_NAME = 'New conversation';
@@ -25,4 +34,17 @@ export const ERROR_MESSAGES = {
 	failAddWishlist: 'Fail To Like Item',
 	failRemoveWishlist: 'Fail To Unlike Item',
 	failCreateReport: 'Fail To Create Report',
+	noPermGuest: 'Guests Do Not Have This Permission',
+	failMsgCore: 'Fail To Message Core Team',
+	failDeleteAnonUser: 'Fail To Delete User',
 };
+export const CORE_TEAM_EMAILS = [
+	'le_w1@denison.edu',
+	'le_k2@denison.edu',
+	'doan_d1@denison.edu',
+	'ly_k1@denison.edu',
+	'le_a2@denison.edu',
+	'pham_p1@denison.edu',
+	'ofosus_c1@denison.edu',
+	'tight_s1@denison.edu',
+];

@@ -1,7 +1,11 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { WishlistData } from 'types';
-import { ERROR_MESSAGES } from '../constants';
+import {
+	DEFAULT_GUEST_DISPLAY_NAME,
+	DEFAULT_GUEST_EMAIL,
+	ERROR_MESSAGES,
+} from '../constants';
 import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
 import { getAllSubstrings, isLoggedIn, isNotBanned } from '../utils';
@@ -38,7 +42,12 @@ const createWishlist = functions.https.onCall(
 				.doc(wishlistData.id),
 			newWishlistData
 		);
-		batch.update(db.collection('listings').doc(wishlistData.id), {
+		const collection =
+			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
+			invoker.email === DEFAULT_GUEST_EMAIL
+				? 'guest_listings'
+				: 'listings';
+		batch.update(db.collection(collection).doc(wishlistData.id), {
 			likedBy: admin.firestore.FieldValue.arrayUnion(invoker.uid),
 		});
 		try {

@@ -1,6 +1,10 @@
 import * as functions from 'firebase-functions';
 import { ListingData } from 'types';
-import { ERROR_MESSAGES } from '../constants';
+import {
+	DEFAULT_GUEST_DISPLAY_NAME,
+	DEFAULT_GUEST_EMAIL,
+	ERROR_MESSAGES,
+} from '../constants';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
@@ -19,16 +23,31 @@ const deleteListing = functions.https.onCall(
 				ERROR_MESSAGES.notListingOwner
 			);
 		}
-
-		try {
-			await db.collection('listings').doc(listingData.id).delete();
-			logger.log(`Deleted listing: ${listingData.id}`);
-		} catch (error) {
-			logger.error(error);
-			throw new functions.https.HttpsError(
-				'internal',
-				ERROR_MESSAGES.failDeleteListing
-			);
+		if (
+			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
+			invoker.email === DEFAULT_GUEST_EMAIL
+		) {
+			try {
+				await db.collection('guest_listings').doc(listingData.id).delete();
+				logger.log(`Deleted guest listing: ${listingData.id}`);
+			} catch (error) {
+				logger.error(error);
+				throw new functions.https.HttpsError(
+					'internal',
+					ERROR_MESSAGES.failDeleteListing
+				);
+			}
+		} else {
+			try {
+				await db.collection('listings').doc(listingData.id).delete();
+				logger.log(`Deleted listing: ${listingData.id}`);
+			} catch (error) {
+				logger.error(error);
+				throw new functions.https.HttpsError(
+					'internal',
+					ERROR_MESSAGES.failDeleteListing
+				);
+			}
 		}
 		return 'ok';
 	}

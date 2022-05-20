@@ -2,6 +2,9 @@ import * as functions from 'firebase-functions';
 import { AuthData } from 'firebase-functions/lib/common/providers/https';
 import { UserData } from 'types';
 import {
+	DEFAULT_GUEST_DISPLAY_NAME,
+	DEFAULT_GUEST_EMAIL,
+	DEFAULT_GUEST_PHOTO_URL,
 	DEFAULT_USER_DISPLAY_NAME,
 	DEFAULT_USER_PHOTO_URL,
 } from '../constants';
@@ -75,7 +78,10 @@ const updateUser = (userInfo: AuthData) => {
 		if (token.email) {
 			email = token.email;
 		} else {
-			throw 'Email is null';
+			if (token.firebase.sign_in_provider !== 'anonymous') {
+				throw 'Non-anoymous user email is null';
+			}
+			email = DEFAULT_GUEST_EMAIL;
 		}
 	} catch (error) {
 		throw new functions.https.HttpsError(
@@ -102,6 +108,9 @@ const updateUser = (userInfo: AuthData) => {
 		} else {
 			photoURL = DEFAULT_USER_PHOTO_URL;
 		}
+	} else if (token.firebase.sign_in_provider === 'anonymous') {
+		displayName = DEFAULT_GUEST_DISPLAY_NAME;
+		photoURL = DEFAULT_GUEST_PHOTO_URL;
 	} else {
 		displayName = DEFAULT_USER_DISPLAY_NAME;
 		photoURL = DEFAULT_USER_PHOTO_URL;
@@ -125,19 +134,44 @@ const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
 			'User is not authenticated'
 		);
 	}
-	if (
-		!context.auth.token.email ||
-		!(
-			context.auth.token.email.endsWith('@denison.edu') ||
-			context.auth.token.email === 'deerx.test@gmail.com' ||
-			context.auth.token.email === 'deerx.dev@gmail.com'
-		) ||
-		!context.auth.token.email_verified
-	) {
-		throw new functions.https.HttpsError(
-			'permission-denied',
-			'The user does not have permission'
-		);
+	if (context.auth.token.email) {
+		if (context.auth.token.email_verified) {
+			if (
+				!(
+					context.auth.token.email.endsWith('@denison.edu') ||
+					context.auth.token.email === 'deerx.test@gmail.com' ||
+					context.auth.token.email === 'deerx.dev@gmail.com'
+				)
+			) {
+				logger.log(
+					`User login with invalid email: ${context.auth.uid}/${context.auth.token.email}`
+				);
+				throw new functions.https.HttpsError(
+					'permission-denied',
+					'The user does not have permission'
+				);
+			}
+		} else {
+			logger.log(
+				`User login with unverified email: ${context.auth.uid}/${context.auth.token.email}`
+			);
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				'The user does not have permission'
+			);
+		}
+	} else {
+		if (context.auth.token.firebase.sign_in_provider !== 'anonymous') {
+			logger.log(
+				`Non-anonymous user login without email: ${context.auth.uid}/${context.auth.token.email}`
+			);
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				'The user does not have permission'
+			);
+		} else {
+			logger.log(`User login anonymously: ${context.auth.uid}`);
+		}
 	}
 
 	const updatedUser = updateUser(context.auth);
