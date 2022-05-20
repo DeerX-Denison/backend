@@ -49,18 +49,18 @@ const readMessages = functions.https.onCall(
 			const updatedSeenAt: MessageSeenAt = {};
 			const nonReaderUids = msg.membersUid.filter((uid) => uid !== readerUid);
 			nonReaderUids.forEach((uid) => {
-				if (
-					'seenAt' in msg &&
-					uid in msg['seenAt'] &&
-					msg['seenAt'][uid] !== null
-				) {
-					const seconds = msg.seenAt[uid]?.seconds;
-					const nanoseconds = msg.seenAt[uid]?.nanoseconds;
-					if (seconds && nanoseconds) {
-						updatedSeenAt[uid] = new admin.firestore.Timestamp(
-							seconds,
-							nanoseconds
-						);
+				if ('seenAt' in msg && uid in msg['seenAt']) {
+					if (msg['seenAt'][uid] !== null) {
+						const seconds = msg.seenAt[uid]?.seconds;
+						const nanoseconds = msg.seenAt[uid]?.nanoseconds;
+						if (seconds && nanoseconds) {
+							updatedSeenAt[uid] = new admin.firestore.Timestamp(
+								seconds,
+								nanoseconds
+							);
+						}
+					} else {
+						updatedSeenAt[uid] = null;
 					}
 				}
 			});
