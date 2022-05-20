@@ -36,4 +36,4 @@ jobs:
       - name: Test
         run: firebase emulators:exec 'yarn test'
       - name: Deploy
-        run: firebase deploy --project $PROJECT_ID --only functions,firestore
+        run: firebase deploy --project $PROJECT_ID --only functions,firestore,firestore:rules
