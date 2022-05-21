@@ -1,6 +1,10 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { ERROR_MESSAGES } from '../constants';
+import {
+	DEFAULT_GUEST_DISPLAY_NAME,
+	DEFAULT_GUEST_EMAIL,
+	ERROR_MESSAGES,
+} from '../constants';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
@@ -20,8 +24,13 @@ const deleteWishlist = functions.https.onCall(
 				.doc(listingId)
 		);
 
-		batch.update(db.collection('listings').doc(listingId), {
-			likedBy: admin.firestore.FieldValue.arrayRemove(invoker.uid),
+		const collection =
+			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
+			invoker.email === DEFAULT_GUEST_EMAIL
+				? 'guest_listings'
+				: 'listings';
+		batch.update(db.collection(collection).doc(listingId), {
+			likedBy: admin.firestore.FieldValue.arrayUnion(invoker.uid),
 		});
 		try {
 			await batch.commit();

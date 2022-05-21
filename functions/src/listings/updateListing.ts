@@ -1,7 +1,11 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { ListingDataCl, UserInfo } from 'types';
-import { ERROR_MESSAGES } from '../constants';
+import {
+	DEFAULT_GUEST_DISPLAY_NAME,
+	DEFAULT_GUEST_EMAIL,
+	ERROR_MESSAGES,
+} from '../constants';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
@@ -41,17 +45,35 @@ const updateListing = functions.https.onCall(
 				createdAtNanoseconds
 			),
 		};
-		try {
-			await db
-				.collection('listings')
-				.doc(listingData.id)
-				.update(updatedListing);
-			logger.log(`Updated listing data: ${listingData.id}`);
-		} catch (error) {
-			throw new functions.https.HttpsError(
-				'internal',
-				ERROR_MESSAGES.failUpdateListing
-			);
+		if (
+			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
+			invoker.email === DEFAULT_GUEST_EMAIL
+		) {
+			try {
+				await db
+					.collection('guest_listings')
+					.doc(listingData.id)
+					.update(updatedListing);
+				logger.log(`Updated guest listing data: ${listingData.id}`);
+			} catch (error) {
+				throw new functions.https.HttpsError(
+					'internal',
+					ERROR_MESSAGES.failUpdateListing
+				);
+			}
+		} else {
+			try {
+				await db
+					.collection('listings')
+					.doc(listingData.id)
+					.update(updatedListing);
+				logger.log(`Updated listing data: ${listingData.id}`);
+			} catch (error) {
+				throw new functions.https.HttpsError(
+					'internal',
+					ERROR_MESSAGES.failUpdateListing
+				);
+			}
 		}
 		return 'ok';
 	}

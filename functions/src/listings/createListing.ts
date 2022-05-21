@@ -1,5 +1,9 @@
 import * as functions from 'firebase-functions';
-import { ERROR_MESSAGES } from '../constants';
+import {
+	DEFAULT_GUEST_DISPLAY_NAME,
+	DEFAULT_GUEST_EMAIL,
+	ERROR_MESSAGES,
+} from '../constants';
 import { db, svTime } from '../firebase.config';
 import Logger from '../Logger';
 import { ListingData, UserInfo } from '../types';
@@ -31,15 +35,34 @@ const createListing = functions.https.onCall(
 		};
 
 		// update new listing data to db
-		try {
-			await db.collection('listings').doc(listingData.id).set(newListingData);
-			logger.log(`Created listing: ${listingData.id}`);
-		} catch (error) {
-			logger.error(error);
-			throw new functions.https.HttpsError(
-				'internal',
-				ERROR_MESSAGES.failCreateListing
-			);
+		if (
+			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
+			invoker.email === DEFAULT_GUEST_EMAIL
+		) {
+			try {
+				await db
+					.collection('guest_listings')
+					.doc(listingData.id)
+					.set(newListingData);
+				logger.log(`Created guest listing: ${listingData.id}`);
+			} catch (error) {
+				logger.error(error);
+				throw new functions.https.HttpsError(
+					'internal',
+					ERROR_MESSAGES.failCreateListing
+				);
+			}
+		} else {
+			try {
+				await db.collection('listings').doc(listingData.id).set(newListingData);
+				logger.log(`Created listing: ${listingData.id}`);
+			} catch (error) {
+				logger.error(error);
+				throw new functions.https.HttpsError(
+					'internal',
+					ERROR_MESSAGES.failCreateListing
+				);
+			}
 		}
 		return 'ok';
 	}
