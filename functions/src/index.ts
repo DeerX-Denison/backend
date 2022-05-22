@@ -2,6 +2,7 @@ export { default as uploadListingImageHandler } from './images/listings';
 export { default as uploadProfileImageHandler } from './images/profilePhotos';
 export { default as createListing } from './listings/createListing';
 export { default as deleteListing } from './listings/deleteListing';
+export { default as markListingAsSold } from './listings/markListingAsSold';
 export { default as onCreateGuestListing } from './listings/onCreateGuestListing';
 export { default as onCreateListing } from './listings/onCreateListing';
 export { default as onDeleteGuestListing } from './listings/onDeleteGuestListing';

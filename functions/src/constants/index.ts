@@ -37,6 +37,7 @@ export const ERROR_MESSAGES = {
 	noPermGuest: 'Guests Do Not Have This Permission',
 	failMsgCore: 'Fail To Message Core Team',
 	failDeleteAnonUser: 'Fail To Delete User',
+	failMarkListingAsSold: 'Fail To Mark Listing As Sold',
 };
 export const CORE_TEAM_EMAILS = [
 	'le_w1@denison.edu',

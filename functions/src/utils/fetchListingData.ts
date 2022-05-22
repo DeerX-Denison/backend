@@ -1,23 +1,26 @@
+import { DEFAULT_GUEST_DISPLAY_NAME, DEFAULT_GUEST_EMAIL } from '../constants';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
-import { ListingData } from '../types';
+import { ListingData, UserInfo } from '../types';
 const logger = new Logger();
 
 export type FetchListingData = (
-	listingId: string
+	listingId: string,
+	invoker: UserInfo
 ) => Promise<ListingData | undefined>;
 
-const fetchListingData = async (listingId: string) => {
+const fetchListingData: FetchListingData = async (listingId, invoker) => {
 	try {
-		const docSnap = await db.collection('listings').doc(listingId).get();
-		if (!docSnap.exists) {
-			logger.log(`Listing does not exist: ${listingId}`);
-			return undefined;
-		}
-		const listingData = docSnap.data() as ListingData;
-		return listingData;
+		const collection =
+			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
+			invoker.email === DEFAULT_GUEST_EMAIL
+				? 'guest_listings'
+				: 'listings';
+		const docSnap = await db.collection(collection).doc(listingId).get();
+		return docSnap.data() as ListingData;
 	} catch (error) {
 		logger.error(error);
+		logger.error(`Fail to fetch listing data: ${listingId}`);
 		return undefined;
 	}
 };

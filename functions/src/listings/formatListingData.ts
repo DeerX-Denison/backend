@@ -28,6 +28,10 @@ const formatListingData: (oldListingData: ListingData) => ListingData = (
 		updatedAt: oldListingData.updatedAt,
 		likedBy: oldListingData.likedBy,
 	};
+
+	if ('soldTo' in oldListingData && oldListingData.soldTo) {
+		newListingData['soldTo'] = oldListingData.soldTo;
+	}
 	return newListingData;
 };
 
