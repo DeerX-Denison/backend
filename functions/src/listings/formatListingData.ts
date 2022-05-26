@@ -1,6 +1,7 @@
 import { ListingData } from 'types';
 
 /**
+ * precondition: listing data pass validListingData() test
  * format input listing data into desireable data
  */
 const formatListingData: (oldListingData: ListingData) => ListingData = (
@@ -29,9 +30,14 @@ const formatListingData: (oldListingData: ListingData) => ListingData = (
 		likedBy: oldListingData.likedBy,
 	};
 
-	if ('soldTo' in oldListingData && oldListingData.soldTo) {
+	if (
+		oldListingData.status === 'sold' &&
+		'soldTo' in oldListingData &&
+		oldListingData.soldTo
+	) {
 		newListingData['soldTo'] = oldListingData.soldTo;
 	}
+
 	return newListingData;
 };
 

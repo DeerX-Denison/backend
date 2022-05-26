@@ -45,6 +45,11 @@ const updateListing = functions.https.onCall(
 				createdAtNanoseconds
 			),
 		};
+
+		if (updatedListing.status !== 'sold') {
+			delete updatedListing['soldTo'];
+		}
+
 		if (
 			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
 			invoker.email === DEFAULT_GUEST_EMAIL
