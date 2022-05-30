@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import { ERROR_MESSAGES } from '../constants';
 import { db } from '../firebase.config';
 import Logger from '../Logger';
+import { isLoggedIn, isNotBanned } from '../utils';
 
 const logger = new Logger();
 const main = async ({ uid }: { uid: string }) => {
@@ -93,8 +94,10 @@ const main = async ({ uid }: { uid: string }) => {
 };
 
 const deleteAnonymousUser = functions.https.onCall(
-	async ({ uid }: { uid: string }) => {
-		await main({ uid });
+	async (_data, context: functions.https.CallableContext) => {
+		const invokerUid = isLoggedIn(context);
+		const invoker = await isNotBanned(invokerUid);
+		await main({ uid: invoker.uid });
 	}
 );
 
