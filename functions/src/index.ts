@@ -21,6 +21,7 @@ export { default as createUserIfNotExist } from './user/createUserIfNotExist';
 export { default as deleteAnonymousUser } from './user/deleteAnonymousUser';
 export { default as deleteFCMToken } from './user/deleteFCMToken';
 export { default as deleteOldAnonUsers } from './user/deleteOldAnonUsers';
+export { default as deleteUser } from './user/deleteUser';
 export { default as fetchCoreTeamInfos } from './user/fetchCoreTeamInfos';
 export { default as getUserProfile } from './user/getUserProfile';
 export { default as sendSignInEmail } from './user/sendSignInEmail';
