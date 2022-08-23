@@ -14,5 +14,6 @@
 		"baseUrl": "src"
 	},
 	"compileOnSave": true,
+	"include": ["src"],
 	"exclude": ["node_modules"]
 }

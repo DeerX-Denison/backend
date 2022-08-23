@@ -1,3 +1,4 @@
+export { health } from './functions/misc/health';
 export { default as createListing } from './listings/createListing';
 export { default as deleteListing } from './listings/deleteListing';
 export { default as imageUploadHandler } from './listings/imageUploadHandler';
