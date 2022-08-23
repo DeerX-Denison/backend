@@ -136,6 +136,18 @@ export class Validator {
 	}
 
 	/**
+	 * validate an input string to be an email
+	 * @param field for debug purposes
+	 * @param value unknown value to be validated
+	 */
+	public static photoURL(field: string, value: unknown) {
+		if (typeof value !== 'string') {
+			throw new ValidationError(field, 'string', typeof value);
+		}
+		return value;
+	}
+
+	/**
 	 * validate an input to be boolean, normalize value if neccessary
 	 * for string inputs, check for toLowerCase value to be "true" or "false"
 	 * for number inputs, return false for 0
