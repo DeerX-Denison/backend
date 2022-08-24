@@ -1,5 +1,3 @@
-import { Timestamp } from './timestamp';
-
 export type JsonValue =
 	| string
 	| number
@@ -7,7 +5,6 @@ export type JsonValue =
 	| null
 	| Json
 	| JsonArray
-	| Timestamp
 	| Date;
 
 export type JsonArray = Array<JsonValue>;

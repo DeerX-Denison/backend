@@ -2,12 +2,10 @@ import * as admin from 'firebase-admin';
 import { Validator } from '../utils/validator';
 import { ValidationError } from './errors/validation-error';
 import { Json } from './json';
-
 export class Timestamp extends admin.firestore.Timestamp implements ITimestamp {
 	/**
 	 * @param field for debug purposes
 	 * @param input unknown data to be parsed
-	 * @param options validator options
 	 */
 	constructor(field: string, input: unknown) {
 		if (input instanceof Date) {
@@ -57,6 +55,6 @@ export class Timestamp extends admin.firestore.Timestamp implements ITimestamp {
 	}
 }
 
-export interface ITimestamp extends admin.firestore.Timestamp {
+export interface ITimestamp {
 	toJSON(): Json;
 }

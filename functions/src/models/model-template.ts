@@ -1,4 +1,3 @@
-import { Validator } from '../utils/validator';
 import { Json } from './json';
 
 export class Model implements IModel {
@@ -7,7 +6,7 @@ export class Model implements IModel {
 	 * @param data unknown data to be parsed
 	 */
 	constructor(field: string, data: unknown) {
-		const json = Validator.json(field, data);
+		// const json = Validator.json(field, data);
 	}
 
 	toJSON(): Json {

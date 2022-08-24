@@ -1,20 +1,11 @@
-import { Json } from '../../../models/json';
-import { Validator } from '../../../utils/validator';
+import { Listing } from '../../listing/listing';
 
-export class CreateListingRequest implements ICreateListingRequest {
+export class CreateListingRequest extends Listing {
 	/**
 	 * @param field for debug purposes
 	 * @param data unknown data to be parsed
 	 */
 	constructor(field: string, data: unknown) {
-		const json = Validator.json(field, data);
+		super(field, data);
 	}
-
-	toJSON(): Json {
-		return {};
-	}
-}
-
-export interface ICreateListingRequest {
-	toJSON(): Json;
 }

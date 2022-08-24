@@ -107,8 +107,8 @@ export class Listing implements IListing {
 			condition: this.condition,
 			description: this.description,
 			savedBy: this.savedBy,
-			createdAt: this.createdAt,
-			updatedAt: this.updatedAt,
+			createdAt: this.createdAt.toJSON(),
+			updatedAt: this.updatedAt.toJSON(),
 			status: this.status,
 		};
 	}
