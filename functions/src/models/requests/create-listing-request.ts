@@ -1,29 +1,15 @@
 import { z } from 'zod';
-import {
-	ListingCategory,
-	ListingCondition,
-	ListingStatus,
-} from '../../models/listing';
+import { Listing } from '../../models/listing';
 
-export const CreateListingRequest = z.object({
-	id: z.string(),
-	images: z
-		.array(
-			z
-				.string()
-				.trim()
-				.regex(
-					/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)?/
-				)
-		)
-		.max(10)
-		.min(1),
-	name: z.string(),
-	price: z.string(),
-	category: z.array(z.nativeEnum(ListingCategory)),
-	condition: z.nativeEnum(ListingCondition),
-	description: z.string(),
-	status: z.nativeEnum(ListingStatus),
+export const CreateListingRequest = Listing.pick({
+	id: true,
+	images: true,
+	name: true,
+	price: true,
+	category: true,
+	condition: true,
+	description: true,
+	status: true,
 });
 
 export type CreateListingRequest = z.infer<typeof CreateListingRequest>;

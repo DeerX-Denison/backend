@@ -11,7 +11,8 @@
 		"deploy": "firebase deploy --only functions",
 		"logs": "firebase functions:log",
 		"lint": "eslint \"src/**/*.ts\"",
-		"format": "yarn prettier --write \"src/**/*.ts\""
+		"format": "yarn prettier --write \"src/**/*.ts\"",
+		"bin:get-tester-token-id": "node ./bin/get-tester-token-id.mjs"
 	},
 	"engines": {
 		"node": "16"
@@ -47,6 +48,8 @@
 		"zod": "^3.18.0"
 	},
 	"devDependencies": {
+		"firebase": "^9.9.3",
+		"inquirer": "^9.1.0",
 		"prettier": "^2.5.1",
 		"prettier-plugin-organize-imports": "^2.3.4"
 	},
