@@ -67,9 +67,6 @@ const validType: (ListingData: ListingData) => boolean = (listingData) => {
 	if (typeof listingData.seller !== 'object') return false;
 	if (!('uid' in listingData.seller)) return false;
 	if (typeof listingData.seller.uid !== 'string') return false;
-	// TODO: make sure photoURL and displayName is not null with custom database
-	if (!('photoURL' in listingData.seller)) return false;
-	if (!('displayName' in listingData.seller)) return false;
 
 	// valid description
 	if (typeof listingData.description !== 'string') return false;

@@ -1,3 +1,4 @@
+export { createListing as createListingV2 } from './functions/listing/create-listing';
 export { default as createListing } from './listings/createListing';
 export { default as deleteListing } from './listings/deleteListing';
 export { default as imageUploadHandler } from './listings/imageUploadHandler';
