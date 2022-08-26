@@ -4,7 +4,7 @@ import { ListingData } from 'types';
  * check if input listingData has valid type for its key
  * Check if listingData has valid data. if not, delete the document. This is to prevent malicious user from abusing firestore REST API to programatically create document. Data created/updated from the app by normal user should be valid.
  */
-const validType: (ListingData: ListingData) => boolean = (listingData) => {
+const validType: (listingData: ListingData) => boolean = (listingData) => {
 	// valid id
 	if (typeof listingData.id !== 'string') return false;
 

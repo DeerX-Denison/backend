@@ -19,6 +19,7 @@ const createListing = functions.https.onCall(
 		const newListingData: ListingData = {
 			...listingData,
 			seller,
+			savedBy: 0,
 			createdAt: svTime() as FirebaseFirestore.Timestamp,
 			updatedAt: svTime() as FirebaseFirestore.Timestamp,
 		};
