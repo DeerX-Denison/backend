@@ -27,3 +27,5 @@ export { default as updateFCMToken } from './user/updateFCMToken';
 export { default as updateUserProfile } from './user/updateUserProfile';
 export { default as createWishlist } from './wishlist/createWishlist';
 export { default as deleteWishlist } from './wishlist/deleteWishlist';
+export { default as uploadListingImageHandler } from './images/listings';
+export { default as uploadProfileImageHandler } from './images/profilePhotos';
