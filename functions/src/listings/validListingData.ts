@@ -58,8 +58,6 @@ const validType: (listingData: ListingData) => boolean = (listingData) => {
 	if (typeof listingData.seller !== 'object') return false;
 	if (!('uid' in listingData.seller)) return false;
 	if (typeof listingData.seller.uid !== 'string') return false;
-	if (!('photoURL' in listingData.seller)) return false;
-	if (!('displayName' in listingData.seller)) return false;
 
 	// valid description
 	if (typeof listingData.description !== 'string') return false;
