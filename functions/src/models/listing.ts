@@ -35,7 +35,7 @@ export const Listing = z.object({
 	seller: UserProfile,
 	condition: z.nativeEnum(ListingCondition),
 	description: z.string(),
-	savedBy: z.number().min(0),
+	likedBy: z.array(z.string().min(1)).min(0),
 	createdAt: z.instanceof(admin.firestore.Timestamp),
 	updatedAt: z.instanceof(admin.firestore.Timestamp),
 	status: z.nativeEnum(ListingStatus),

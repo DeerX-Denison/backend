@@ -22,7 +22,7 @@ export const createListing = functions.https.onCall(
 			const newListing = Listing.parse({
 				...requestData,
 				seller: invoker,
-				savedBy: 0,
+				likedBy: [],
 				createdAt: admin.firestore.Timestamp.now(),
 				updatedAt: admin.firestore.Timestamp.now(),
 			});
