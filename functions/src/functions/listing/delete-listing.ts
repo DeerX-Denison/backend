@@ -30,6 +30,10 @@ export const deleteListing = functions.https.onCall(
 				.doc(listing.id)
 				.delete();
 
+			// removed images from storage
+			await Promise.all(
+				listing.images.map(Utils.extractImageRefFromUrl).map(Utils.deleteImage)
+			);
 			return ConfirmationResponse.parse();
 		} catch (error) {
 			return Utils.errorHandler(error);

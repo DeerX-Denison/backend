@@ -1,4 +1,5 @@
 import { app } from '../firebase.config';
+import { default as secrets } from '../secrets.json';
 
 const db = app.firestore();
 
@@ -10,6 +11,6 @@ const auth = app.auth();
 
 export class Firebase {
 	public static db = db;
-	public static storage = storage;
+	public static storage = storage.bucket(secrets.storageBucket);
 	public static auth = auth;
 }

@@ -96,4 +96,24 @@ export class Utils {
 
 		return Listing.parse(docSnap.data());
 	}
+
+	/**
+	 * extract imageRef from provided imageUrl
+	 */
+	public static extractImageRefFromUrl(imageUrl: string): string {
+		return imageUrl
+			.substring(imageUrl.lastIndexOf('/') + 1, imageUrl.lastIndexOf('?'))
+			.replace(/%2F/g, '/');
+	}
+
+	/**
+	 * delete image base on provided imageRef from storage
+	 */
+	public static async deleteImage(imageRef: string): Promise<void> {
+		const fileRef = Firebase.storage.file(imageRef);
+		const [exists] = await fileRef.exists();
+		if (exists) {
+			await Firebase.storage.file(imageRef).delete();
+		}
+	}
 }

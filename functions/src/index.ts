@@ -1,11 +1,5 @@
 export { createListing } from './functions/listing/create-listing';
 export { deleteListing } from './functions/listing/delete-listing';
-export { default as onCreateGuestListing } from './listings/onCreateGuestListing';
-export { default as onCreateListing } from './listings/onCreateListing';
-export { default as onDeleteGuestListing } from './listings/onDeleteGuestListing';
-export { default as onDeleteListing } from './listings/onDeleteListing';
-export { default as onUpdateGuestListing } from './listings/onUpdateGuestListing';
-export { default as onUpdateListing } from './listings/onUpdateListing';
 export { updateListing } from './functions/listing/update-listing';
 export { default as createMessage } from './messages/createMessage';
 export { default as createThread } from './messages/createThread';

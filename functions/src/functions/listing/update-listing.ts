@@ -26,7 +26,7 @@ export const updateListing = functions.https.onCall(
 
 			Utils.isSelf(invoker.uid, listing.seller.uid);
 
-			// create new listing
+			// generate updated listing
 			const updatedListing = Listing.omit({ createdAt: true }).parse({
 				...listing,
 				...requestData,
@@ -41,6 +41,17 @@ export const updateListing = functions.https.onCall(
 					...updatedListing,
 					updatedAt: admin.firestore.FieldValue.serverTimestamp(),
 				});
+
+			// check for removed images to delete from storage
+			const deletedImagesUrl = listing.images.filter(
+				(url) => !updatedListing.images.includes(url)
+			);
+
+			await Promise.all(
+				deletedImagesUrl
+					.map(Utils.extractImageRefFromUrl)
+					.map(Utils.deleteImage)
+			);
 
 			return ConfirmationResponse.parse();
 		} catch (error) {
