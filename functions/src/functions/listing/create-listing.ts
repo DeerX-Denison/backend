@@ -29,7 +29,11 @@ export const createListing = functions.https.onCall(
 
 			// write to db
 			await Firebase.db
-				.collection(Collection.listings)
+				.collection(
+					Utils.isGuest(invoker)
+						? Collection.guest_listings
+						: Collection.listings
+				)
 				.doc(newListing.id)
 				.set({
 					...newListing,

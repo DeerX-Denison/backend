@@ -1,4 +1,5 @@
 import { FirebaseError } from '@firebase/util';
+import { DEFAULT_GUEST_DISPLAY_NAME, DEFAULT_GUEST_EMAIL } from '../constants';
 import { CallableContext } from 'firebase-functions/v1/https';
 import { ZodError } from 'zod';
 import { Collection } from '../models/collection-name';
@@ -58,5 +59,15 @@ export class Utils {
 	 */
 	public static isNotBanned(invoker: User): void {
 		if (invoker.disabled) throw new AuthError();
+	}
+
+	/**
+	 * validate user is guest
+	 */
+	public static isGuest(invoker: User): boolean {
+		return (
+			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
+			invoker.email === DEFAULT_GUEST_EMAIL
+		);
 	}
 }

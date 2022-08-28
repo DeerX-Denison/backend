@@ -9,7 +9,7 @@ export const DEFAULT_GUEST_PHOTO_URL =
 export const DEFAULT_GUEST_DISPLAY_NAME = 'Guest User';
 
 // make sure this match FE
-export const DEFAULT_GUEST_EMAIL = 'guest-user-email';
+export const DEFAULT_GUEST_EMAIL = 'guest-user-email@deerx.web.app';
 
 export const INVALID_IMAGE_CONTENT_IMAGE_URL =
 	'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg';
