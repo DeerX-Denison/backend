@@ -9,6 +9,7 @@ import { NotFoundError } from '../models/error/not-found-error';
 import { ValidationError } from '../models/error/validation-error';
 import { User } from '../models/user';
 import { Firebase } from '../services/firebase-service';
+import { Listing } from '../models/listing';
 
 export class Utils {
 	/**
@@ -69,5 +70,30 @@ export class Utils {
 			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
 			invoker.email === DEFAULT_GUEST_EMAIL
 		);
+	}
+
+	/**
+	 * validate invokerUid matches targetUid
+	 */
+	public static isSelf(invokerUid: string, targetUid: string) {
+		if (invokerUid !== targetUid) throw new AuthError();
+	}
+
+	/**
+	 * fetch latest listing from provided listingId
+	 */
+	public static async fetchListing(
+		listingId: string,
+		isGuest: boolean
+	): Promise<Listing> {
+		const docSnap = await Firebase.db
+			.collection(isGuest ? Collection.guest_listings : Collection.listings)
+			.doc(listingId)
+			.get();
+
+		if (!docSnap.data())
+			throw new NotFoundError(`Listing not found: ${listingId}`);
+
+		return Listing.parse(docSnap.data());
 	}
 }

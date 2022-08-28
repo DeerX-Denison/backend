@@ -1,10 +1,12 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
+import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Collection } from '../../models/collection-name';
 import { Listing } from '../../models/listing';
 import { CreateListingRequest } from '../../models/requests/create-listing-request';
 import { Firebase } from '../../services/firebase-service';
 import { Utils } from '../../utils/utils';
+
 export const createListing = functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
@@ -40,8 +42,10 @@ export const createListing = functions.https.onCall(
 					updatedAt: admin.firestore.FieldValue.serverTimestamp(),
 					createdAt: admin.firestore.FieldValue.serverTimestamp(),
 				});
+
+			return ConfirmationResponse.parse();
 		} catch (error) {
-			Utils.errorHandler(error);
+			return Utils.errorHandler(error);
 		}
 	}
 );

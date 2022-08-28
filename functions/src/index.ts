@@ -1,5 +1,5 @@
 export { createListing } from './functions/listing/create-listing';
-export { default as deleteListing } from './listings/deleteListing';
+export { deleteListing } from './functions/listing/delete-listing';
 export { default as onCreateGuestListing } from './listings/onCreateGuestListing';
 export { default as onCreateListing } from './listings/onCreateListing';
 export { default as onDeleteGuestListing } from './listings/onDeleteGuestListing';
