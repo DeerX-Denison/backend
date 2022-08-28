@@ -6,7 +6,7 @@ export { default as onDeleteGuestListing } from './listings/onDeleteGuestListing
 export { default as onDeleteListing } from './listings/onDeleteListing';
 export { default as onUpdateGuestListing } from './listings/onUpdateGuestListing';
 export { default as onUpdateListing } from './listings/onUpdateListing';
-export { default as updateListing } from './listings/updateListing';
+export { updateListing } from './functions/listing/update-listing';
 export { default as createMessage } from './messages/createMessage';
 export { default as createThread } from './messages/createThread';
 export { default as readMessages } from './messages/readMessages';
