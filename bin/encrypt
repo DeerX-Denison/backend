@@ -2,8 +2,8 @@
 source .env
 
 # USER_INFO_FILE_PASSPHRASE
-USER_INFO_INPUT=functions/src/user/users.json
-USER_INFO_OUTPUT=functions/src/user/users.gpg
+USER_INFO_INPUT=functions/src/functions/user/users.json
+USER_INFO_OUTPUT=functions/src/functions/user/users.gpg
 gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --output "$USER_INFO_OUTPUT" --passphrase "$USER_INFO_FILE_PASSPHRASE" "$USER_INFO_INPUT"
 
 DEV_INPUT="functions/src/secrets.dev.json"
