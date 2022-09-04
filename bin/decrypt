@@ -6,8 +6,8 @@ source .env
 # Regardless of env
 
 # USER_INFO_FILE_PASSPHRASE
-USER_INFO_INPUT=functions/src/user/users.gpg
-USER_INFO_OUTPUT=functions/src/user/users.json
+USER_INFO_INPUT=functions/src/functions/user/users.gpg
+USER_INFO_OUTPUT=functions/src/functions/user/users.json
 gpg --quiet --batch --yes --decrypt --passphrase "$USER_INFO_FILE_PASSPHRASE" --output "$USER_INFO_OUTPUT" "$USER_INFO_INPUT"
 
 if [[ $NODE_ENV = "development" ]]
