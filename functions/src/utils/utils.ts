@@ -1,6 +1,7 @@
 import { FirebaseError } from '@firebase/util';
 import { DEFAULT_GUEST_DISPLAY_NAME, DEFAULT_GUEST_EMAIL } from '../constants';
 import { CallableContext } from 'firebase-functions/v1/https';
+import { Listing } from '../models/listing';
 import { ZodError } from 'zod';
 import { Collection } from '../models/collection-name';
 import { AuthError } from '../models/error/auth-error';
@@ -23,6 +24,8 @@ export class Utils {
 		} else if (error instanceof FirebaseError) {
 			throw new InternalError(error);
 		} else if (error instanceof AuthError) {
+			throw error;
+		} else if (error instanceof NotFoundError) {
 			throw error;
 		} else {
 			throw new InternalError(error);
