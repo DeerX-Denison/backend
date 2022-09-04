@@ -10,6 +10,7 @@ import { ValidationError } from '../models/error/validation-error';
 import { User } from '../models/user';
 import { Firebase } from '../services/firebase-service';
 import { Listing } from '../models/listing';
+import { AuthData } from 'firebase-functions/lib/common/providers/tasks';
 
 export class Utils {
 	/**
@@ -115,5 +116,41 @@ export class Utils {
 		if (exists) {
 			await Firebase.storage.file(imageRef).delete();
 		}
+	}
+
+	/**
+	 * validate valid email address
+	 */
+	public static validEmail(authData: AuthData | undefined) {
+		if (!authData) throw new AuthError();
+		const email = authData.token.email;
+		if (!email) throw new AuthError();
+		if (!authData.token.email_verified) throw new AuthError();
+		if (email.endsWith('@denison.edu')) return email;
+		if (email === 'deerx.test@gmail.com') return email;
+		if (email === 'deerx.dev@gmail.com') return email;
+		throw new AuthError();
+	}
+
+	/**
+	 * validate invoker to not be anonymous user
+	 */
+	public static isAnonymousUser(context: CallableContext) {
+		return context.auth?.token.firebase.sign_in_provider === 'anonymous';
+	}
+
+	/**
+	 * generate array of all substrings of input string
+	 */
+	public static getAllSubstrings(s: string): string[] {
+		const substrings: string[] = [];
+		if (s) {
+			for (let i = 0; i < s.length; i++) {
+				for (let j = i + 1; j < s.length + 1; j++) {
+					substrings.push(s.slice(i, j).toLocaleLowerCase());
+				}
+			}
+		}
+		return substrings;
 	}
 }

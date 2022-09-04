@@ -66,7 +66,7 @@ export const User = z.object({
 	providerData: z.array(UserProviderData),
 	passwordHash: z.string().min(1).optional(),
 	passwordSalt: z.string().min(1).optional(),
-	tokensValidAfterTime: z.string().min(1).optional(),
+	tokensValidAfterTime: z.string().min(1).optional().nullable(),
 	tenantId: z.string().min(1).optional().nullable(),
 	multiFactor: UserMultiFactorSettings.optional(),
 	role: z.nativeEnum(UserRole).optional(),
