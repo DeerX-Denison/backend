@@ -65,10 +65,12 @@ export const syncUser = functions.https.onCall(async (_, context) => {
 			.doc(invokerId)
 			.set(updatedUser);
 
-		await Firebase.auth.updateUser(invokerId, {
-			...updatedUser,
-			email: updatedUser.email ? updatedUser.email : undefined,
-		});
+		if (!isAnonymousUser) {
+			await Firebase.auth.updateUser(invokerId, {
+				...updatedUser,
+				email: updatedUser.email ? updatedUser.email : undefined,
+			});
+		}
 
 		return 'updated';
 	} catch (error) {

@@ -10,7 +10,6 @@ import { NotFoundError } from '../models/error/not-found-error';
 import { ValidationError } from '../models/error/validation-error';
 import { User } from '../models/user';
 import { Firebase } from '../services/firebase-service';
-import { Listing } from '../models/listing';
 import { AuthData } from 'firebase-functions/lib/common/providers/tasks';
 
 export class Utils {
