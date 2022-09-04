@@ -28,7 +28,7 @@ const createReport = functions.https.onCall(
 		let evidenceData: ListingData | MessageData;
 		let reportedUid: string;
 		if (data.type === 'listing') {
-			const listingData = await fetchListingData(data.id);
+			const listingData = await fetchListingData(data.id, invoker);
 			if (!listingData) {
 				logger.error(`Fail to fetch listing data: ${data.id}`);
 				throw new functions.https.HttpsError(

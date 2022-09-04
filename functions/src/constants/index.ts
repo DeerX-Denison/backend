@@ -9,7 +9,7 @@ export const DEFAULT_GUEST_PHOTO_URL =
 export const DEFAULT_GUEST_DISPLAY_NAME = 'Guest User';
 
 // make sure this match FE
-export const DEFAULT_GUEST_EMAIL = 'guest-user-email';
+export const DEFAULT_GUEST_EMAIL = 'guest-user-email@deerx.web.app';
 
 export const INVALID_IMAGE_CONTENT_IMAGE_URL =
 	'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg';
@@ -37,6 +37,8 @@ export const ERROR_MESSAGES = {
 	noPermGuest: 'Guests Do Not Have This Permission',
 	failMsgCore: 'Fail To Message Core Team',
 	failDeleteAnonUser: 'Fail To Delete User',
+	failMarkListingAsSold: 'Fail To Mark Listing As Sold',
+	failMarkListingPublic: 'Fail To Mark Listing Public',
 };
 export const CORE_TEAM_EMAILS = [
 	'le_w1@denison.edu',
@@ -48,3 +50,24 @@ export const CORE_TEAM_EMAILS = [
 	'ofosus_c1@denison.edu',
 	'tight_s1@denison.edu',
 ];
+
+export const VALID_CONDITIONS = [
+	'BRAND NEW',
+	'LIKE NEW',
+	'FAIRLY USED',
+	'USEABLE',
+	'BARELY FUNCTIONAL',
+];
+
+export const VALID_CATEGORIES = [
+	'FURNITURE',
+	'FASHION',
+	'BOOKS',
+	'SEASONAL',
+	'DORM GOODS',
+	'JEWELRIES',
+	'ELECTRONIC',
+	'INSTRUMENT',
+];
+
+export const VALID_STATUSES = ['posted', 'saved', 'sold'];
