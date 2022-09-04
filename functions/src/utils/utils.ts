@@ -136,7 +136,7 @@ export class Utils {
 	 * validate invoker to not be anonymous user
 	 */
 	public static isAnonymousUser(context: CallableContext) {
-		return context.auth?.token.firebase.sign_in_provider !== 'anonymous';
+		return context.auth?.token.firebase.sign_in_provider === 'anonymous';
 	}
 
 	/**
