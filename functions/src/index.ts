@@ -4,7 +4,7 @@ export { updateListing } from './functions/listing/update-listing';
 export { createMessage } from './functions/message/create-message';
 export { syncUser } from './functions/user/sync-user';
 export { health } from './functions/misc/health';
-export { default as createThread } from './messages/createThread';
+export { createRoom as createThread } from './functions/room/create-room';
 export { default as readMessages } from './messages/readMessages';
 export { default as sendManualMessage } from './messages/sendManualMessage';
 export { default as createReport } from './report/createReport';

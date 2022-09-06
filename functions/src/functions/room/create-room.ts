@@ -1,22 +1,24 @@
-import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { db } from '../../firebase.config';
 import { Room } from '../../models/room';
 import { Url } from '../../models/url';
-import { Message } from '../../models/message';
-import { CreateMessageRequest } from '../../models/requests/create-message-request';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Utils } from '../../utils/utils';
 import { NonEmptyString } from '../../models/non-empty-string';
-import { DEFAULT_USER_PHOTO_URL, DEFAULT_MESSAGE_NAME } from '../../constants';
+import {
+	DEFAULT_USER_PHOTO_URL,
+	DEFAULT_MESSAGE_NAME,
+	NEW_ROOM_MESSAGE,
+} from '../../constants';
 import { InternalError } from '../../models/error/internal-error';
 import { ERROR_MESSAGES } from '../../constants';
+import { CreateRoomRequest } from '../../models/requests/create-room-request';
+import { db, localTime } from '../../firebase.config';
 
-export const createMessage = functions.https.onCall(
+export const createRoom = functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
 			// validate request data
-			const requestData = CreateMessageRequest.parse(data);
+			const requestData = CreateRoomRequest.parse(data);
 
 			// authorize user
 			const invokerId = Utils.isLoggedIn(context);
@@ -25,51 +27,19 @@ export const createMessage = functions.https.onCall(
 
 			Utils.isNotBanned(invoker);
 
-			Utils.isMember(requestData.threadPreviewData.membersUid, invokerId);
+			Utils.isMember(requestData.membersUid, invokerId);
 
-			Utils.isMember(requestData.message.membersUid, invokerId);
-
-			// create new message
+			// fetch members if room
 			const members = [
 				...(await Promise.all(
-					requestData.threadPreviewData.membersUid
+					requestData.membersUid
 						.filter((x) => x !== invokerId)
 						.map(Utils.fetchUser)
 				)),
 				invoker,
 			];
 
-			const newMessage = Message.parse({
-				...requestData.message,
-				sender: invoker,
-				time: admin.firestore.Timestamp.now(),
-				seenAt: {
-					...requestData.message.seenAt,
-					[requestData.message.sender.uid]: admin.firestore.Timestamp.now(),
-				},
-			});
-
-			// create new message in db
-			const batch = db.batch();
-
-			batch.set(
-				db
-					.collection('threads')
-					.doc(requestData.threadPreviewData.id)
-					.collection('messages')
-					.doc(requestData.message.id),
-				{
-					...newMessage,
-					time: admin.firestore.FieldValue.serverTimestamp(),
-					seenAt: {
-						...newMessage.seenAt,
-						[requestData.message.sender.uid]:
-							admin.firestore.FieldValue.serverTimestamp(),
-					},
-				}
-			);
-
-			// update room data
+			// parse updated name and thumbnail from members info
 			const name: Record<NonEmptyString, NonEmptyString> = {};
 			const thumbnail: Record<NonEmptyString, Url> = {};
 
@@ -96,32 +66,21 @@ export const createMessage = functions.https.onCall(
 				}
 			});
 
-			const updatedRoom = Room.parse({
-				...requestData.threadPreviewData,
+			// generate new room
+			const newRoom = Room.parse({
+				...requestData,
 				thumbnail,
 				name,
 				members,
-				latestMessage: newMessage.content,
-				latestTime: newMessage.time,
-				latestSenderUid: newMessage.sender.uid,
-				latestSeenAt: newMessage.seenAt,
+				latestMessage: NEW_ROOM_MESSAGE,
+				latestTime: localTime(),
+				latestSenderUid: invokerId,
+				latestSeenAt: {},
 			});
 
-			batch.update(
-				db.collection('threads').doc(requestData.threadPreviewData.id),
-				{
-					...updatedRoom,
-					latestTime: admin.firestore.FieldValue.serverTimestamp(),
-					latestSeenAt: {
-						...newMessage.seenAt,
-						[requestData.message.sender.uid]:
-							admin.firestore.FieldValue.serverTimestamp(),
-					},
-				}
-			);
-
+			// update db with new room
 			try {
-				await batch.commit();
+				await db.collection('threads').doc(newRoom.id).set(newRoom);
 			} catch (error) {
 				throw new InternalError(error);
 			}

@@ -3,7 +3,15 @@ import { Room } from '../../models/room';
 import { z } from 'zod';
 
 export const CreateMessageRequest = z.object({
-	threadPreviewData: Room,
+	threadPreviewData: Room.omit({
+		thumbnail: true,
+		name: true,
+		members: true,
+		latestMessage: true,
+		latestTime: true,
+		latestSenderUid: true,
+		latestSeenAt: true,
+	}),
 	message: Message,
 });
 
