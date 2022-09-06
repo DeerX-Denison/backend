@@ -1,9 +1,10 @@
 export { createListing } from './functions/listing/create-listing';
 export { deleteListing } from './functions/listing/delete-listing';
 export { updateListing } from './functions/listing/update-listing';
+export { createMessage } from './functions/message/create-message';
 export { syncUser } from './functions/user/sync-user';
-export { default as createMessage } from './messages/createMessage';
-export { default as createThread } from './messages/createThread';
+export { health } from './functions/misc/health';
+export { createRoom as createThread } from './functions/room/create-room';
 export { default as readMessages } from './messages/readMessages';
 export { default as sendManualMessage } from './messages/sendManualMessage';
 export { default as createReport } from './report/createReport';

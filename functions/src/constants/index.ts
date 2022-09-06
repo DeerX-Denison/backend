@@ -1,4 +1,5 @@
 export const LISTING_IMAGE_HEIGHT = 720;
+export const NEW_ROOM_MESSAGE = 'New message';
 export const DEFAULT_USER_PHOTO_URL =
 	'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg';
 export const DEFAULT_USER_DISPLAY_NAME = 'New User';

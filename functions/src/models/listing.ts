@@ -1,5 +1,7 @@
-import * as admin from 'firebase-admin';
 import { z } from 'zod';
+import { NonEmptyString } from './non-empty-string';
+import { Timestamp } from './timestamp';
+import { Url } from './url';
 import { UserProfile } from './user';
 
 export enum ListingCategory {
@@ -27,17 +29,17 @@ export enum ListingStatus {
 }
 
 export const Listing = z.object({
-	id: z.string(),
-	images: z.array(z.string().trim().url()).max(10).min(1),
-	name: z.string(),
-	price: z.string(),
+	id: NonEmptyString,
+	images: z.array(Url).max(10).min(1),
+	name: NonEmptyString,
+	price: NonEmptyString,
 	category: z.array(z.nativeEnum(ListingCategory)),
 	seller: UserProfile,
 	condition: z.nativeEnum(ListingCondition),
-	description: z.string(),
-	likedBy: z.array(z.string().min(1)).min(0),
-	createdAt: z.instanceof(admin.firestore.Timestamp),
-	updatedAt: z.instanceof(admin.firestore.Timestamp),
+	description: NonEmptyString,
+	likedBy: z.array(NonEmptyString).min(0),
+	createdAt: Timestamp,
+	updatedAt: Timestamp,
 	status: z.nativeEnum(ListingStatus),
 });
 
