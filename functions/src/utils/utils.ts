@@ -155,4 +155,11 @@ export class Utils {
 		}
 		return substrings;
 	}
+
+	/**
+	 * validate an invoker uid is part of membersUid
+	 */
+	public static isMember(membersUid: string[], invokerUid: string) {
+		return membersUid.includes(invokerUid);
+	}
 }
