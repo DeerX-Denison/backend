@@ -1,9 +1,9 @@
 export { createListing } from './functions/listing/create-listing';
 export { deleteListing } from './functions/listing/delete-listing';
 export { updateListing } from './functions/listing/update-listing';
+export { createMessage } from './functions/message/create-message';
 export { syncUser } from './functions/user/sync-user';
 export { health } from './functions/misc/health';
-export { default as createMessage } from './messages/createMessage';
 export { default as createThread } from './messages/createThread';
 export { default as readMessages } from './messages/readMessages';
 export { default as sendManualMessage } from './messages/sendManualMessage';
