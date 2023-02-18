@@ -26,6 +26,7 @@ export enum ListingCondition {
 export enum ListingStatus {
 	'POSTED' = 'posted',
 	'SAVED' = 'saved',
+	'SOLD' = 'sold',
 }
 
 export const Listing = z.object({
