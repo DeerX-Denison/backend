@@ -42,6 +42,7 @@ export const Listing = z.object({
 	createdAt: Timestamp,
 	updatedAt: Timestamp,
 	status: z.nativeEnum(ListingStatus),
+	soldTo: UserProfile,
 });
 
 export type Listing = z.infer<typeof Listing>;
