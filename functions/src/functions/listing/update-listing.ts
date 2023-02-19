@@ -34,7 +34,7 @@ export const updateListing = functions.https.onCall(
 			});
 
 			if (updatedListing.status !== ListingStatus.SOLD) {
-				delete updatedListing.soldTo;
+				updatedListing.soldTo = null;
 			}
 
 			// write to db

@@ -24,6 +24,7 @@ export const createListing = functions.https.onCall(
 			const newListing = Listing.parse({
 				...requestData,
 				seller: invoker,
+				soldTo: null,
 				likedBy: [],
 				createdAt: admin.firestore.Timestamp.now(),
 				updatedAt: admin.firestore.Timestamp.now(),
