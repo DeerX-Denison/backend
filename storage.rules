@@ -1,8 +1,13 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if true;
+    function loggedIn(){
+      return request.auth != null;
+    }
+
+    match /listings/{listingId}/{fileName} {
+      allow read:
+        if loggedIn();
     }
   }
 }

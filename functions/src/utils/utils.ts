@@ -11,6 +11,7 @@ import { ValidationError } from '../models/error/validation-error';
 import { User } from '../models/user';
 import { Firebase } from '../services/firebase-service';
 import { AuthData } from 'firebase-functions/lib/common/providers/tasks';
+import { Config } from '../config';
 
 export class Utils {
 	/**
@@ -128,9 +129,9 @@ export class Utils {
 		const email = authData.token.email;
 		if (!email) throw new AuthError();
 		if (!authData.token.email_verified) throw new AuthError();
-		if (email.endsWith('@denison.edu')) return email;
-		if (email === 'deerx.test@gmail.com') return email;
-		if (email === 'deerx.dev@gmail.com') return email;
+		if (email.endsWith(Config.emailPrefix)) return email;
+		if (Config.testerEmails.includes(email)) return email;
+		console.log(Config.testerEmails);
 		throw new AuthError();
 	}
 
