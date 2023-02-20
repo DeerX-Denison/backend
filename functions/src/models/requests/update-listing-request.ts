@@ -10,6 +10,7 @@ export const UpdateListingRequest = Listing.pick({
 	condition: true,
 	description: true,
 	status: true,
+	soldTo: true,
 });
 
 export type UpdateListingRequest = z.infer<typeof UpdateListingRequest>;

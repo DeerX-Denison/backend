@@ -26,6 +26,7 @@ export enum ListingCondition {
 export enum ListingStatus {
 	'POSTED' = 'posted',
 	'SAVED' = 'saved',
+	'SOLD' = 'sold',
 }
 
 export const Listing = z.object({
@@ -41,6 +42,7 @@ export const Listing = z.object({
 	createdAt: Timestamp,
 	updatedAt: Timestamp,
 	status: z.nativeEnum(ListingStatus),
+	soldTo: UserProfile.nullable().default(null),
 });
 
 export type Listing = z.infer<typeof Listing>;

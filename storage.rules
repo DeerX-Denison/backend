@@ -1,8 +1,32 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if true;
+    function loggedIn(){
+      return request.auth != null;
+    }
+
+    match /listings/{listingId}/{fileName} {
+      function isSeller(){
+        return firestore.get(/databases/(default)/documents/listings/$(listingId)).seller.uid == request.auth.uid;
+      }
+
+      allow read:
+        if loggedIn();
+      allow write:
+        if loggedIn();
+        && isSeller();
+    }
+
+    match /profilePhotos/{uid}/{fileName} {
+      function isSelf(){
+        return uid == request.auth.uid
+      }
+
+      allow read:
+        if loggedIn();
+      allow write:
+        if loggedIn();
+        && isSelf();
     }
   }
 }

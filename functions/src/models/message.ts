@@ -6,6 +6,7 @@ import { UserProfile } from './user';
 
 export enum MessageContentType {
 	'text' = 'text',
+	'reference' = 'reference',
 }
 
 export const Message = z.object({
