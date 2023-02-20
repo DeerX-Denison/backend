@@ -6,8 +6,15 @@ service firebase.storage {
     }
 
     match /listings/{listingId}/{fileName} {
+      function isSeller(){
+        return firestore.get(/databases/(default)/documents/listings/$(listingId)).seller.uid == request.auth.uid;
+      }
+
       allow read:
         if loggedIn();
+      allow write:
+        if loggedIn();
+        && isSeller();
     }
   }
 }
