@@ -16,5 +16,17 @@ service firebase.storage {
         if loggedIn();
         && isSeller();
     }
+
+    match /profilePhotos/{uid}/{fileName} {
+      function isSelf(){
+        return uid == request.auth.uid
+      }
+
+      allow read:
+        if loggedIn();
+      allow write:
+        if loggedIn();
+        && isSelf();
+    }
   }
 }
