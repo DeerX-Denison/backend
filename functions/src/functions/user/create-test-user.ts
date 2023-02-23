@@ -6,8 +6,9 @@ import { InternalError } from '../../models/error/internal-error';
 import { CreateTestUserResponse } from '../../models/response/user/create-test-user-response';
 import { AuthError } from '../../models/error/auth-error';
 
-export const createTestUser = Firebase.functions.https.onCall(
-	async (data: unknown) => {
+export const createTestUser = Firebase.functions
+	.region(...Config.regions)
+	.https.onCall(async (data: unknown) => {
 		try {
 			// parse incoming data
 			const requestData = CreateTestUserRequest.parse(data);
@@ -37,5 +38,4 @@ export const createTestUser = Firebase.functions.https.onCall(
 			console.error(error);
 			throw error;
 		}
-	}
-);
+	});
