@@ -2,25 +2,17 @@ import { program } from 'commander';
 import { Context } from './models/context';
 import { FirebaseClient } from './service/firebase-client';
 import { z } from 'zod';
-import { NonEmptyString } from '../src/models/non-empty-string';
 import { Environments } from './models/environments';
 
-export const createTestUser = async (
-	context: Context,
-	requestData: unknown
-) => {
-	const res = await context.firebaseClient.callableFunctions('createTestUser')(
-		requestData
-	);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const health = async (context: Context, opts?: unknown) => {
+	const res = await context.firebaseClient.callableFunctions('health')();
 	if (context.debug) console.log(res.data);
 	return res.data;
 };
 
 if (require.main === module) {
 	program
-		.requiredOption('--email <string>', 'user email')
-		.requiredOption('--password <string>', 'user password')
-		.requiredOption('--token <string>', 'token to create test user')
 		.option(
 			'--environment <string>',
 			'test environment',
@@ -31,9 +23,6 @@ if (require.main === module) {
 
 	const opts = z
 		.object({
-			email: NonEmptyString,
-			password: NonEmptyString,
-			token: NonEmptyString,
 			environment: z.nativeEnum(Environments),
 			debug: z.boolean().optional().nullable(),
 		})
@@ -43,5 +32,5 @@ if (require.main === module) {
 
 	const context = { firebaseClient, ...opts };
 
-	createTestUser(context, opts);
+	health(context);
 }

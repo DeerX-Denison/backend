@@ -163,4 +163,31 @@ export class Utils {
 	public static isMember(membersUid: string[], invokerUid: string) {
 		return membersUid.includes(invokerUid);
 	}
+
+	/**
+	 * Check if unknown input value is dictionary
+	 * @param o input unknown value to be checked
+	 * @returns boolean if input is a dictionary
+	 */
+	public static isDictionary(o: unknown): o is Record<string, unknown> {
+		return typeof o === 'object' && o !== null && !Array.isArray(o);
+	}
+
+	/**
+	 * check 2 diciontary to be identical. Identical means
+	 * similar key disregarding order, and similar values.
+	 * Only checks raw data of dictionary, will not check
+	 * for methods of classes.
+	 * @param d1 dictionary 1 to check
+	 * @param d2 dictionary 2 to check
+	 * @returns boolean
+	 */
+	public static identicalDictionary(d1: unknown, d2: unknown): boolean {
+		return (
+			this.isDictionary(d1) &&
+			this.isDictionary(d2) &&
+			Object.entries(d1).sort().toString() ===
+				Object.entries(d2).sort().toString()
+		);
+	}
 }
