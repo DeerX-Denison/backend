@@ -8,7 +8,7 @@ import { NonEmptyString } from '../../models/non-empty-string';
 import { DEFAULT_USER_PHOTO_URL, DEFAULT_MESSAGE_NAME } from '../../constants';
 import { InternalError } from '../../models/error/internal-error';
 import { ERROR_MESSAGES } from '../../constants';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 
 export const createMessage = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {

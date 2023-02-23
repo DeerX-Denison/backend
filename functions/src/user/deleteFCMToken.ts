@@ -1,4 +1,4 @@
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 import Logger from '../Logger';
 const logger = new Logger();
 

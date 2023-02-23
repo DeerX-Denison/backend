@@ -2,7 +2,7 @@ import { UserProfile } from 'types';
 import { CORE_TEAM_EMAILS, ERROR_MESSAGES } from '../constants';
 import Logger from '../Logger';
 import { fetchUserProfile, isLoggedIn } from '../utils';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 

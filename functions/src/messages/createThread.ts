@@ -6,7 +6,7 @@ import {
 import Logger from '../Logger';
 import { ThreadName, ThreadPreviewData, ThreadThumbnail } from '../types';
 import { fetchUserInfo, isLoggedIn, isNotBanned } from '../utils';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 import { Timestamp } from '../models/timestamp';
 
 const logger = new Logger();

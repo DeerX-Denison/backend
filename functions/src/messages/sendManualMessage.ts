@@ -1,7 +1,7 @@
-import { messaging } from 'firebase-admin';
 import { UserFCMTokenData } from 'types';
 import Logger from '../Logger';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
+import { MulticastMessage } from 'firebase-admin/messaging';
 
 const logger = new Logger();
 
@@ -19,7 +19,7 @@ const sendManualMessage = Firebase.functions.https.onCall(
 		);
 		const tokens = tokensData.map((tokenData) => tokenData.token);
 
-		const message: messaging.MulticastMessage = {
+		const message: MulticastMessage = {
 			data: {
 				message: JSON.stringify({
 					content: 'hello world',

@@ -4,7 +4,7 @@ import validImageContent from '../validImageContent';
 import resizeImage from './resizeImage';
 import validMetadata from './validMetadata';
 import { ListingImageMetadata, Listing } from '../../models/listing';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 import { ObjectMetadata } from 'firebase-functions/v1/storage';
 
 const logger = new Logger();

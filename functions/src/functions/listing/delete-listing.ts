@@ -1,6 +1,6 @@
 import { DeleteListingRequest } from '../../models/requests/delete-listing-request';
 import { Collection } from '../../models/collection-name';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 import { Utils } from '../../utils/utils';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
 

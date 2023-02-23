@@ -9,7 +9,7 @@ import { InternalError } from '../models/error/internal-error';
 import { NotFoundError } from '../models/error/not-found-error';
 import { ValidationError } from '../models/error/validation-error';
 import { User } from '../models/user';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 import { AuthData } from 'firebase-functions/lib/common/providers/tasks';
 import { Config } from '../config';
 

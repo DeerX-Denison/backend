@@ -1,6 +1,7 @@
 import { MessageData } from 'types';
-import { db } from '../firebase.config';
 import Logger from '../Logger';
+import { Firebase } from '../services/firebase';
+
 const logger = new Logger();
 
 /**
@@ -11,7 +12,7 @@ const fetchMessage: (
 	messageId: string
 ) => Promise<MessageData | undefined> = async (threadId, messageId) => {
 	try {
-		const docSnap = await db
+		const docSnap = await Firebase.db
 			.collection('threads')
 			.doc(threadId)
 			.collection('messages')

@@ -12,12 +12,15 @@ export enum MessageContentType {
 export const Message = z.object({
 	id: NonEmptyString,
 	sender: UserProfile,
-	time: Timestamp,
+	time: z.instanceof(Timestamp),
 	contentType: z.array(z.nativeEnum(MessageContentType)).min(1),
 	content: NonEmptyString,
 	membersUid: z.array(NonEmptyString).min(2),
 	threadName: z.record(NonEmptyString, NonEmptyString),
-	seenAt: z.record(NonEmptyString, z.union([Timestamp, z.null()])),
+	seenAt: z.record(
+		NonEmptyString,
+		z.union([z.instanceof(Timestamp), z.null()])
+	),
 	refs: z.array(
 		z.object({
 			begin: z.number().min(0),

@@ -10,7 +10,7 @@ import {
 import Logger from '../Logger';
 import { getAllSubstrings } from '../utils';
 import userNameAndPhoto from './users.json';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 

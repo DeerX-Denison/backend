@@ -1,6 +1,6 @@
 import Logger from '../Logger';
 import { main as deleteAnonymousUser } from './deleteAnonymousUser';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 const deleteOldAnonUsers = Firebase.functions.pubsub

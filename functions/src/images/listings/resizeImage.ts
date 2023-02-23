@@ -5,7 +5,7 @@ import sharp from 'sharp';
 import { LISTING_IMAGE_HEIGHT } from '../../constants';
 import Logger from '../../Logger';
 import { ListingImageMetadata } from '../../models/listing';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 
 const logger = new Logger();
 

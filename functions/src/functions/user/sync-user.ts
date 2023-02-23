@@ -6,7 +6,7 @@ import {
 import userData from './users.json';
 import { User, UserProfile } from '../../models/user';
 import { z } from 'zod';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 import { Collection } from '../../models/collection-name';
 import { AuthError } from '../../models/error/auth-error';
 import { NotFoundError } from '../../models/error/not-found-error';

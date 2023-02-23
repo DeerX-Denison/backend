@@ -1,13 +1,13 @@
 import { UserFCMTokenData } from 'types';
-import { db } from '../firebase.config';
 import Logger from '../Logger';
+import { Firebase } from '../services/firebase';
 const logger = new Logger();
 /**
  * function to fetch all fcm token of the provided uid
  */
 const fetchFCMTokensFromUid = async (uid: string) => {
 	try {
-		const querySnap = await db
+		const querySnap = await Firebase.db
 			.collection('users')
 			.doc(uid)
 			.collection('fcm_tokens')

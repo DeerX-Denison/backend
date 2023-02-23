@@ -3,7 +3,7 @@ import { ERROR_MESSAGES } from '../constants';
 import Logger from '../Logger';
 import secrets from '../secrets.json';
 import { ActionCodeSettings } from 'firebase-admin/auth';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 

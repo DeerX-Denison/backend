@@ -6,7 +6,7 @@ import { fetchUserInfo } from '../../utils';
 import resizeImage from '../listings/resizeImage';
 import validImageContent from '../validImageContent';
 import validMetadata from './validMetadata';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 import { ObjectMetadata } from 'firebase-functions/v1/storage';
 
 const logger = new Logger();

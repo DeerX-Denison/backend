@@ -2,7 +2,7 @@ import { ConfirmationResponse } from '../../models/response/confirmation-respons
 import { Collection } from '../../models/collection-name';
 import { Listing } from '../../models/listing';
 import { CreateListingRequest } from '../../models/requests/create-listing-request';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 import { Utils } from '../../utils/utils';
 
 export const createListing = Firebase.functions.https.onCall(

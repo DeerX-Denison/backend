@@ -7,7 +7,7 @@ import {
 import Logger from '../Logger';
 import { getAllSubstrings, isLoggedIn, isNotBanned } from '../utils';
 import validWishlistData from './validWishlishData';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 import { Timestamp } from '../models/timestamp';
 
 const logger = new Logger();

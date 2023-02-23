@@ -1,6 +1,6 @@
-import { default as functions } from 'firebase-functions';
+import functions from 'firebase-functions';
 import { initializeApp, cert } from 'firebase-admin/app';
-import { default as secrets } from '../secrets.json';
+import secrets from '../secrets.json';
 import testFunctions from 'firebase-functions-test';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';

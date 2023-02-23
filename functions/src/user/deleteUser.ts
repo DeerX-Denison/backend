@@ -1,7 +1,7 @@
 import { ERROR_MESSAGES } from '../constants';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 

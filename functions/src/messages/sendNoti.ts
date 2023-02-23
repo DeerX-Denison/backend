@@ -1,8 +1,8 @@
 import { MessageData, MessageId, ThreadId, UserInfo } from 'types';
-import { msg } from '../firebase.config';
 import Logger from '../Logger';
 import constructNoti from './constructNoti';
 import fetchFCMTokensFromUid from './fetchFCMTokens';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 
@@ -28,7 +28,9 @@ const sendNoti = async (
 			const tokens = tokensData.map((tokenData) => tokenData.token);
 			const noti = constructNoti(message, tokens, members, uid);
 			try {
-				const { successCount, failureCount } = await msg.sendMulticast(noti);
+				const { successCount, failureCount } = await Firebase.msg.sendMulticast(
+					noti
+				);
 				logger.log(`successCount: ${successCount}`);
 				logger.log(`failureCount: ${failureCount}`);
 			} catch (error) {

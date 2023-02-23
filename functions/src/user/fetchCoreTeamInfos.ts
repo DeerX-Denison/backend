@@ -3,7 +3,7 @@ import { CORE_TEAM_EMAILS, ERROR_MESSAGES } from '../constants';
 import Logger from '../Logger';
 import { UserInfo } from '../types';
 import { isLoggedIn, isNotBanned } from '../utils';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 

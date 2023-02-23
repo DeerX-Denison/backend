@@ -1,5 +1,5 @@
 import { UserRecord } from 'firebase-functions/v1/auth';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 import { CreateTestUserRequest } from '../../models/requests/user/create-test-user-request';
 import { Config } from '../../config';
 import { InternalError } from '../../models/error/internal-error';

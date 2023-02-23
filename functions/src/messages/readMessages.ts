@@ -2,7 +2,7 @@ import { MessageData, MessageId, MessageSeenAt, ThreadId } from 'types';
 import Logger from '../Logger';
 import { isLoggedIn } from '../utils';
 import fetchMessage from '../utils/fetchMessage';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 import { Timestamp } from '../models/timestamp';
 
 export type ReadMessageData = { messageIds: MessageId[]; threadId: ThreadId };

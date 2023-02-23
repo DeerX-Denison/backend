@@ -4,7 +4,7 @@ import os from 'os';
 import path from 'path';
 import { ListingImageMetadata } from 'types';
 import Logger from '../Logger';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 

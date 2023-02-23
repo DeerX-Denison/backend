@@ -11,7 +11,7 @@ import {
 import { InternalError } from '../../models/error/internal-error';
 import { ERROR_MESSAGES } from '../../constants';
 import { CreateRoomRequest } from '../../models/requests/create-room-request';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 
 export const createRoom = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {

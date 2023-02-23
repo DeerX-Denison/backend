@@ -1,7 +1,7 @@
 import { UserData, UserProfile } from 'types';
 import { ERROR_MESSAGES } from '../constants';
 import Logger from '../Logger';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 
