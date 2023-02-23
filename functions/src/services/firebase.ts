@@ -1,4 +1,4 @@
-import functions from 'firebase-functions';
+import * as functions from 'firebase-functions';
 import { initializeApp, cert } from 'firebase-admin/app';
 import secrets from '../secrets.json';
 import testFunctions from 'firebase-functions-test';
@@ -28,7 +28,6 @@ const storage = getStorage(app);
 const auth = getAuth(app);
 
 const msg = getMessaging(app);
-
 export class Firebase {
 	public static db = db;
 	public static storage = storage.bucket(secrets.storageBucket);
