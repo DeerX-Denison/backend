@@ -1,10 +1,9 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
 import { UserPronoun } from 'types';
 import { ERROR_MESSAGES } from '../constants';
-import { db } from '../firebase.config';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
+import { Firebase } from '../services/firebase-service';
+
 const logger = new Logger();
 
 type Data = {
@@ -13,7 +12,7 @@ type Data = {
 	pronouns: UserPronoun[] | undefined;
 };
 
-const updateUserProfile = functions.https.onCall(
+const updateUserProfile = Firebase.functions.https.onCall(
 	async ({ imageUrl, bio, pronouns }: Data, context) => {
 		const invokerUid = isLoggedIn(context);
 		const invoker = await isNotBanned(invokerUid);
@@ -23,16 +22,19 @@ const updateUserProfile = functions.https.onCall(
 		if (pronouns) updateValue['pronouns'] = pronouns;
 
 		try {
-			await db.collection('users').doc(invoker.uid).update(updateValue);
+			await Firebase.db
+				.collection('users')
+				.doc(invoker.uid)
+				.update(updateValue);
 			logger.log(`Updated user profile in database: ${invoker.uid}`);
 			if (imageUrl) {
-				await admin.auth().updateUser(invoker.uid, { photoURL: imageUrl });
+				await Firebase.auth.updateUser(invoker.uid, { photoURL: imageUrl });
 				logger.log(`Updated user profile in firebase: ${invoker.uid}`);
 			}
 		} catch (error) {
 			logger.error(error);
 			logger.error(`Fail to update user profile: ${invoker.uid}`);
-			throw new functions.https.HttpsError(
+			throw new Firebase.functions.https.HttpsError(
 				'internal',
 				ERROR_MESSAGES.failUpdateUserProfile
 			);

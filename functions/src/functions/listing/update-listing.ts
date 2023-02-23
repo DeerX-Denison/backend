@@ -1,5 +1,3 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Collection } from '../../models/collection-name';
 import { Listing, ListingStatus } from '../../models/listing';
@@ -7,7 +5,7 @@ import { Firebase } from '../../services/firebase-service';
 import { Utils } from '../../utils/utils';
 import { UpdateListingRequest } from '../../models/requests/update-listing-request';
 
-export const updateListing = functions.https.onCall(
+export const updateListing = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
 			// validate request data
@@ -43,7 +41,7 @@ export const updateListing = functions.https.onCall(
 				.doc(updatedListing.id)
 				.update({
 					...updatedListing,
-					updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+					updatedAt: Firebase.serverTime(),
 				});
 
 			// check for removed images to delete from storage

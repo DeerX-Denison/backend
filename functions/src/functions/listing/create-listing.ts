@@ -1,5 +1,3 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Collection } from '../../models/collection-name';
 import { Listing } from '../../models/listing';
@@ -7,7 +5,7 @@ import { CreateListingRequest } from '../../models/requests/create-listing-reque
 import { Firebase } from '../../services/firebase-service';
 import { Utils } from '../../utils/utils';
 
-export const createListing = functions.https.onCall(
+export const createListing = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
 			// validate request data
@@ -26,8 +24,8 @@ export const createListing = functions.https.onCall(
 				seller: invoker,
 				soldTo: null,
 				likedBy: [],
-				createdAt: admin.firestore.Timestamp.now(),
-				updatedAt: admin.firestore.Timestamp.now(),
+				createdAt: Firebase.serverTime(),
+				updatedAt: Firebase.serverTime(),
 			});
 
 			// write to db
@@ -38,11 +36,7 @@ export const createListing = functions.https.onCall(
 						: Collection.listings
 				)
 				.doc(newListing.id)
-				.set({
-					...newListing,
-					updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-					createdAt: admin.firestore.FieldValue.serverTimestamp(),
-				});
+				.set(newListing);
 
 			return ConfirmationResponse.parse();
 		} catch (error) {

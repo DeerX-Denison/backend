@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import { ObjectMetadata } from 'firebase-functions/v1/storage';
 import Logger from '../../Logger';
 import secrets from '../../secrets.json';
 
@@ -7,9 +7,7 @@ const logger = new Logger();
 /**
  * verify if metadata of newly uploaded image is valid
  */
-const validMetadata: (obj: functions.storage.ObjectMetadata) => boolean = (
-	obj
-) => {
+const validMetadata: (obj: ObjectMetadata) => boolean = (obj) => {
 	const { kind, name, metadata, bucket, contentType } = obj;
 
 	// if invalid custom metadata

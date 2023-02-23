@@ -1,17 +1,10 @@
 import { z } from 'zod';
+import { Email } from './email';
+import { PhoneNumber } from './phone-number';
 
-export const uid = z.string().min(1);
+export const Uid = z.string().min(1);
 
 export const displayName = z.string().min(1).optional().nullable();
-
-export const email = z.string().min(1).email().optional().nullable();
-
-export const phoneNumber = z
-	.string()
-	.min(1)
-	.regex(/^\\+\d{7,16}$/)
-	.optional()
-	.nullable();
 
 export const photoURL = z.string().min(1).url().optional().nullable();
 
@@ -22,20 +15,20 @@ export const UserMetadata = z.object({
 });
 
 export const UserProviderData = z.object({
-	uid,
+	uid: Uid,
 	displayName,
-	email,
-	phoneNumber,
+	email: Email.optional().nullable(),
+	phoneNumber: PhoneNumber,
 	photoURL,
 	providerId: z.string().min(1),
 });
 
 export const UserMultiFactorInfo = z.object({
-	uid,
+	uid: Uid,
 	displayName,
 	enrollmentTime: z.string().min(1).optional(),
 	factorId: z.string().min(1),
-	phoneNumber,
+	phoneNumber: PhoneNumber.optional().nullable(),
 });
 
 export const UserMultiFactorSettings = z.object({
@@ -55,12 +48,12 @@ export enum UserProfileStatus {
 }
 
 export const User = z.object({
-	uid,
-	email,
+	uid: Uid,
+	email: Email,
 	emailVerified: z.boolean(),
 	displayName,
 	photoURL,
-	phoneNumber,
+	phoneNumber: PhoneNumber.optional().nullable(),
 	disabled: z.boolean(),
 	metadata: UserMetadata,
 	providerData: z.array(UserProviderData),

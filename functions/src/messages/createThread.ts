@@ -1,16 +1,17 @@
-import * as functions from 'firebase-functions';
 import {
 	DEFAULT_MESSAGE_NAME,
 	DEFAULT_USER_PHOTO_URL,
 	ERROR_MESSAGES,
 } from '../constants';
-import { db, svTime, Timestamp } from '../firebase.config';
 import Logger from '../Logger';
 import { ThreadName, ThreadPreviewData, ThreadThumbnail } from '../types';
 import { fetchUserInfo, isLoggedIn, isNotBanned } from '../utils';
+import { Firebase } from '../services/firebase-service';
+import { Timestamp } from '../models/timestamp';
+
 const logger = new Logger();
 
-const createThread = functions.https.onCall(
+const createThread = Firebase.functions.https.onCall(
 	async (threadPreviewData: ThreadPreviewData, context) => {
 		const invokerUid = isLoggedIn(context);
 		const invoker = await isNotBanned(invokerUid);
@@ -19,7 +20,7 @@ const createThread = functions.https.onCall(
 			logger.error(
 				`membersUid does not have length 2: ${threadPreviewData.id}`
 			);
-			throw new functions.https.HttpsError(
+			throw new Firebase.functions.https.HttpsError(
 				'invalid-argument',
 				ERROR_MESSAGES.invalidInput
 			);
@@ -29,7 +30,7 @@ const createThread = functions.https.onCall(
 			logger.log(
 				`Invoker (${invoker.uid}) is not thread's member: ${threadPreviewData.id}`
 			);
-			throw new functions.https.HttpsError(
+			throw new Firebase.functions.https.HttpsError(
 				'permission-denied',
 				ERROR_MESSAGES.notThreadMember
 			);
@@ -39,7 +40,7 @@ const createThread = functions.https.onCall(
 			logger.log(
 				`Invoker (${invoker.uid}) is not thread's member (id): ${threadPreviewData.id}`
 			);
-			throw new functions.https.HttpsError(
+			throw new Firebase.functions.https.HttpsError(
 				'permission-denied',
 				ERROR_MESSAGES.notThreadMember
 			);
@@ -49,7 +50,7 @@ const createThread = functions.https.onCall(
 			(x) => x.uid === context.auth?.uid
 		);
 		if (!threadCreator) {
-			throw new functions.https.HttpsError(
+			throw new Firebase.functions.https.HttpsError(
 				'permission-denied',
 				`Invoker (${invoker.uid}) is not thread's member (thread creator): ${threadPreviewData.id}`
 			);
@@ -87,7 +88,7 @@ const createThread = functions.https.onCall(
 					: DEFAULT_USER_PHOTO_URL;
 			} else {
 				logger.error(`other members length is < 0: ${threadPreviewData.id}`);
-				throw new functions.https.HttpsError(
+				throw new Firebase.functions.https.HttpsError(
 					'invalid-argument',
 					ERROR_MESSAGES.invalidInput
 				);
@@ -100,11 +101,11 @@ const createThread = functions.https.onCall(
 			members,
 			name,
 			thumbnail,
-			latestTime: svTime() as Timestamp,
+			latestTime: Firebase.serverTime() as Timestamp,
 		};
 
 		try {
-			await db
+			await Firebase.db
 				.collection('threads')
 				.doc(threadPreviewData.id)
 				.set(newThreadPreviewData);
@@ -112,7 +113,7 @@ const createThread = functions.https.onCall(
 		} catch (error) {
 			logger.error(error);
 			logger.error(`Fail to create new thread: ${threadPreviewData.id}`);
-			throw new functions.https.HttpsError(
+			throw new Firebase.functions.https.HttpsError(
 				'internal',
 				ERROR_MESSAGES.failCreateThread
 			);

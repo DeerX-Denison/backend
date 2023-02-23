@@ -7,4 +7,7 @@ export class Config {
 	public static testerEmails = process.env.TESTER_EMAILS
 		? process.env.TESTER_EMAILS.split(',').map((_) => _.trim())
 		: [];
+	public static regions = [];
+	public static createTestUserToken =
+		process.env.CREATE_TEST_USER_TOKEN ?? 'welcome-to-deerx';
 }

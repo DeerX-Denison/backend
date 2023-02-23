@@ -1,14 +1,13 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
 import Logger from '../Logger';
 import { main as deleteAnonymousUser } from './deleteAnonymousUser';
+import { Firebase } from '../services/firebase-service';
 
 const logger = new Logger();
-const deleteOldAnonUsers = functions.pubsub
+const deleteOldAnonUsers = Firebase.functions.pubsub
 	.schedule('0 0 * * *')
 	.timeZone('America/New_York')
 	.onRun(async () => {
-		const allUsers = await admin.auth().listUsers();
+		const allUsers = await Firebase.auth.listUsers();
 		const anonUserRecords = allUsers.users.filter(
 			(userRecord) => userRecord.providerData.length === 0
 		);

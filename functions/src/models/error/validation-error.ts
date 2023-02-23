@@ -1,7 +1,7 @@
-import * as functions from 'firebase-functions';
+import { HttpsError } from 'firebase-functions/v1/https';
 import { ZodError } from 'zod';
 
-export class ValidationError extends functions.https.HttpsError {
+export class ValidationError extends HttpsError {
 	constructor(error: ZodError) {
 		super('invalid-argument', error.message, {
 			error,

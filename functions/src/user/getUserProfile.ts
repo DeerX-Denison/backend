@@ -1,12 +1,13 @@
-import * as functions from 'firebase-functions';
 import { UserProfile } from 'types';
 import { CORE_TEAM_EMAILS, ERROR_MESSAGES } from '../constants';
 import Logger from '../Logger';
 import { fetchUserProfile, isLoggedIn } from '../utils';
+import { Firebase } from '../services/firebase-service';
+
 const logger = new Logger();
 
-const getUserProfile = functions.https.onCall(
-	async (uid: string, context: functions.https.CallableContext) => {
+const getUserProfile = Firebase.functions.https.onCall(
+	async (uid: string, context) => {
 		isLoggedIn(context);
 
 		let userProfile: UserProfile;
@@ -15,7 +16,7 @@ const getUserProfile = functions.https.onCall(
 		} catch (error) {
 			logger.error(error);
 			logger.error(`Fail to fetch user profile: ${uid}`);
-			throw new functions.https.HttpsError(
+			throw new Firebase.functions.https.HttpsError(
 				'internal',
 				ERROR_MESSAGES.failGetUserProfile
 			);
@@ -30,7 +31,7 @@ const getUserProfile = functions.https.onCall(
 					logger.log(
 						`Anonymous user (${context.auth.uid}) attempt to fetch: ${uid}`
 					);
-					throw new functions.https.HttpsError(
+					throw new Firebase.functions.https.HttpsError(
 						'internal',
 						ERROR_MESSAGES.noPermGuest
 					);

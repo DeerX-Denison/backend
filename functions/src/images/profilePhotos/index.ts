@@ -1,7 +1,4 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
 import { DEFAULT_USER_PHOTO_URL } from '../../constants';
-import { db, storage } from '../../firebase.config';
 import Logger from '../../Logger';
 import { ListingImageMetadata, UserInfo } from '../../types';
 import userNameAndPhoto from '../../user/users.json';
@@ -9,6 +6,9 @@ import { fetchUserInfo } from '../../utils';
 import resizeImage from '../listings/resizeImage';
 import validImageContent from '../validImageContent';
 import validMetadata from './validMetadata';
+import { Firebase } from '../../services/firebase-service';
+import { ObjectMetadata } from 'firebase-functions/v1/storage';
+
 const logger = new Logger();
 
 // typing of the user file that maps displayName and photoURL
@@ -19,23 +19,23 @@ type UserFile = {
 /**
  * function that triggers to verify newly added profile image has valid metadata. This should prevent malicious user to abuse REST end points to programatically upload image. Normal user that uploads image through the app should pass this function.
  */
-const uploadProfileImageHandler = functions.storage
+const uploadProfileImageHandler = Firebase.functions.storage
 	.object()
-	.onFinalize(async (obj: functions.storage.ObjectMetadata) => {
+	.onFinalize(async (obj: ObjectMetadata) => {
 		const imageRef = obj.id.substring(
 			obj.id.indexOf('/') + 1,
 			obj.id.lastIndexOf('/')
 		);
 		if (imageRef.split('/')[0] !== 'profilePhotos') return 'ok';
 		const uid = imageRef.split('/')[1];
-		const imageFile = storage.file(imageRef);
+		const imageFile = Firebase.storage.file(imageRef);
 		const metaRes = await imageFile.getMetadata();
 		logger.log(`Fetched image metadata: ${imageRef}`);
 		const imageMetadata: ListingImageMetadata = metaRes[0].metadata;
 
 		if (!validMetadata(obj)) {
 			try {
-				await storage.file(imageRef).delete();
+				await Firebase.storage.file(imageRef).delete();
 				logger.log(`Deleted image: ${imageRef}`);
 			} catch (error) {
 				logger.error(error);
@@ -50,7 +50,7 @@ const uploadProfileImageHandler = functions.storage
 		if (imageMetadata.contentValidated === 'false') {
 			if (!(await validImageContent(imageRef))) {
 				try {
-					await storage.file(imageRef).delete();
+					await Firebase.storage.file(imageRef).delete();
 					logger.log(`Invalid image content, deleted: ${imageRef}`);
 				} catch (error) {
 					logger.error(
@@ -82,7 +82,7 @@ const uploadProfileImageHandler = functions.storage
 				}
 
 				try {
-					await db.collection('users').doc(uid).update({ photoURL });
+					await Firebase.db.collection('users').doc(uid).update({ photoURL });
 					logger.log(`Updated user profile photo in database: ${imageRef}`);
 				} catch (error) {
 					logger.error(error);
@@ -90,7 +90,7 @@ const uploadProfileImageHandler = functions.storage
 					return 'error';
 				}
 				try {
-					await admin.auth().updateUser(uid, { photoURL: photoURL });
+					await Firebase.auth.updateUser(uid, { photoURL: photoURL });
 					logger.log(`Updated user profile photo in firebase: ${imageRef}`);
 				} catch (error) {
 					logger.error(error);

@@ -4,24 +4,27 @@ import 'ts-jest';
 // import * as myFunctions from '.';
 
 describe('hello world callable', () => {
-	// let wrapped: WrappedFunction;
-	beforeAll(() => {
-		// wrapped = testEnv.wrap(myFunctions.helloWorldCallable);
+	// let createTestUser: WrappedFunction;
+	// beforeAll(() => {
+	// 	createTestUser = testEnv.wrap(myFunctions.createTestUser);
+	// });
+	test('It creates new test user', async () => {
+		// const res = await createTestUser({email: })
 	});
 	test('it returns "Hello from Callable Firebase!"', async () => {
-		// const res = await wrapped({});
-		// expect(res).toBe('Hello from Callable Firebase!');
+		// const res = await wrapped({}, { auth: { uid: 'foobar' } });
+		// expect(res).toBe('error');
 	});
 });
 
 describe('hello world request', () => {
-	test('it returns "Hello from Request Firebase!', () => {
-		// const req = {};
-		// const res = {
-		// 	send: (payload: any) => {
-		// 		expect(payload).toBe('Hello from Request Firebase!');
-		// 	},
-		// };
-		// myFunctions.helloWorldRequest(req as any, res as any);
-	});
+	// test('it returns "Hello from Request Firebase!', () => {
+	// 	const req = {};
+	// 	const res = {
+	// 		send: (payload: any) => {
+	// 			expect(payload).toBe('Hello from Request Firebase!');
+	// 		},
+	// 	};
+	// 	myFunctions.helloWorldRequest(req as any, res as any);
+	// });
 });

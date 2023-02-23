@@ -11,9 +11,12 @@ export const Room = z.object({
 	thumbnail: z.record(NonEmptyString, Url),
 	name: z.record(NonEmptyString, NonEmptyString),
 	latestMessage: NonEmptyString,
-	latestTime: Timestamp,
+	latestTime: z.instanceof(Timestamp),
 	latestSenderUid: NonEmptyString,
-	latestSeenAt: z.record(NonEmptyString, z.union([Timestamp, z.null()])),
+	latestSeenAt: z.record(
+		NonEmptyString,
+		z.union([z.instanceof(Timestamp), z.null()])
+	),
 });
 
 export type Room = z.infer<typeof Room>;

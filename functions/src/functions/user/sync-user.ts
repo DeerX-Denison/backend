@@ -1,4 +1,3 @@
-import * as functions from 'firebase-functions';
 import { Utils } from '../../utils/utils';
 import {
 	DEFAULT_USER_DISPLAY_NAME,
@@ -12,7 +11,7 @@ import { Collection } from '../../models/collection-name';
 import { AuthError } from '../../models/error/auth-error';
 import { NotFoundError } from '../../models/error/not-found-error';
 
-export const syncUser = functions.https.onCall(async (_, context) => {
+export const syncUser = Firebase.functions.https.onCall(async (_, context) => {
 	try {
 		// authorize user
 		const invokerId = Utils.isLoggedIn(context);

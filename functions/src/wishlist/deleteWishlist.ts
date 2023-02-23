@@ -1,23 +1,23 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
 import {
 	DEFAULT_GUEST_DISPLAY_NAME,
 	DEFAULT_GUEST_EMAIL,
 	ERROR_MESSAGES,
 } from '../constants';
-import { db } from '../firebase.config';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
+import { Firebase } from '../services/firebase-service';
+
 const logger = new Logger();
-const deleteWishlist = functions.https.onCall(
+
+const deleteWishlist = Firebase.functions.https.onCall(
 	async (listingId: string, context) => {
 		const invokerUid = isLoggedIn(context);
 		const invoker = await isNotBanned(invokerUid);
 
-		const batch = db.batch();
+		const batch = Firebase.db.batch();
 
 		batch.delete(
-			db
+			Firebase.db
 				.collection('users')
 				.doc(invoker.uid)
 				.collection('wishlist')
@@ -29,8 +29,8 @@ const deleteWishlist = functions.https.onCall(
 			invoker.email === DEFAULT_GUEST_EMAIL
 				? 'guest_listings'
 				: 'listings';
-		batch.update(db.collection(collection).doc(listingId), {
-			likedBy: admin.firestore.FieldValue.arrayUnion(invoker.uid),
+		batch.update(Firebase.db.collection(collection).doc(listingId), {
+			likedBy: Firebase.arrayUnion(invoker.uid),
 		});
 		try {
 			await batch.commit();
@@ -41,7 +41,7 @@ const deleteWishlist = functions.https.onCall(
 			logger.error(
 				`Fail to remove listing from wishlist or remove from listing's likedBy array: ${invoker.uid}/${listingId}`
 			);
-			throw new functions.https.HttpsError(
+			throw new Firebase.functions.https.HttpsError(
 				'internal',
 				ERROR_MESSAGES.failAddWishlist
 			);

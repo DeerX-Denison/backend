@@ -1,6 +1,6 @@
-import * as functions from 'firebase-functions';
+import { HttpsError } from 'firebase-functions/v1/https';
 
-export class AuthError extends functions.https.HttpsError {
+export class AuthError extends HttpsError {
 	/**
 	 * creates new AuthError class
 	 */

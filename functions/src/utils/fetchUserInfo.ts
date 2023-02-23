@@ -1,8 +1,8 @@
-import * as functions from 'firebase-functions';
 import { UserData, UserInfo } from 'types';
 import { ERROR_MESSAGES } from '../constants';
-import { db } from '../firebase.config';
 import Logger from '../Logger';
+import { Firebase } from '../services/firebase-service';
+
 const logger = new Logger();
 
 /**
@@ -11,10 +11,10 @@ const logger = new Logger();
 const fetchUserInfo: (uid: string) => Promise<UserInfo> = async (uid) => {
 	let docSnap: FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>;
 	try {
-		docSnap = await db.collection('users').doc(uid).get();
+		docSnap = await Firebase.db.collection('users').doc(uid).get();
 	} catch (error) {
 		logger.log(`Fail to fetch user info: ${uid}`);
-		throw new functions.https.HttpsError(
+		throw new Firebase.functions.https.HttpsError(
 			'internal',
 			ERROR_MESSAGES.failGetUserProfile
 		);
@@ -22,7 +22,7 @@ const fetchUserInfo: (uid: string) => Promise<UserInfo> = async (uid) => {
 
 	if (!docSnap.exists) {
 		logger.log(`User not exist: ${uid}`);
-		throw new functions.https.HttpsError(
+		throw new Firebase.functions.https.HttpsError(
 			'not-found',
 			ERROR_MESSAGES.failGetUserProfile
 		);

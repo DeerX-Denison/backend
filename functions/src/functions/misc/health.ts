@@ -1,3 +1,3 @@
-import * as functions from 'firebase-functions';
+import { Firebase } from '../../services/firebase-service';
 
-export const health = functions.https.onCall(() => 'ok');
+export const health = Firebase.functions.https.onCall(() => 'ok');

@@ -1,20 +1,20 @@
-import * as functions from 'firebase-functions';
-import { ListingData, ListingImageMetadata } from 'types';
 import { INVALID_IMAGE_CONTENT_IMAGE_URL } from '../../constants';
-import { db, storage } from '../../firebase.config';
 import Logger from '../../Logger';
 import validImageContent from '../validImageContent';
 import resizeImage from './resizeImage';
 import validMetadata from './validMetadata';
+import { ListingImageMetadata, Listing } from '../../models/listing';
+import { Firebase } from '../../services/firebase-service';
+import { ObjectMetadata } from 'firebase-functions/v1/storage';
 
 const logger = new Logger();
 
 /**
  * function that triggers to verify newly added listing image has valid metadata. This should prevent malicious user to abuse REST end points to programatically upload image. Normal user that uploads image through the app should pass this function.
  */
-const uploadListingImageHandler = functions.storage
+const uploadListingImageHandler = Firebase.functions.storage
 	.object()
-	.onFinalize(async (obj: functions.storage.ObjectMetadata) => {
+	.onFinalize(async (obj: ObjectMetadata) => {
 		const imageRef = obj.id.substring(
 			obj.id.indexOf('/') + 1,
 			obj.id.lastIndexOf('/')
@@ -22,16 +22,16 @@ const uploadListingImageHandler = functions.storage
 		if (imageRef.split('/')[0] !== 'listings') return 'ok';
 
 		const listingId = imageRef.split('/')[1];
-		const imageFile = storage.file(imageRef);
+		const imageFile = Firebase.storage.file(imageRef);
 		const metaRes = await imageFile.getMetadata();
 		logger.log(
 			`Fetched image metadata for content validation and resize: ${imageRef}`
 		);
-		const imageMetadata: ListingImageMetadata = metaRes[0].metadata;
+		const imageMetadata = ListingImageMetadata.parse(metaRes[0].metadata);
 
 		if (!validMetadata(obj)) {
 			try {
-				await storage.file(imageRef).delete();
+				await Firebase.storage.file(imageRef).delete();
 				logger.log(`Deleted image: ${imageRef}`);
 			} catch (error) {
 				logger.error(
@@ -45,7 +45,7 @@ const uploadListingImageHandler = functions.storage
 		if (imageMetadata.contentValidated === 'false') {
 			if (!(await validImageContent(imageRef))) {
 				try {
-					await storage.file(imageRef).delete();
+					await Firebase.storage.file(imageRef).delete();
 					logger.log(`Invalid image content, deleted: ${imageRef}`);
 				} catch (error) {
 					logger.error(
@@ -56,9 +56,12 @@ const uploadListingImageHandler = functions.storage
 
 				let images: string[];
 				try {
-					const docSnap = await db.collection('listings').doc(listingId).get();
+					const docSnap = await Firebase.db
+						.collection('listings')
+						.doc(listingId)
+						.get();
 					if (docSnap.exists) {
-						const listingData = docSnap.data() as ListingData;
+						const listingData = Listing.parse(docSnap.data());
 						images = listingData.images;
 						logger.log(`Fetch current listing data's images: ${imageRef}`);
 					} else {
@@ -82,7 +85,7 @@ const uploadListingImageHandler = functions.storage
 				});
 
 				try {
-					await db
+					await Firebase.db
 						.collection('listings')
 						.doc(listingId)
 						.update({ images: newImages });

@@ -3,8 +3,8 @@ import { google } from '@google-cloud/vision/build/protos/protos';
 import os from 'os';
 import path from 'path';
 import { ListingImageMetadata } from 'types';
-import { storage } from '../firebase.config';
 import Logger from '../Logger';
+import { Firebase } from '../services/firebase-service';
 
 const logger = new Logger();
 
@@ -104,7 +104,7 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 	imageRef
 ) => {
 	initGoogleCredentials();
-	const imageFile = storage.file(imageRef);
+	const imageFile = Firebase.storage.file(imageRef);
 	const imagePath = path.join(os.tmpdir(), path.basename(imageFile.name));
 
 	// fetch image metadata
@@ -159,7 +159,7 @@ const validImageContent: (imageRef: string) => Promise<boolean> = async (
 
 	try {
 		// yes, custom metadata is "metadata" for fb admin sdk, very weird
-		await storage.file(imageRef).setMetadata({
+		await Firebase.storage.file(imageRef).setMetadata({
 			metadata: {
 				...imageMetadata,
 				contentValidated: 'true',

@@ -1,15 +1,16 @@
-import * as functions from 'firebase-functions';
+import { CallableContext } from 'firebase-functions/v1/https';
 import { ERROR_MESSAGES } from '../constants';
 import Logger from '../Logger';
+import { Firebase } from '../services/firebase-service';
 
 const logger = new Logger();
 
-export type IsLoggedIn = (context: functions.https.CallableContext) => string;
+export type IsLoggedIn = (context: CallableContext) => string;
 
 const isLoggedIn: IsLoggedIn = (context) => {
 	if (!context.auth) {
 		logger.log(`User unauthenticated`);
-		throw new functions.https.HttpsError(
+		throw new Firebase.functions.https.HttpsError(
 			'unauthenticated',
 			ERROR_MESSAGES.unauthenticated
 		);

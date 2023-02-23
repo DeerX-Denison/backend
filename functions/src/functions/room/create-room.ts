@@ -1,4 +1,3 @@
-import * as functions from 'firebase-functions';
 import { Room } from '../../models/room';
 import { Url } from '../../models/url';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
@@ -12,9 +11,9 @@ import {
 import { InternalError } from '../../models/error/internal-error';
 import { ERROR_MESSAGES } from '../../constants';
 import { CreateRoomRequest } from '../../models/requests/create-room-request';
-import { db, localTime } from '../../firebase.config';
+import { Firebase } from '../../services/firebase-service';
 
-export const createRoom = functions.https.onCall(
+export const createRoom = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
 			// validate request data
@@ -73,14 +72,14 @@ export const createRoom = functions.https.onCall(
 				name,
 				members,
 				latestMessage: NEW_ROOM_MESSAGE,
-				latestTime: localTime(),
+				latestTime: Firebase.localTime(),
 				latestSenderUid: invokerId,
 				latestSeenAt: {},
 			});
 
 			// update db with new room
 			try {
-				await db.collection('threads').doc(newRoom.id).set(newRoom);
+				await Firebase.db.collection('threads').doc(newRoom.id).set(newRoom);
 			} catch (error) {
 				throw new InternalError(error);
 			}

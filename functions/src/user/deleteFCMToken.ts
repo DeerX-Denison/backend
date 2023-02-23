@@ -1,5 +1,4 @@
-import * as functions from 'firebase-functions';
-import { db } from '../firebase.config';
+import { Firebase } from '../services/firebase-service';
 import Logger from '../Logger';
 const logger = new Logger();
 
@@ -7,10 +6,10 @@ type Data = {
 	deviceId: string;
 	uid: string;
 };
-const deleteFCMToken = functions.https.onCall(
+const deleteFCMToken = Firebase.functions.https.onCall(
 	async ({ deviceId, uid }: Data) => {
 		try {
-			await db
+			await Firebase.db
 				.collection('users')
 				.doc(uid)
 				.collection('fcm_tokens')
