@@ -18,7 +18,7 @@ export const UserProviderData = z.object({
 	uid: Uid,
 	displayName,
 	email: Email.optional().nullable(),
-	phoneNumber: PhoneNumber,
+	phoneNumber: PhoneNumber.optional().nullable(),
 	photoURL,
 	providerId: z.string().min(1),
 });

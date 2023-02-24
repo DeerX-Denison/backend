@@ -3,7 +3,7 @@
 	"main": "lib/src/index.js",
 	"scripts": {
 		"dev": "tsc -w | firebase emulators:start",
-		"test": "firebase emulators:exec ./tests/test.sh",
+		"test": "tsc && firebase emulators:exec ./tests/test.sh",
 		"test:watch": "jest --watchAll",
 		"build": "tsc",
 		"predeploy": "firebase functions:config:unset env && firebase functions:config:set env=\"$(cat ./src/secrets.json)\"",

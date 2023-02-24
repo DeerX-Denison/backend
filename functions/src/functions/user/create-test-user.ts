@@ -23,6 +23,7 @@ export const createTestUser = Firebase.functions
 				userRecord = await Firebase.auth.createUser({
 					email: requestData.email,
 					password: requestData.password,
+					emailVerified: true,
 				});
 			} catch (error) {
 				throw new InternalError(error);

@@ -9,6 +9,7 @@ import { Context } from './models/context';
 import { Utils } from '../src/utils/utils';
 import { health } from './health.test';
 import { createFCMToken } from './create-fcm-token.test';
+import { syncUser } from './sync-user.test';
 
 /**
  * Make changes to this constant variable.
@@ -27,7 +28,14 @@ const STEPS: ((ctx: Context, opts: any) => Promise<void> | void)[] = [
 		);
 	},
 	async (ctx, opts) => {
-		await createFCMToken(ctx, opts);
+		assert((await syncUser(ctx, opts)) == 'updated');
+	},
+	async (ctx, opts) => {
+		assert(
+			Utils.identicalDictionary(await createFCMToken(ctx, opts), {
+				status: 'ok',
+			})
+		);
 	},
 ];
 
