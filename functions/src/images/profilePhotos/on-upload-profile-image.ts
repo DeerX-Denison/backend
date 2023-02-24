@@ -1,15 +1,12 @@
-import { DEFAULT_USER_PHOTO_URL } from '../../constants';
-import Logger from '../../Logger';
+import { Logger } from '../../services/logger';
 import { ListingImageMetadata, UserInfo } from '../../types';
 import userNameAndPhoto from '../../user/users.json';
 import { fetchUserInfo } from '../../utils';
-import resizeImage from '../listings/resizeImage';
-import validImageContent from '../validImageContent';
-import validMetadata from './validMetadata';
 import { Firebase } from '../../services/firebase';
-import { ObjectMetadata } from 'firebase-functions/v1/storage';
-
-const logger = new Logger();
+import { ImageDetector } from '../../services/image-detector';
+import { ImageResizer } from '../../services/image-resizer';
+import { Config } from '../../config';
+import { OnUploadProfileImageResponse } from '../../models/response/images/on-upload-profile-image-response';
 
 // typing of the user file that maps displayName and photoURL
 type UserFile = {
@@ -21,51 +18,58 @@ type UserFile = {
  */
 const uploadProfileImageHandler = Firebase.functions.storage
 	.object()
-	.onFinalize(async (obj: ObjectMetadata) => {
+	.onFinalize(async (obj) => {
 		const imageRef = obj.id.substring(
 			obj.id.indexOf('/') + 1,
 			obj.id.lastIndexOf('/')
 		);
-		if (imageRef.split('/')[0] !== 'profilePhotos') return 'ok';
+
+		if (imageRef.split('/')[0] !== 'profilePhotos')
+			return OnUploadProfileImageResponse.ok;
+
 		const uid = imageRef.split('/')[1];
+
 		const imageFile = Firebase.storage.file(imageRef);
+
 		const metaRes = await imageFile.getMetadata();
-		logger.log(`Fetched image metadata: ${imageRef}`);
+
+		Logger.log(`Fetched image metadata: ${imageRef}`);
+
 		const imageMetadata: ListingImageMetadata = metaRes[0].metadata;
 
-		if (!validMetadata(obj)) {
+		if (!ImageDetector.validProfileImageMetadata(obj)) {
 			try {
 				await Firebase.storage.file(imageRef).delete();
-				logger.log(`Deleted image: ${imageRef}`);
+				Logger.log(`Deleted image: ${imageRef}`);
 			} catch (error) {
-				logger.error(error);
-				logger.error(
+				Logger.error(error);
+				Logger.error(
 					`[ERROR 0]: Can't delete image with invalid metadata: ${imageRef}`
 				);
-				return 'error';
+				return OnUploadProfileImageResponse.error;
 			}
-			return 'ok';
+			return OnUploadProfileImageResponse.ok;
 		}
 
 		if (imageMetadata.contentValidated === 'false') {
-			if (!(await validImageContent(imageRef))) {
+			if (!(await ImageDetector.validImageContent(imageRef))) {
 				try {
 					await Firebase.storage.file(imageRef).delete();
-					logger.log(`Invalid image content, deleted: ${imageRef}`);
+					Logger.log(`Invalid image content, deleted: ${imageRef}`);
 				} catch (error) {
-					logger.error(
+					Logger.error(
 						`[ERROR 1]: Can't delete image with invalid content: ${imageRef}`
 					);
-					return 'error';
+					return OnUploadProfileImageResponse.error;
 				}
 				let userInfo: UserInfo | undefined;
 				try {
 					userInfo = await fetchUserInfo(uid);
 					if (!userInfo) throw 'User info is undefined after fetched';
 				} catch (error) {
-					logger.error(error);
-					logger.error(`[ERROR 2]: Can't fetch user with uid: ${uid}`);
-					return 'error';
+					Logger.error(error);
+					Logger.error(`[ERROR 2]: Can't fetch user with uid: ${uid}`);
+					return OnUploadProfileImageResponse.error;
 				}
 				const { email } = userInfo;
 				const userFile = userNameAndPhoto as UserFile;
@@ -75,45 +79,45 @@ const uploadProfileImageHandler = Firebase.functions.storage
 					if ('img' in userFile[email]) {
 						photoURL = userFile[email].img;
 					} else {
-						photoURL = DEFAULT_USER_PHOTO_URL;
+						photoURL = Config.defaultUserPhotoURL;
 					}
 				} else {
-					photoURL = DEFAULT_USER_PHOTO_URL;
+					photoURL = Config.defaultUserPhotoURL;
 				}
 
 				try {
 					await Firebase.db.collection('users').doc(uid).update({ photoURL });
-					logger.log(`Updated user profile photo in database: ${imageRef}`);
+					Logger.log(`Updated user profile photo in database: ${imageRef}`);
 				} catch (error) {
-					logger.error(error);
-					logger.error(`[ERROR 3]: Can't update firestore: ${imageRef}`);
-					return 'error';
+					Logger.error(error);
+					Logger.error(`[ERROR 3]: Can't update firestore: ${imageRef}`);
+					return OnUploadProfileImageResponse.error;
 				}
 				try {
 					await Firebase.auth.updateUser(uid, { photoURL: photoURL });
-					logger.log(`Updated user profile photo in firebase: ${imageRef}`);
+					Logger.log(`Updated user profile photo in firebase: ${imageRef}`);
 				} catch (error) {
-					logger.error(error);
-					logger.error(
+					Logger.error(error);
+					Logger.error(
 						`[ERROR 4]: Can't update user profile in firebase: ${imageRef}`
 					);
-					return 'error';
+					return OnUploadProfileImageResponse.error;
 				}
-				return 'ok';
+				return OnUploadProfileImageResponse.ok;
 			}
 		}
 
 		if (imageMetadata.resized === 'false') {
 			try {
-				await resizeImage(imageRef);
-				logger.log(`Successfully resized image: ${imageRef}`);
+				await ImageResizer.resizeImage(imageRef);
+				Logger.log(`Successfully resized image: ${imageRef}`);
 			} catch (error) {
-				logger.error(`[ERROR 5]: Can't resize image: ${imageRef}`);
-				return 'error';
+				Logger.error(`[ERROR 5]: Can't resize image: ${imageRef}`);
+				return OnUploadProfileImageResponse.error;
 			}
 		}
 
-		return 'ok';
+		return OnUploadProfileImageResponse.ok;
 	});
 
 export default uploadProfileImageHandler;

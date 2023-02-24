@@ -4,6 +4,8 @@ export TESTER_PASSWORD="super-secret"
 export TESTER_DEVICE_ID="device-id-1"
 export TESTER_FCM_TOKEN="test-fcm-token"
 export FIRESTORE_EMULATOR_HOST="localhost:8080"
+export FIREBASE_STORAGE_EMULATOR_HOST="localhost:9199"
+export FIREBASE_AUTH_EMULATOR_HOST="localhost:9099"
 
 source .env
 

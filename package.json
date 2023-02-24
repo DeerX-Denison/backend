@@ -14,7 +14,7 @@
 		"dev": "yarn --cwd functions dev",
 		"build": "yarn --cwd functions build",
 		"install": "yarn --cwd functions install",
-		"test": "yarn --cwd functions test",
+		"test": "yarn --cwd functions test:integration",
 		"test:watch": "yarn --cwd functions test:watch",
 		"lint": "yarn --cwd functions lint",
 		"format": "yarn --cwd functions format",

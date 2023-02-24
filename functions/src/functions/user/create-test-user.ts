@@ -14,6 +14,8 @@ export const createTestUser = Firebase.functions
 			const requestData = CreateTestUserRequest.parse(data);
 
 			// authorize request
+			if (Config.createTestUserToken === undefined) throw new AuthError();
+
 			if (requestData.token !== Config.createTestUserToken)
 				throw new AuthError();
 

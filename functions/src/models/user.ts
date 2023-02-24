@@ -78,3 +78,13 @@ export const UserProfile = User.pick({
 });
 
 export type UserProfile = z.infer<typeof UserProfile>;
+
+export const UserInfo = User.pick({
+	uid: true,
+	email: true,
+	displayName: true,
+	photoURL: true,
+	disabled: true,
+});
+
+export type UserInfo = z.infer<typeof UserInfo>;
