@@ -5,7 +5,7 @@ export { createMessage } from './functions/message/create-message';
 export { syncUser } from './functions/user/sync-user';
 export { health } from './functions/misc/health';
 export { createTestUser } from './functions/user/create-test-user';
-export { createRoom as createThread } from './functions/room/create-room';
+export { createThread } from './functions/thread/create-thread';
 export { default as readMessages } from './messages/readMessages';
 export { default as sendManualMessage } from './messages/sendManualMessage';
 export { default as createReport } from './report/createReport';

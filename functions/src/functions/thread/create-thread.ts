@@ -13,7 +13,7 @@ import { ERROR_MESSAGES } from '../../constants';
 import { CreateRoomRequest } from '../../models/requests/create-room-request';
 import { Firebase } from '../../services/firebase';
 
-export const createRoom = Firebase.functions.https.onCall(
+export const createThread = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
 			// validate request data
