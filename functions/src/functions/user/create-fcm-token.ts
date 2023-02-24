@@ -1,7 +1,6 @@
 import { Firebase } from '../../services/firebase';
 import { Config } from '../../config';
 import { InternalError } from '../../models/error/internal-error';
-import { AuthError } from '../../models/error/auth-error';
 import { CreateFCMTokenRequest } from '../../models/requests/user/create-fcm-token-request';
 import { Utils } from '../../utils/utils';
 import { Logger } from '../../services/logger';
@@ -13,10 +12,6 @@ export const createFCMToken = Firebase.functions
 		try {
 			// parse incoming data
 			const requestData = CreateFCMTokenRequest.parse(data);
-
-			// authorize request
-			if (requestData.token !== Config.createTestUserToken)
-				throw new AuthError();
 
 			// authorize user
 			const invokerId = Utils.isLoggedIn(context);

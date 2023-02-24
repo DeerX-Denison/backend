@@ -4,13 +4,18 @@ import { FirebaseClient } from './service/firebase-client';
 import { z } from 'zod';
 import { NonEmptyString } from '../src/models/non-empty-string';
 import { Environments } from './models/environments';
+import assert from 'assert';
+import { Utils } from '../src/utils/utils';
 
 export const createTestUser = async (ctx: Context, reqData: any) => {
 	const res = await ctx.firebase.functions('createTestUser')(reqData);
 
-	if (ctx.debug) console.log(res.data);
-
-	return res.data;
+	assert(
+		Utils.identicalDictionary(res.data, {
+			email: reqData.email,
+			password: reqData.password,
+		})
+	);
 };
 
 if (require.main === module) {

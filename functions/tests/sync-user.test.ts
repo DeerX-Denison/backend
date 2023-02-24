@@ -4,8 +4,8 @@ import { FirebaseClient } from './service/firebase-client';
 import { z } from 'zod';
 import { NonEmptyString } from '../src/models/non-empty-string';
 import { Environments } from './models/environments';
+import assert from 'assert';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const syncUser = async (ctx: Context, reqData: any) => {
 	await ctx.firebase.signInWithEmailAndPassword(
 		reqData.email,
@@ -14,9 +14,7 @@ export const syncUser = async (ctx: Context, reqData: any) => {
 
 	const res = await ctx.firebase.functions('syncUser')();
 
-	if (ctx.debug) console.log(res.data);
-
-	return res.data;
+	assert(res.data === 'updated');
 };
 
 if (require.main === module) {

@@ -3,12 +3,13 @@ import { Context } from './models/context';
 import { FirebaseClient } from './service/firebase-client';
 import { z } from 'zod';
 import { Environments } from './models/environments';
+import assert from 'assert';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const health = async (ctx: Context, reqData?: any) => {
 	const res = await ctx.firebase.functions('health')();
-	if (ctx.debug) console.log(res.data);
-	return res.data;
+
+	assert(res.data === 'ok');
 };
 
 if (require.main === module) {

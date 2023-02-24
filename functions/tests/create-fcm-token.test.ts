@@ -4,18 +4,51 @@ import { FirebaseClient } from './service/firebase-client';
 import { z } from 'zod';
 import { NonEmptyString } from '../src/models/non-empty-string';
 import { Environments } from './models/environments';
+import { Firebase } from '../src/services/firebase';
+import { Collection } from '../src/models/collection-name';
+import { Utils } from '../src/utils/utils';
+import assert from 'assert';
 
 export const createFCMToken = async (ctx: Context, reqData: any) => {
-	await ctx.firebase.signInWithEmailAndPassword(
+	assert(process.env.TESTER_DEVICE_ID !== undefined);
+	assert(process.env.TESTER_FCM_TOKEN !== undefined);
+
+	const userCredential = await ctx.firebase.signInWithEmailAndPassword(
 		reqData.email,
 		reqData.password
 	);
 
 	const res = await ctx.firebase.functions('createFCMToken')(reqData);
 
-	if (ctx.debug) console.log(res.data);
+	assert(Utils.identicalDictionary(res.data, { status: 'ok' }));
 
-	return res.data;
+	const docSnap = await Firebase.db
+		.collection(Collection.users)
+		.doc(userCredential.user.uid)
+		.collection(Collection.fcm_tokens)
+		.doc(process.env.TESTER_DEVICE_ID)
+		.get();
+
+	assert(docSnap.exists === true);
+
+	const token = docSnap.data();
+
+	assert(token !== undefined);
+
+	assert(token.updatedAt !== undefined);
+
+	delete token.updatedAt;
+
+	assert(token.updatedAt === undefined);
+
+	console.log(token);
+
+	assert(
+		Utils.identicalDictionary(token, {
+			deviceId: process.env.TESTER_DEVICE_ID,
+			token: process.env.TESTER_FCM_TOKEN,
+		})
+	);
 };
 
 if (require.main === module) {

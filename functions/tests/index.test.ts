@@ -2,49 +2,39 @@ import { program } from 'commander';
 import { FirebaseClient } from './service/firebase-client';
 import { z } from 'zod';
 import { Environments } from './models/environments';
-import assert from 'assert';
 import { createTestUser } from './create-test-user.test';
 import { NonEmptyString } from '../src/models/non-empty-string';
 import { Context } from './models/context';
-import { Utils } from '../src/utils/utils';
-import { health } from './health.test';
+import { health as healthCheck } from './health.test';
 import { createFCMToken } from './create-fcm-token.test';
 import { syncUser } from './sync-user.test';
+import { Logger } from '../src/services/logger';
 
-/**
- * Make changes to this constant variable.
- * All the steps will be executed sequentially.
- */
-const STEPS: ((ctx: Context, opts: any) => Promise<void> | void)[] = [
-	async (ctx, opts) => {
-		assert((await health(ctx, opts)) === 'ok');
-	},
-	async (ctx, opts) => {
-		assert(
-			Utils.identicalDictionary(await createTestUser(ctx, opts), {
-				email: opts.email,
-				password: opts.password,
-			})
-		);
-	},
-	async (ctx, opts) => {
-		assert((await syncUser(ctx, opts)) == 'updated');
-	},
-	async (ctx, opts) => {
-		assert(
-			Utils.identicalDictionary(await createFCMToken(ctx, opts), {
-				status: 'ok',
-			})
-		);
-	},
-];
+const main = async (ctx: Context, opts: any) => {
+	Logger.log('Health check');
+	await healthCheck(ctx, {});
+	Logger.log('Passed');
 
-const main = async (context: Context, opts: any) => {
-	for (let i = 0; i < STEPS.length; i++) {
-		const step = STEPS[i];
-		await step(context, opts);
-		console.log(`Step ${i} Passes`);
-	}
+	Logger.log('Create test user');
+	await createTestUser(ctx, {
+		email: opts.email,
+		password: opts.password,
+		token: opts.token,
+	});
+	Logger.log('Passed');
+
+	Logger.log('Sync user to database');
+	await syncUser(ctx, { email: opts.email, password: opts.password });
+	Logger.log('Passed');
+
+	Logger.log('Create FCM token for user');
+	await createFCMToken(ctx, {
+		email: opts.email,
+		password: opts.password,
+		deviceId: opts.deviceId,
+		token: opts.fcmToken,
+	});
+	Logger.log('Passed');
 };
 
 if (require.main === module) {
