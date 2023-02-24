@@ -41,7 +41,6 @@ export const createFCMToken = Firebase.functions
 			// parse response
 			return ConfirmationResponse.parse();
 		} catch (error) {
-			console.error(error);
-			throw error;
+			throw Utils.cloudFunctionHandler(error);
 		}
 	});

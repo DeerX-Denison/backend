@@ -8,15 +8,32 @@ import { Firebase } from '../../../src/services/firebase';
 import { Collection } from '../../../src/models/collection-name';
 import { Utils } from '../../../src/utils/utils';
 import assert from 'assert';
+import { FirebaseError } from '@firebase/util';
 
 export const createFCMToken = async (ctx: Context, reqData: any) => {
 	assert(process.env.TESTER_DEVICE_ID !== undefined);
 	assert(process.env.TESTER_FCM_TOKEN !== undefined);
 
+	try {
+		await ctx.firebase.functions('createFCMToken')(reqData);
+	} catch (error) {
+		assert(error instanceof FirebaseError);
+		assert(error.code === 'functions/permission-denied');
+	}
+
 	const userCredential = await ctx.firebase.signInWithEmailAndPassword(
 		reqData.email,
 		reqData.password
 	);
+
+	try {
+		await ctx.firebase.functions('createFCMToken')({
+			a: 'invalid data',
+		});
+	} catch (error) {
+		assert(error instanceof FirebaseError);
+		assert(error.code === 'functions/invalid-argument');
+	}
 
 	const res = await ctx.firebase.functions('createFCMToken')(reqData);
 
