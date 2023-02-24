@@ -1,9 +1,9 @@
 import { program } from 'commander';
-import { Context } from './models/context';
-import { FirebaseClient } from './service/firebase-client';
+import { Context } from '../../models/context';
+import { FirebaseClient } from '../../service/firebase-client';
 import { z } from 'zod';
-import { NonEmptyString } from '../src/models/non-empty-string';
-import { Environments } from './models/environments';
+import { NonEmptyString } from '../../../src/models/non-empty-string';
+import { Environments } from '../../models/environments';
 import assert from 'assert';
 
 export const syncUser = async (ctx: Context, reqData: any) => {

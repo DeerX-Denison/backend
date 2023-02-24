@@ -1,13 +1,13 @@
 import { program } from 'commander';
-import { Context } from './models/context';
-import { FirebaseClient } from './service/firebase-client';
+import { Context } from '../../models/context';
+import { FirebaseClient } from '../../service/firebase-client';
 import { z } from 'zod';
-import { NonEmptyString } from '../src/models/non-empty-string';
-import { Environments } from './models/environments';
-import { Firebase } from '../src/services/firebase';
-import { Collection } from '../src/models/collection-name';
+import { NonEmptyString } from '../../../src/models/non-empty-string';
+import { Environments } from '../../models/environments';
+import { Firebase } from '../../../src/services/firebase';
+import { Collection } from '../../../src/models/collection-name';
 import assert from 'assert';
-import { Utils } from '../src/utils/utils';
+import { Utils } from '../../../src/utils/utils';
 import { FirebaseError } from '@firebase/util';
 
 export const deleteFCMToken = async (ctx: Context, reqData: any) => {

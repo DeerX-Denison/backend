@@ -2,13 +2,13 @@ import { program } from 'commander';
 import { FirebaseClient } from './service/firebase-client';
 import { z } from 'zod';
 import { Environments } from './models/environments';
-import { createTestUser } from './create-test-user.test';
+import { createTestUser } from './functions/user/create-test-user.test';
 import { NonEmptyString } from '../src/models/non-empty-string';
 import { Context } from './models/context';
-import { health as healthCheck } from './health.test';
-import { createFCMToken } from './create-fcm-token.test';
-import { syncUser } from './sync-user.test';
-import { deleteFCMToken } from './delete-fcm-token.test';
+import { health as healthCheck } from './functions/misc/health.test';
+import { createFCMToken } from './functions/user/create-fcm-token.test';
+import { syncUser } from './functions/user/sync-user.test';
+import { deleteFCMToken } from './functions/user/delete-fcm-token.test';
 
 const main = async (ctx: Context, opts: any) => {
 	await healthCheck(ctx, {});
