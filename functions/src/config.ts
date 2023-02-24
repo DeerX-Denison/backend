@@ -4,8 +4,8 @@ dotenv.config();
 
 export class Config {
 	public static emailPrefix = process.env.EMAIL_PREFIX ?? '@denison.edu';
-	public static testerEmails = process.env.TESTER_EMAILS
-		? process.env.TESTER_EMAILS.split(',').map((_) => _.trim())
+	public static testerEmails = process.env.TESTERS_EMAIL
+		? process.env.TESTERS_EMAIL.split(',').map((_) => _.trim())
 		: [];
 	public static regions = process.env.CLOUD_FUNCTIONS_REGIONS
 		? process.env.CLOUD_FUNCTIONS_REGIONS.split(',').map((_) => _.trim())

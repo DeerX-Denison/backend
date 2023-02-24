@@ -5,9 +5,9 @@ import { z } from 'zod';
 import { Environments } from './models/environments';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const health = async (context: Context, opts?: unknown) => {
-	const res = await context.firebaseClient.callableFunctions('health')();
-	if (context.debug) console.log(res.data);
+export const health = async (ctx: Context, reqData?: any) => {
+	const res = await ctx.firebase.functions('health')();
+	if (ctx.debug) console.log(res.data);
 	return res.data;
 };
 
@@ -28,9 +28,9 @@ if (require.main === module) {
 		})
 		.parse(program.opts());
 
-	const firebaseClient = new FirebaseClient(opts);
+	const firebase = new FirebaseClient(opts);
 
-	const context = { firebaseClient, ...opts };
+	const context = { firebase, ...opts };
 
 	health(context);
 }

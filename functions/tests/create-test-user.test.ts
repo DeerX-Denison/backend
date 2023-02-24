@@ -5,14 +5,11 @@ import { z } from 'zod';
 import { NonEmptyString } from '../src/models/non-empty-string';
 import { Environments } from './models/environments';
 
-export const createTestUser = async (
-	context: Context,
-	requestData: unknown
-) => {
-	const res = await context.firebaseClient.callableFunctions('createTestUser')(
-		requestData
-	);
-	if (context.debug) console.log(res.data);
+export const createTestUser = async (ctx: Context, reqData: any) => {
+	const res = await ctx.firebase.functions('createTestUser')(reqData);
+
+	if (ctx.debug) console.log(res.data);
+
 	return res.data;
 };
 
@@ -39,9 +36,9 @@ if (require.main === module) {
 		})
 		.parse(program.opts());
 
-	const firebaseClient = new FirebaseClient(opts);
+	const firebase = new FirebaseClient(opts);
 
-	const context = { firebaseClient, ...opts };
+	const ctx = { firebase, ...opts };
 
-	createTestUser(context, opts);
+	createTestUser(ctx, opts);
 }
