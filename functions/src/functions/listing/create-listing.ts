@@ -1,9 +1,9 @@
-import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Collection } from '../../models/collection-name';
 import { Listing } from '../../models/listing';
 import { CreateListingRequest } from '../../models/requests/create-listing-request';
 import { Firebase } from '../../services/firebase';
 import { Utils } from '../../utils/utils';
+import { CreateListingResponse } from '../../models/response/listing/create-listing-response';
 
 export const createListing = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
@@ -19,13 +19,15 @@ export const createListing = Firebase.functions.https.onCall(
 			Utils.isNotBanned(invoker);
 
 			// create new listing
-			const newListing = Listing.parse({
+			const newListing = Listing.omit({
+				updatedAt: true,
+				createdAt: true,
+			}).parse({
 				...requestData,
+				id: Utils.randomId(),
 				seller: invoker,
 				soldTo: null,
 				likedBy: [],
-				createdAt: Firebase.serverTime(),
-				updatedAt: Firebase.serverTime(),
 			});
 
 			// write to db
@@ -36,9 +38,13 @@ export const createListing = Firebase.functions.https.onCall(
 						: Collection.listings
 				)
 				.doc(newListing.id)
-				.set(newListing);
+				.set({
+					...newListing,
+					createdAt: Firebase.serverTime(),
+					updatedAt: Firebase.serverTime(),
+				});
 
-			return ConfirmationResponse.parse();
+			return CreateListingResponse.parse({ id: newListing.id });
 		} catch (error) {
 			return Utils.errorHandler(error);
 		}

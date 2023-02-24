@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { Listing } from '../../models/listing';
 
 export const CreateListingRequest = Listing.pick({
-	id: true,
 	images: true,
 	name: true,
 	price: true,

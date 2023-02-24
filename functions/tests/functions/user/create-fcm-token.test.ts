@@ -15,7 +15,10 @@ export const createFCMToken = async (ctx: Context, reqData: any) => {
 	assert(process.env.TESTER_FCM_TOKEN !== undefined);
 
 	try {
-		await ctx.firebase.functions('createFCMToken')(reqData);
+		await ctx.firebase.functions('createFCMToken')({
+			...reqData,
+			token: reqData.fcmToken,
+		});
 	} catch (error) {
 		assert(error instanceof FirebaseError);
 		assert(error.code === 'functions/permission-denied');
@@ -35,7 +38,10 @@ export const createFCMToken = async (ctx: Context, reqData: any) => {
 		assert(error.code === 'functions/invalid-argument');
 	}
 
-	const res = await ctx.firebase.functions('createFCMToken')(reqData);
+	const res = await ctx.firebase.functions('createFCMToken')({
+		...reqData,
+		token: reqData.fcmToken,
+	});
 
 	assert(Utils.identicalDictionary(res.data, { status: 'ok' }));
 

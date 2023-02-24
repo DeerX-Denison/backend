@@ -5,7 +5,7 @@ import z from 'zod';
 export const CreateTestUserRequest = z.object({
 	email: Email,
 	password: NonEmptyString,
-	token: NonEmptyString,
+	createTestUserToken: NonEmptyString,
 });
 
 export type CreateTestUserRequest = z.infer<typeof CreateTestUserRequest>;

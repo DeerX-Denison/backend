@@ -1,4 +1,4 @@
-import { FirebaseError } from '@firebase/util';
+import { FirebaseError, uuidv4 } from '@firebase/util';
 import { DEFAULT_GUEST_DISPLAY_NAME, DEFAULT_GUEST_EMAIL } from '../constants';
 import { CallableContext } from 'firebase-functions/v1/https';
 import { Listing } from '../models/listing';
@@ -200,5 +200,13 @@ export class Utils {
 		Logger.error(error);
 		if (error instanceof ZodError) return new ValidationError(error);
 		return error;
+	}
+
+	/**
+	 * randomly generate a string
+	 * @returns random string id
+	 */
+	public static randomId(): string {
+		return uuidv4();
 	}
 }

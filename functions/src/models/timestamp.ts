@@ -9,4 +9,9 @@ export class Timestamp extends FirebaseTimestamp {
 		this._seconds = z.number().parse(seconds);
 		this._nanoseconds = z.number().parse(nanoseconds);
 	}
+
+	static now(): Timestamp {
+		const now = FirebaseTimestamp.now();
+		return new this(now.seconds, now.nanoseconds);
+	}
 }
