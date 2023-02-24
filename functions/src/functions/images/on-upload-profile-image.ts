@@ -16,7 +16,7 @@ type UserFile = {
 /**
  * function that triggers to verify newly added profile image has valid metadata. This should prevent malicious user to abuse REST end points to programatically upload image. Normal user that uploads image through the app should pass this function.
  */
-const uploadProfileImageHandler = Firebase.functions.storage
+export const uploadProfileImageHandler = Firebase.functions.storage
 	.object()
 	.onFinalize(async (obj) => {
 		const imageRef = obj.id.substring(
@@ -119,5 +119,3 @@ const uploadProfileImageHandler = Firebase.functions.storage
 
 		return OnUploadProfileImageResponse.ok;
 	});
-
-export default uploadProfileImageHandler;
