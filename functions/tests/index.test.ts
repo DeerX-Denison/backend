@@ -9,6 +9,7 @@ import { health as healthCheck } from './health.test';
 import { createFCMToken } from './create-fcm-token.test';
 import { syncUser } from './sync-user.test';
 import { Logger } from '../src/services/logger';
+import { deleteFCMToken } from './delete-fcm-token.test';
 
 const main = async (ctx: Context, opts: any) => {
 	Logger.log('Health check');
@@ -33,6 +34,14 @@ const main = async (ctx: Context, opts: any) => {
 		password: opts.password,
 		deviceId: opts.deviceId,
 		token: opts.fcmToken,
+	});
+	Logger.log('Passed');
+
+	Logger.log('Delete FCM token of user');
+	await deleteFCMToken(ctx, {
+		email: opts.email,
+		password: opts.password,
+		deviceId: opts.deviceId,
 	});
 	Logger.log('Passed');
 };
