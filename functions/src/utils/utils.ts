@@ -12,6 +12,7 @@ import { User } from '../models/user';
 import { Firebase } from '../services/firebase';
 import { AuthData } from 'firebase-functions/lib/common/providers/tasks';
 import { Config } from '../config';
+import { Logger } from '../services/logger';
 
 export class Utils {
 	/**
@@ -189,5 +190,15 @@ export class Utils {
 			Object.entries(d1).sort().toString() ===
 				Object.entries(d2).sort().toString()
 		);
+	}
+
+	/**
+	 * handle error thrown in cloud functions
+	 * @param error error throw while executing functions
+	 */
+	public static cloudFunctionHandler(error: unknown) {
+		Logger.error(error);
+		if (error instanceof ZodError) return new ValidationError(error);
+		return error;
 	}
 }

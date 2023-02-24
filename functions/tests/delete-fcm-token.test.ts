@@ -7,21 +7,42 @@ import { Environments } from './models/environments';
 import { Firebase } from '../src/services/firebase';
 import { Collection } from '../src/models/collection-name';
 import assert from 'assert';
+import { Utils } from '../src/utils/utils';
+import { FirebaseError } from '@firebase/util';
 
 export const deleteFCMToken = async (ctx: Context, reqData: any) => {
 	assert(process.env.TESTER_DEVICE_ID !== undefined);
+
+	try {
+		await ctx.firebase.functions('deleteFCMToken')({
+			...reqData,
+			uid: 'fake id',
+		});
+	} catch (error) {
+		assert(error instanceof FirebaseError);
+		assert(error.code === 'functions/permission-denied');
+	}
 
 	const userCredential = await ctx.firebase.signInWithEmailAndPassword(
 		reqData.email,
 		reqData.password
 	);
 
+	try {
+		await ctx.firebase.functions('deleteFCMToken')({
+			a: 'invalid data',
+		});
+	} catch (error) {
+		assert(error instanceof FirebaseError);
+		assert(error.code === 'functions/invalid-argument');
+	}
+
 	const res = await ctx.firebase.functions('deleteFCMToken')({
 		...reqData,
 		uid: userCredential.user.uid,
 	});
 
-	assert(res.data === null);
+	assert(Utils.identicalDictionary(res.data, { status: 'ok' }));
 
 	const docSnap = await Firebase.db
 		.collection(Collection.users)

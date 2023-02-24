@@ -41,8 +41,6 @@ export const createFCMToken = async (ctx: Context, reqData: any) => {
 
 	assert(token.updatedAt === undefined);
 
-	console.log(token);
-
 	assert(
 		Utils.identicalDictionary(token, {
 			deviceId: process.env.TESTER_DEVICE_ID,

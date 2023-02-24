@@ -12,7 +12,7 @@ export { default as createReport } from './report/createReport';
 export { createFCMToken } from './functions/user/create-fcm-token';
 export { default as createUserIfNotExist } from './user/createUserIfNotExist';
 export { default as deleteAnonymousUser } from './user/deleteAnonymousUser';
-export { default as deleteFCMToken } from './user/deleteFCMToken';
+export { deleteFCMToken } from './functions/user/delete-fcm-token';
 export { default as deleteOldAnonUsers } from './user/deleteOldAnonUsers';
 export { default as deleteUser } from './user/deleteUser';
 export { default as fetchCoreTeamInfos } from './user/fetchCoreTeamInfos';

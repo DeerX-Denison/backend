@@ -8,42 +8,31 @@ import { Context } from './models/context';
 import { health as healthCheck } from './health.test';
 import { createFCMToken } from './create-fcm-token.test';
 import { syncUser } from './sync-user.test';
-import { Logger } from '../src/services/logger';
 import { deleteFCMToken } from './delete-fcm-token.test';
 
 const main = async (ctx: Context, opts: any) => {
-	Logger.log('Health check');
 	await healthCheck(ctx, {});
-	Logger.log('Passed');
 
-	Logger.log('Create test user');
 	await createTestUser(ctx, {
 		email: opts.email,
 		password: opts.password,
 		token: opts.token,
 	});
-	Logger.log('Passed');
 
-	Logger.log('Sync user to database');
 	await syncUser(ctx, { email: opts.email, password: opts.password });
-	Logger.log('Passed');
 
-	Logger.log('Create FCM token for user');
 	await createFCMToken(ctx, {
 		email: opts.email,
 		password: opts.password,
 		deviceId: opts.deviceId,
 		token: opts.fcmToken,
 	});
-	Logger.log('Passed');
 
-	Logger.log('Delete FCM token of user');
 	await deleteFCMToken(ctx, {
 		email: opts.email,
 		password: opts.password,
 		deviceId: opts.deviceId,
 	});
-	Logger.log('Passed');
 };
 
 if (require.main === module) {
