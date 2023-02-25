@@ -9,43 +9,77 @@ import { createFCMToken } from './functions/user/create-fcm-token.test';
 import { syncUser } from './functions/user/sync-user.test';
 import { deleteFCMToken } from './functions/user/delete-fcm-token.test';
 import { createListing } from './functions/listing/create-listing.test';
-import { CreateListingRequest } from '../src/models/requests/create-listing-request';
-import { CreateTestUserRequest } from '../src/models/requests/user/create-test-user-request';
-import { CreateFCMTokenRequest } from '../src/models/requests/user/create-fcm-token-request';
-import { DeleteFCMTokenRequest } from '../src/models/requests/user/delete-fcm-token-request';
-import { NonEmptyString } from '../src/models/non-empty-string';
+import { Config } from '../src/config';
+import assert from 'assert';
+// import { updateListing } from './functions/listing/update-listing.test';
 
 const main = async (ctx: Context, opts: any) => {
+	assert(Config.createTestUserToken);
+
+	const credentials = {
+		email: Config.testerEmails[0],
+		password: 'superSecret',
+	};
 	await healthCheck(ctx, {});
 
-	await createTestUser(ctx, opts);
+	await createTestUser(ctx, {
+		...opts,
+		...credentials,
+		token: Config.createTestUserToken,
+	});
 
-	await syncUser(ctx, opts);
+	await syncUser(ctx, { ...opts, ...credentials });
 
-	await createFCMToken(ctx, opts);
+	await createFCMToken(ctx, {
+		...opts,
+		...credentials,
+		deviceId: 'test-device-id',
+		token: 'test-fcm-token',
+	});
 
-	await deleteFCMToken(ctx, opts);
+	await deleteFCMToken(ctx, {
+		...opts,
+		...credentials,
+		deviceId: 'test-device-id',
+		token: 'test-fcm-token',
+	});
 
-	await createListing(ctx, opts);
+	await createListing(ctx, {
+		...opts,
+		...credentials,
+		images: [
+			'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg',
+			'https://i.ibb.co/JKS8DzC/default-profile-photo.jpg',
+			'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg',
+		],
+		name: 'test listing',
+		price: '123',
+		category: ['FASHION', 'ELECTRONIC'],
+		condition: 'BRAND NEW',
+		description: 'test description',
+		status: 'posted',
+	});
+
+	// await updateListing(ctx, {
+	// 	...opts,
+	// 	...credentials,
+	// 	id: listingId,
+	// 	images: [
+	// 		'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg',
+	// 		'https://i.ibb.co/JKS8DzC/default-profile-photo.jpg',
+	// 		'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg',
+	// 	],
+	// 	name: 'updated test listing',
+	// 	price: '321',
+	// 	category: ['FASHION', 'ELECTRONIC'],
+	// 	condition: 'BRAND NEW',
+	// 	description: 'test description',
+	// 	status: 'saved',
+	// });
 };
 
 if (require.main === module) {
 	program
-		.requiredOption('--email <string>', 'user email')
-		.requiredOption('--password <string>', 'user password')
-		.requiredOption(
-			'--create-test-user-token <string>',
-			'token to create test user'
-		)
-		.requiredOption('--device-id <string>', 'user device id')
-		.requiredOption('--fcm-token <string>', 'user test fcm token')
-		.requiredOption('--images <string>', 'listing images url')
-		.requiredOption('--name <string>', 'listing name')
-		.requiredOption('--price <string>', 'listing price')
-		.requiredOption('--category <string>', 'listing category')
-		.requiredOption('--condition <string>', 'listing condition')
-		.requiredOption('--description <string>', 'listing description')
-		.requiredOption('--status <string>', 'listing status')
 		.option(
 			'--environment <string>',
 			'test environment',
@@ -61,16 +95,7 @@ if (require.main === module) {
 			environment: z.nativeEnum(Environments),
 			debug: z.boolean().optional().nullable(),
 		})
-		.merge(CreateTestUserRequest)
-		.merge(CreateFCMTokenRequest.omit({ token: true }))
-		.merge(z.object({ fcmToken: NonEmptyString }))
-		.merge(DeleteFCMTokenRequest.omit({ uid: true }))
-		.merge(CreateListingRequest)
-		.parse({
-			...opts,
-			images: opts.images.split(','),
-			category: opts.category.split(','),
-		});
+		.parse(opts);
 
 	const context = {
 		firebase: new FirebaseClient(_opts),

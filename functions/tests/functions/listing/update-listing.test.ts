@@ -6,14 +6,14 @@ import { NonEmptyString } from '../../../src/models/non-empty-string';
 import { Environments } from '../../models/environments';
 import assert from 'assert';
 import { Utils } from '../../../src/utils/utils';
-import { CreateListingRequest } from '../../../src/models/requests/create-listing-request';
 import { FirebaseError } from '@firebase/util';
 import { Firebase } from '../../../src/services/firebase';
 import { Collection } from '../../../src/models/collection-name';
+import { UpdateListingRequest } from '../../../src/models/requests/update-listing-request';
 
-export const createListing = async (ctx: Context, opts: any) => {
+export const updateListing = async (ctx: Context, opts: any) => {
 	try {
-		await ctx.firebase.functions('createListing')(opts);
+		await ctx.firebase.functions('updateListing')(opts);
 	} catch (error) {
 		assert(error instanceof FirebaseError);
 		assert(error.code === 'functions/permission-denied');
@@ -25,7 +25,7 @@ export const createListing = async (ctx: Context, opts: any) => {
 	);
 
 	try {
-		await ctx.firebase.functions('createListing')({
+		await ctx.firebase.functions('updateListing')({
 			a: 'invalid data',
 		});
 	} catch (error) {
@@ -33,7 +33,7 @@ export const createListing = async (ctx: Context, opts: any) => {
 		assert(error.code === 'functions/invalid-argument');
 	}
 
-	const res = await ctx.firebase.functions('createListing')(opts);
+	const res = await ctx.firebase.functions('updateListing')(opts);
 
 	assert(Utils.isDictionary(res.data));
 
@@ -89,14 +89,13 @@ export const createListing = async (ctx: Context, opts: any) => {
 			soldTo: null,
 		})
 	);
-
-	return res.data.id;
 };
 
 if (require.main === module) {
 	program
 		.requiredOption('--email <string>', 'user email')
 		.requiredOption('--password <string>', 'user password')
+		.requiredOption('--id <string>', 'listing id')
 		.requiredOption('--images <string>', 'listing images url')
 		.requiredOption('--name <string>', 'listing name')
 		.requiredOption('--price <string>', 'listing price')
@@ -104,6 +103,7 @@ if (require.main === module) {
 		.requiredOption('--condition <string>', 'listing condition')
 		.requiredOption('--description <string>', 'listing description')
 		.requiredOption('--status <string>', 'listing status')
+		.option('--sold-to <string>', 'listing soldTo')
 		.option(
 			'--environment <string>',
 			'test environment',
@@ -119,12 +119,12 @@ if (require.main === module) {
 			environment: z.nativeEnum(Environments),
 			debug: z.boolean().optional().nullable(),
 		})
-		.merge(CreateListingRequest)
+		.merge(UpdateListingRequest)
 		.parse(program.opts());
 
 	const firebase = new FirebaseClient(opts);
 
 	const ctx = { firebase, ...opts };
 
-	createListing(ctx, opts);
+	updateListing(ctx, opts);
 }

@@ -7,13 +7,13 @@ import { Environments } from '../../models/environments';
 import assert from 'assert';
 import { Utils } from '../../../src/utils/utils';
 
-export const createTestUser = async (ctx: Context, reqData: any) => {
-	const res = await ctx.firebase.functions('createTestUser')(reqData);
+export const createTestUser = async (ctx: Context, opts: any) => {
+	const res = await ctx.firebase.functions('createTestUser')(opts);
 
 	assert(
 		Utils.identicalDictionary(res.data, {
-			email: reqData.email,
-			password: reqData.password,
+			email: opts.email,
+			password: opts.password,
 		})
 	);
 };

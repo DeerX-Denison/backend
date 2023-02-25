@@ -25,7 +25,10 @@ export const updateListing = Firebase.functions.https.onCall(
 			Utils.isSelf(invoker.uid, listing.seller.uid);
 
 			// generate updated listing
-			const updatedListing = Listing.omit({ createdAt: true }).parse({
+			const updatedListing = Listing.omit({
+				createdAt: true,
+				updatedAt: true,
+			}).parse({
 				...listing,
 				...requestData,
 				seller: invoker,

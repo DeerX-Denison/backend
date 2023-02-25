@@ -10,23 +10,17 @@ import { Utils } from '../../../src/utils/utils';
 import assert from 'assert';
 import { FirebaseError } from '@firebase/util';
 
-export const createFCMToken = async (ctx: Context, reqData: any) => {
-	assert(process.env.TESTER_DEVICE_ID !== undefined);
-	assert(process.env.TESTER_FCM_TOKEN !== undefined);
-
+export const createFCMToken = async (ctx: Context, opts: any) => {
 	try {
-		await ctx.firebase.functions('createFCMToken')({
-			...reqData,
-			token: reqData.fcmToken,
-		});
+		await ctx.firebase.functions('createFCMToken')(opts);
 	} catch (error) {
 		assert(error instanceof FirebaseError);
 		assert(error.code === 'functions/permission-denied');
 	}
 
 	const userCredential = await ctx.firebase.signInWithEmailAndPassword(
-		reqData.email,
-		reqData.password
+		opts.email,
+		opts.password
 	);
 
 	try {
@@ -38,10 +32,7 @@ export const createFCMToken = async (ctx: Context, reqData: any) => {
 		assert(error.code === 'functions/invalid-argument');
 	}
 
-	const res = await ctx.firebase.functions('createFCMToken')({
-		...reqData,
-		token: reqData.fcmToken,
-	});
+	const res = await ctx.firebase.functions('createFCMToken')(opts);
 
 	assert(Utils.identicalDictionary(res.data, { status: 'ok' }));
 
@@ -49,7 +40,7 @@ export const createFCMToken = async (ctx: Context, reqData: any) => {
 		.collection(Collection.users)
 		.doc(userCredential.user.uid)
 		.collection(Collection.fcm_tokens)
-		.doc(process.env.TESTER_DEVICE_ID)
+		.doc(opts.deviceId)
 		.get();
 
 	assert(docSnap.exists === true);
@@ -66,8 +57,8 @@ export const createFCMToken = async (ctx: Context, reqData: any) => {
 
 	assert(
 		Utils.identicalDictionary(token, {
-			deviceId: process.env.TESTER_DEVICE_ID,
-			token: process.env.TESTER_FCM_TOKEN,
+			deviceId: opts.deviceId,
+			token: opts.token,
 		})
 	);
 };
@@ -77,7 +68,7 @@ if (require.main === module) {
 		.requiredOption('--email <string>', 'user email')
 		.requiredOption('--password <string>', 'user password')
 		.requiredOption('--device-id <string>', 'user device id')
-		.requiredOption('--fcm-token <string>', 'user test fcm token')
+		.requiredOption('--token <string>', 'user test fcm token')
 		.option(
 			'--environment <string>',
 			'test environment',
@@ -91,7 +82,7 @@ if (require.main === module) {
 			email: NonEmptyString,
 			password: NonEmptyString,
 			deviceId: NonEmptyString,
-			fcmToken: NonEmptyString,
+			token: NonEmptyString,
 			environment: z.nativeEnum(Environments),
 			debug: z.boolean().optional().nullable(),
 		})
@@ -101,9 +92,5 @@ if (require.main === module) {
 
 	const context = { firebase, ...opts };
 
-	createFCMToken(context, {
-		...opts,
-		deviceId: opts.deviceId,
-		token: opts.fcmToken,
-	});
+	createFCMToken(context, opts);
 }

@@ -10,12 +10,10 @@ import assert from 'assert';
 import { Utils } from '../../../src/utils/utils';
 import { FirebaseError } from '@firebase/util';
 
-export const deleteFCMToken = async (ctx: Context, reqData: any) => {
-	assert(process.env.TESTER_DEVICE_ID !== undefined);
-
+export const deleteFCMToken = async (ctx: Context, opts: any) => {
 	try {
 		await ctx.firebase.functions('deleteFCMToken')({
-			...reqData,
+			...opts,
 			uid: 'fake id',
 		});
 	} catch (error) {
@@ -24,8 +22,8 @@ export const deleteFCMToken = async (ctx: Context, reqData: any) => {
 	}
 
 	const userCredential = await ctx.firebase.signInWithEmailAndPassword(
-		reqData.email,
-		reqData.password
+		opts.email,
+		opts.password
 	);
 
 	try {
@@ -38,7 +36,7 @@ export const deleteFCMToken = async (ctx: Context, reqData: any) => {
 	}
 
 	const res = await ctx.firebase.functions('deleteFCMToken')({
-		...reqData,
+		...opts,
 		uid: userCredential.user.uid,
 	});
 
@@ -48,7 +46,7 @@ export const deleteFCMToken = async (ctx: Context, reqData: any) => {
 		.collection(Collection.users)
 		.doc(userCredential.user.uid)
 		.collection(Collection.fcm_tokens)
-		.doc(process.env.TESTER_DEVICE_ID)
+		.doc(opts.deviceId)
 		.get();
 
 	assert(docSnap.exists === false);
