@@ -7,6 +7,8 @@ import { Environments } from '../../models/environments';
 import assert from 'assert';
 
 export const syncUser = async (ctx: Context, reqData: any) => {
+	await ctx.firebase.signOut();
+
 	await ctx.firebase.signInWithEmailAndPassword(
 		reqData.email,
 		reqData.password

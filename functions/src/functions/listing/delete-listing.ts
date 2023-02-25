@@ -33,6 +33,7 @@ export const deleteListing = Firebase.functions.https.onCall(
 			await Promise.all(
 				listing.images.map(Utils.extractImageRefFromUrl).map(Utils.deleteImage)
 			);
+
 			return ConfirmationResponse.parse();
 		} catch (error) {
 			return Utils.errorHandler(error);

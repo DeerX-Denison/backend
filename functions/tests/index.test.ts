@@ -12,6 +12,7 @@ import { createListing } from './functions/listing/create-listing.test';
 import { Config } from '../src/config';
 import assert from 'assert';
 import { updateListing } from './functions/listing/update-listing.test';
+import { deleteListing } from './functions/listing/delete-listing.test';
 // import { updateListing } from './functions/listing/update-listing.test';
 
 const main = async (ctx: Context, opts: any) => {
@@ -78,6 +79,8 @@ const main = async (ctx: Context, opts: any) => {
 		description: 'test description',
 		status: 'saved',
 	});
+
+	await deleteListing(ctx, { ...opts, ...credentials, id: listingId });
 };
 
 if (require.main === module) {

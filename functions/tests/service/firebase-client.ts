@@ -9,6 +9,7 @@ import {
 	connectAuthEmulator,
 	getAuth,
 	signInWithEmailAndPassword,
+	signOut,
 } from 'firebase/auth';
 
 export interface FirebaseClientsOpts {
@@ -25,6 +26,8 @@ export class FirebaseClient {
 	public functions;
 
 	public signInWithEmailAndPassword;
+
+	public signOut;
 
 	constructor(opts: FirebaseClientsOpts) {
 		this._app = initializeApp({
@@ -45,6 +48,8 @@ export class FirebaseClient {
 		this._auth = getAuth(this._app);
 		this.signInWithEmailAndPassword = (email: string, password: string) =>
 			signInWithEmailAndPassword(this._auth, email, password);
+
+		this.signOut = () => signOut(this._auth);
 
 		// connect to emulators
 		if (opts.environment === Environments.development) {

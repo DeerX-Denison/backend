@@ -12,6 +12,8 @@ import { Collection } from '../../../src/models/collection-name';
 import { UpdateListingRequest } from '../../../src/models/requests/update-listing-request';
 
 export const updateListing = async (ctx: Context, opts: any) => {
+	await ctx.firebase.signOut();
+
 	try {
 		await ctx.firebase.functions('updateListing')(opts);
 	} catch (error) {

@@ -12,6 +12,8 @@ import { Firebase } from '../../../src/services/firebase';
 import { Collection } from '../../../src/models/collection-name';
 
 export const createListing = async (ctx: Context, opts: any) => {
+	await ctx.firebase.signOut();
+
 	try {
 		await ctx.firebase.functions('createListing')(opts);
 	} catch (error) {
@@ -97,6 +99,7 @@ if (require.main === module) {
 	program
 		.requiredOption('--email <string>', 'user email')
 		.requiredOption('--password <string>', 'user password')
+		.requiredOption('--id <string>', 'listing id')
 		.requiredOption('--images <string>', 'listing images url')
 		.requiredOption('--name <string>', 'listing name')
 		.requiredOption('--price <string>', 'listing price')
