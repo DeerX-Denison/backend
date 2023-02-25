@@ -48,6 +48,7 @@ const main = async (ctx: Context, opts: any) => {
 	const listingId = await createListing(ctx, {
 		...opts,
 		...credentials,
+		id: 'test-listing-id',
 		images: [
 			'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg',
 			'https://i.ibb.co/JKS8DzC/default-profile-photo.jpg',

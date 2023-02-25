@@ -24,7 +24,6 @@ export const createListing = Firebase.functions.https.onCall(
 				createdAt: true,
 			}).parse({
 				...requestData,
-				id: Utils.randomId(),
 				seller: invoker,
 				soldTo: null,
 				likedBy: [],

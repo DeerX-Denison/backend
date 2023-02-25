@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { NonEmptyString } from './non-empty-string';
-import { Url } from './url';
 import { UserProfile } from './user';
 import { ZodTimestamp } from './zod-timestamp';
+import { Url } from './url';
 
 export enum ListingCategory {
 	'FURNITURE' = 'FURNITURE',
