@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { NonEmptyString } from './non-empty-string';
-import { Timestamp } from './timestamp';
 import { Url } from './url';
 import { UserProfile } from './user';
+import { ZodTimestamp } from './zod-timestamp';
 
 export enum ListingCategory {
 	'FURNITURE' = 'FURNITURE',
@@ -49,8 +49,8 @@ export const Listing = z.object({
 	condition: z.nativeEnum(ListingCondition),
 	description: NonEmptyString,
 	likedBy: z.array(NonEmptyString).min(0),
-	createdAt: z.instanceof(Timestamp),
-	updatedAt: z.instanceof(Timestamp),
+	createdAt: ZodTimestamp,
+	updatedAt: ZodTimestamp,
 	status: z.nativeEnum(ListingStatus),
 	soldTo: UserProfile.nullable().default(null),
 });

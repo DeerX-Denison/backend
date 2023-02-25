@@ -11,6 +11,7 @@ import { deleteFCMToken } from './functions/user/delete-fcm-token.test';
 import { createListing } from './functions/listing/create-listing.test';
 import { Config } from '../src/config';
 import assert from 'assert';
+import { updateListing } from './functions/listing/update-listing.test';
 // import { updateListing } from './functions/listing/update-listing.test';
 
 const main = async (ctx: Context, opts: any) => {
@@ -44,7 +45,7 @@ const main = async (ctx: Context, opts: any) => {
 		token: 'test-fcm-token',
 	});
 
-	await createListing(ctx, {
+	const listingId = await createListing(ctx, {
 		...opts,
 		...credentials,
 		images: [
@@ -60,22 +61,22 @@ const main = async (ctx: Context, opts: any) => {
 		status: 'posted',
 	});
 
-	// await updateListing(ctx, {
-	// 	...opts,
-	// 	...credentials,
-	// 	id: listingId,
-	// 	images: [
-	// 		'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg',
-	// 		'https://i.ibb.co/JKS8DzC/default-profile-photo.jpg',
-	// 		'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg',
-	// 	],
-	// 	name: 'updated test listing',
-	// 	price: '321',
-	// 	category: ['FASHION', 'ELECTRONIC'],
-	// 	condition: 'BRAND NEW',
-	// 	description: 'test description',
-	// 	status: 'saved',
-	// });
+	await updateListing(ctx, {
+		...opts,
+		...credentials,
+		id: listingId,
+		images: [
+			'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg',
+			'https://i.ibb.co/JKS8DzC/default-profile-photo.jpg',
+			'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg',
+		],
+		name: 'updated test listing',
+		price: '321',
+		category: ['FASHION', 'ELECTRONIC'],
+		condition: 'BRAND NEW',
+		description: 'test description',
+		status: 'saved',
+	});
 };
 
 if (require.main === module) {
