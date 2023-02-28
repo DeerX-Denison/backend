@@ -11,6 +11,8 @@ import assert from 'assert';
 import { FirebaseError } from '@firebase/util';
 
 export const createFCMToken = async (ctx: Context, opts: any) => {
+	await ctx.firebase.signOut();
+
 	try {
 		await ctx.firebase.functions('createFCMToken')(opts);
 	} catch (error) {
