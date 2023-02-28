@@ -63,6 +63,8 @@ export const createFCMToken = async (ctx: Context, opts: any) => {
 			token: opts.token,
 		})
 	);
+
+	await ctx.firebase.signOut();
 };
 
 if (require.main === module) {

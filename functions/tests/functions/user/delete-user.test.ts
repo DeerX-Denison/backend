@@ -26,6 +26,8 @@ export const deleteUser = async (ctx: Context, reqData: any) => {
 	const res = await ctx.firebase.functions('deleteUser')();
 
 	assert(Utils.identicalDictionary(res.data, { status: 'ok' }));
+
+	await ctx.firebase.signOut();
 };
 
 if (require.main === module) {

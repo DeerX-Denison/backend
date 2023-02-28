@@ -14,6 +14,7 @@ import assert from 'assert';
 import { updateListing } from './functions/listing/update-listing.test';
 import { deleteListing } from './functions/listing/delete-listing.test';
 import { deleteUser } from './functions/user/delete-user.test';
+import { getUserProfile } from './functions/user/get-user-profile.test';
 // import { updateListing } from './functions/listing/update-listing.test';
 
 const main = async (ctx: Context, opts: any) => {
@@ -82,6 +83,8 @@ const main = async (ctx: Context, opts: any) => {
 	});
 
 	await deleteListing(ctx, { ...opts, ...credentials, id: listingId });
+
+	await getUserProfile(ctx, { ...opts, ...credentials });
 
 	await deleteUser(ctx, { ...opts, ...credentials });
 };

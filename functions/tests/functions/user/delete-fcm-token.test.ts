@@ -52,6 +52,8 @@ export const deleteFCMToken = async (ctx: Context, opts: any) => {
 		.get();
 
 	assert(docSnap.exists === false);
+
+	await ctx.firebase.signOut();
 };
 
 if (require.main === module) {

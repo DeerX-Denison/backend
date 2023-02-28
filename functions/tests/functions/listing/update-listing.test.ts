@@ -91,6 +91,8 @@ export const updateListing = async (ctx: Context, opts: any) => {
 			soldTo: null,
 		})
 	);
+
+	await ctx.firebase.signOut();
 };
 
 if (require.main === module) {

@@ -92,6 +92,8 @@ export const createListing = async (ctx: Context, opts: any) => {
 		})
 	);
 
+	await ctx.firebase.signOut();
+
 	return res.data.id;
 };
 

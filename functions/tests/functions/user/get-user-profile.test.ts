@@ -4,18 +4,31 @@ import { FirebaseClient } from '../../service/firebase-client';
 import { z } from 'zod';
 import { NonEmptyString } from '../../../src/models/non-empty-string';
 import { Environments } from '../../models/environments';
-import assert from 'assert';
 import { Utils } from '../../../src/utils/utils';
-import { DeleteListingRequest } from '../../../src/models/requests/delete-listing-request';
+import assert from 'assert';
 import { FirebaseError } from '@firebase/util';
-import { Firebase } from '../../../src/services/firebase';
-import { Collection } from '../../../src/models/collection-name';
+import { createTestUser } from './create-test-user.test';
+import { Config } from '../../../src/config';
+import { syncUser } from './sync-user.test';
+import userData from '../../../src/user/users.json';
 
-export const deleteListing = async (ctx: Context, opts: any) => {
+export const getUserProfile = async (ctx: Context, opts: any) => {
 	await ctx.firebase.signOut();
 
+	const newUid = await createTestUser(ctx, {
+		...opts,
+		email: Config.testerEmails[1],
+		password: 'superSecret',
+		token: Config.createTestUserToken,
+	});
+
+	await syncUser(ctx, {
+		email: Config.testerEmails[1],
+		password: 'superSecret',
+	});
+
 	try {
-		await ctx.firebase.functions('deleteListing')(opts);
+		await ctx.firebase.functions('getUserProfile')(newUid);
 	} catch (error) {
 		assert(error instanceof FirebaseError);
 		assert(error.code === 'functions/permission-denied');
@@ -24,7 +37,7 @@ export const deleteListing = async (ctx: Context, opts: any) => {
 	await ctx.firebase.signInWithEmailAndPassword(opts.email, opts.password);
 
 	try {
-		await ctx.firebase.functions('deleteListing')({
+		await ctx.firebase.functions('getUserProfile')({
 			a: 'invalid data',
 		});
 	} catch (error) {
@@ -32,25 +45,27 @@ export const deleteListing = async (ctx: Context, opts: any) => {
 		assert(error.code === 'functions/invalid-argument');
 	}
 
-	const res = await ctx.firebase.functions('deleteListing')(opts);
+	const res = await ctx.firebase.functions('getUserProfile')(newUid);
 
 	assert(Utils.isDictionary(res.data));
 
-	assert(Utils.identicalDictionary(res.data, { status: 'ok' }));
-
-	const docSnap = await Firebase.db
-		.collection(Collection.listings)
-		.doc(opts.id)
-		.get();
-
-	assert(docSnap.exists === false);
+	assert(
+		Utils.identicalDictionary(res.data, {
+			uid: newUid,
+			email: Config.testerEmails[1],
+			photoURL: (userData as any)[Config.testerEmails[1]].img,
+			displayName: (userData as any)[Config.testerEmails[1]].name,
+		})
+	);
 
 	await ctx.firebase.signOut();
 };
 
 if (require.main === module) {
 	program
-		.requiredOption('--id <string>', 'listing id')
+		.requiredOption('--email <string>', 'user email')
+		.requiredOption('--password <string>', 'user password')
+		.requiredOption('--uid <string>', 'target user id')
 		.option(
 			'--environment <string>',
 			'test environment',
@@ -63,15 +78,15 @@ if (require.main === module) {
 		.object({
 			email: NonEmptyString,
 			password: NonEmptyString,
+			uid: NonEmptyString,
 			environment: z.nativeEnum(Environments),
 			debug: z.boolean().optional().nullable(),
 		})
-		.merge(DeleteListingRequest)
 		.parse(program.opts());
 
 	const firebase = new FirebaseClient(opts);
 
-	const ctx = { firebase, ...opts };
+	const context = { firebase, ...opts };
 
-	deleteListing(ctx, opts);
+	getUserProfile(context, opts);
 }

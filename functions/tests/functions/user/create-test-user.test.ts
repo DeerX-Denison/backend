@@ -10,12 +10,26 @@ import { Utils } from '../../../src/utils/utils';
 export const createTestUser = async (ctx: Context, opts: any) => {
 	const res = await ctx.firebase.functions('createTestUser')(opts);
 
+	assert(Utils.isDictionary(res.data));
+
+	assert('uid' in res.data);
+
+	assert(res.data.uid !== undefined);
+
+	assert(typeof res.data.uid === 'string');
+
+	const uid = res.data.uid;
+
+	delete res.data.uid;
+
 	assert(
 		Utils.identicalDictionary(res.data, {
 			email: opts.email,
 			password: opts.password,
 		})
 	);
+
+	return uid;
 };
 
 if (require.main === module) {

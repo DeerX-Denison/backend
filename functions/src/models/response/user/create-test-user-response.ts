@@ -3,6 +3,7 @@ import { Email } from '../../../models/email';
 import z from 'zod';
 
 export const CreateTestUserResponse = z.object({
+	uid: NonEmptyString,
 	email: Email,
 	password: NonEmptyString,
 });

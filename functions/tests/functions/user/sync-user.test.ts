@@ -17,6 +17,8 @@ export const syncUser = async (ctx: Context, reqData: any) => {
 	const res = await ctx.firebase.functions('syncUser')();
 
 	assert(res.data === 'updated');
+
+	await ctx.firebase.signOut();
 };
 
 if (require.main === module) {
