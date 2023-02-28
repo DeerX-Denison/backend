@@ -7,6 +7,10 @@ import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 
+/**
+ * Deprecated. The app is no longer supporting anonymous sign in.
+ * It will be removed in future updates.
+ */
 const fetchCoreTeamInfos = Firebase.functions.https.onCall(
 	async (_data, context) => {
 		const invokerUid = isLoggedIn(context);

@@ -3,6 +3,11 @@ import { main as deleteAnonymousUser } from './deleteAnonymousUser';
 import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
+
+/**
+ * Deprecated. The app is no longer supporting anonymous sign in.
+ * It will be removed in future updates.
+ */
 const deleteOldAnonUsers = Firebase.functions.pubsub
 	.schedule('0 0 * * *')
 	.timeZone('America/New_York')

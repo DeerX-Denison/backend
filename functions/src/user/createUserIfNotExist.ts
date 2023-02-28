@@ -126,6 +126,10 @@ const updateUser = (userInfo: AuthData) => {
 	return updatedUser;
 };
 
+/**
+ * Deprecated. This function has been upgrade to "syncUser".
+ * It will be removed in future updates.
+ */
 const createUserIfNotExist = Firebase.functions.https.onCall(
 	async (_data, context) => {
 		if (!context.auth) {
