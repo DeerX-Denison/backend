@@ -7,13 +7,14 @@ import { Environments } from '../../models/environments';
 import { Utils } from '../../../src/utils/utils';
 import assert from 'assert';
 import { FirebaseError } from '@firebase/util';
-import { createTestUser } from './create-test-user.test';
+import { UserPronoun } from '../../../src/models/user';
 import { Config } from '../../../src/config';
+import { createTestUser } from './create-test-user.test';
 import { syncUser } from './sync-user.test';
 import userData from '../../../src/user/users.json';
 import { deleteUser } from './delete-user.test';
 
-export const getUserProfile = async (ctx: Context, opts: any) => {
+export const updateUserProfile = async (ctx: Context, opts: any) => {
 	const otherTestUserPassword = 'superSecret';
 
 	await ctx.firebase.signOut();
@@ -31,16 +32,19 @@ export const getUserProfile = async (ctx: Context, opts: any) => {
 	});
 
 	try {
-		await ctx.firebase.functions('getUserProfile')(newUid);
+		await ctx.firebase.functions('updateUserProfile')(opts);
 	} catch (error) {
 		assert(error instanceof FirebaseError);
 		assert(error.code === 'functions/permission-denied');
 	}
 
-	await ctx.firebase.signInWithEmailAndPassword(opts.email, opts.password);
+	await ctx.firebase.signInWithEmailAndPassword(
+		Config.testerEmails[1],
+		otherTestUserPassword
+	);
 
 	try {
-		await ctx.firebase.functions('getUserProfile')({
+		await ctx.firebase.functions('updateUserProfile')({
 			a: 'invalid data',
 		});
 	} catch (error) {
@@ -48,16 +52,28 @@ export const getUserProfile = async (ctx: Context, opts: any) => {
 		assert(error.code === 'functions/invalid-argument');
 	}
 
-	const res = await ctx.firebase.functions('getUserProfile')(newUid);
+	const res = await ctx.firebase.functions('updateUserProfile')(opts);
 
 	assert(Utils.isDictionary(res.data));
 
+	assert(Utils.identicalDictionary(res.data, { status: 'ok' }));
+
+	await ctx.firebase.signOut();
+
+	await ctx.firebase.signInWithEmailAndPassword(opts.email, opts.password);
+
+	const res1 = await ctx.firebase.functions('getUserProfile')(newUid);
+
+	assert(Utils.isDictionary(res1.data));
+
 	assert(
-		Utils.identicalDictionary(res.data, {
+		Utils.identicalDictionary(res1.data, {
 			uid: newUid,
 			email: Config.testerEmails[1],
-			photoURL: (userData as any)[Config.testerEmails[1]].img,
 			displayName: (userData as any)[Config.testerEmails[1]].name,
+			photoURL: opts.imageUrl,
+			bio: opts.bio,
+			pronouns: opts.pronouns,
 		})
 	);
 
@@ -73,7 +89,9 @@ if (require.main === module) {
 	program
 		.requiredOption('--email <string>', 'user email')
 		.requiredOption('--password <string>', 'user password')
-		.requiredOption('--uid <string>', 'target user id')
+		.requiredOption('--image-url <string>', 'user profile image url')
+		.requiredOption('--bio <string>', 'user bio')
+		.requiredOption('--pronouns <string>', 'user separated pronouns')
 		.option(
 			'--environment <string>',
 			'test environment',
@@ -86,7 +104,11 @@ if (require.main === module) {
 		.object({
 			email: NonEmptyString,
 			password: NonEmptyString,
-			uid: NonEmptyString,
+			imageUrl: NonEmptyString,
+			bio: NonEmptyString,
+			pronouns: NonEmptyString.transform((obj) =>
+				obj.split(',').map((_) => z.nativeEnum(UserPronoun).parse(_))
+			),
 			environment: z.nativeEnum(Environments),
 			debug: z.boolean().optional().nullable(),
 		})
@@ -96,5 +118,5 @@ if (require.main === module) {
 
 	const context = { firebase, ...opts };
 
-	getUserProfile(context, opts);
+	updateUserProfile(context, opts);
 }

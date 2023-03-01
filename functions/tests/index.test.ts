@@ -16,6 +16,7 @@ import { deleteListing } from './functions/listing/delete-listing.test';
 import { deleteUser } from './functions/user/delete-user.test';
 import { getUserProfile } from './functions/user/get-user-profile.test';
 import { updateFCMToken } from './functions/user/update-fcm-token.test';
+import { updateUserProfile } from './functions/user/update-user-profile.test';
 
 const main = async (ctx: Context, opts: any) => {
 	assert(Config.createTestUserToken);
@@ -92,6 +93,14 @@ const main = async (ctx: Context, opts: any) => {
 	await deleteListing(ctx, { ...opts, ...credentials, id: listingId });
 
 	await getUserProfile(ctx, { ...opts, ...credentials });
+
+	await updateUserProfile(ctx, {
+		...opts,
+		...credentials,
+		imageUrl: 'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg',
+		bio: 'test user bio',
+		pronouns: ['HE', 'HIM'],
+	});
 
 	await deleteUser(ctx, { ...opts, ...credentials });
 };
