@@ -1,26 +1,24 @@
 import sgMail from '@sendgrid/mail';
-import { ERROR_MESSAGES } from '../constants';
-import Logger from '../Logger';
-import secrets from '../secrets.json';
+import { ERROR_MESSAGES } from '../../constants';
+import { Logger } from '../../services/logger';
+import secrets from '../../secrets.json';
 import { ActionCodeSettings } from 'firebase-admin/auth';
-import { Firebase } from '../services/firebase';
-
-const logger = new Logger();
+import { Firebase } from '../../services/firebase';
 
 /**
  * function to send user a sign in email
  */
-const sendSignInEmail = Firebase.functions.https.onCall(
+export const sendSignInEmail = Firebase.functions.https.onCall(
 	async (data: { email: string; actionCodeSettings: ActionCodeSettings }) => {
 		if (!('email' in data)) {
-			logger.log(`Missing "email" in data: ${JSON.stringify(data)}`);
+			Logger.log(`Missing "email" in data: ${JSON.stringify(data)}`);
 			throw new Firebase.functions.https.HttpsError(
 				'invalid-argument',
 				ERROR_MESSAGES.invalidInput
 			);
 		}
 		if (!('actionCodeSettings' in data)) {
-			logger.log(
+			Logger.log(
 				`Missing "actionCodeSettings" in data: ${JSON.stringify(data)}`
 			);
 			throw new Firebase.functions.https.HttpsError(
@@ -29,7 +27,7 @@ const sendSignInEmail = Firebase.functions.https.onCall(
 			);
 		}
 		if (typeof data.email !== 'string') {
-			logger.log(`Data email is not string: ${JSON.stringify(data.email)}`);
+			Logger.log(`Data email is not string: ${JSON.stringify(data.email)}`);
 			throw new Firebase.functions.https.HttpsError(
 				'invalid-argument',
 				ERROR_MESSAGES.invalidInput
@@ -38,7 +36,7 @@ const sendSignInEmail = Firebase.functions.https.onCall(
 
 		const [...match] = data.email.matchAll(/@denison.edu/g);
 		if (match.length !== 1) {
-			logger.log(`Invalid Email Address: ${data.email}`);
+			Logger.log(`Invalid Email Address: ${data.email}`);
 			throw new Firebase.functions.https.HttpsError(
 				'invalid-argument',
 				'Invalid Email Address'
@@ -52,10 +50,10 @@ const sendSignInEmail = Firebase.functions.https.onCall(
 				data.email,
 				data.actionCodeSettings
 			);
-			logger.log(`Generated auth link: ${data.email}`);
+			Logger.log(`Generated auth link: ${data.email}`);
 		} catch (error) {
-			logger.error(error);
-			logger.error(`Fail to create authentication link: ${data.email}`);
+			Logger.error(error);
+			Logger.error(`Fail to create authentication link: ${data.email}`);
 			throw new Firebase.functions.https.HttpsError(
 				'internal',
 				ERROR_MESSAGES.failSendSignInEmail
@@ -70,10 +68,10 @@ const sendSignInEmail = Firebase.functions.https.onCall(
 				dynamicTemplateData: { authLink },
 				hideWarnings: true,
 			});
-			logger.log(`Sent sign in email to: ${data.email}`);
+			Logger.log(`Sent sign in email to: ${data.email}`);
 		} catch (error) {
-			logger.error(error);
-			logger.error('Fail to send auth email');
+			Logger.error(error);
+			Logger.error('Fail to send auth email');
 			throw new Firebase.functions.https.HttpsError(
 				'internal',
 				ERROR_MESSAGES.failSendSignInEmail
@@ -81,5 +79,3 @@ const sendSignInEmail = Firebase.functions.https.onCall(
 		}
 	}
 );
-
-export default sendSignInEmail;

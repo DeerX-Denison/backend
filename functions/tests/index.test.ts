@@ -15,7 +15,7 @@ import { updateListing } from './functions/listing/update-listing.test';
 import { deleteListing } from './functions/listing/delete-listing.test';
 import { deleteUser } from './functions/user/delete-user.test';
 import { getUserProfile } from './functions/user/get-user-profile.test';
-// import { updateListing } from './functions/listing/update-listing.test';
+import { updateFCMToken } from './functions/user/update-fcm-token.test';
 
 const main = async (ctx: Context, opts: any) => {
 	assert(Config.createTestUserToken);
@@ -39,6 +39,13 @@ const main = async (ctx: Context, opts: any) => {
 		...credentials,
 		deviceId: 'test-device-id',
 		token: 'test-fcm-token',
+	});
+
+	await updateFCMToken(ctx, {
+		...opts,
+		...credentials,
+		deviceId: 'test-device-id',
+		token: 'updated-test-fcm-token',
 	});
 
 	await deleteFCMToken(ctx, {
