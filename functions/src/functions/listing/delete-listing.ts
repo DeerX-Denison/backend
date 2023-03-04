@@ -1,4 +1,4 @@
-import { DeleteListingRequest } from '../../models/requests/delete-listing-request';
+import { DeleteListingRequest } from '../../models/requests/listing/delete-listing-request';
 import { Collection } from '../../models/collection-name';
 import { Firebase } from '../../services/firebase';
 import { Utils } from '../../utils/utils';

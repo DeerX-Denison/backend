@@ -13,6 +13,7 @@ import { Firebase } from '../services/firebase';
 import { AuthData } from 'firebase-functions/lib/common/providers/tasks';
 import { Config } from '../config';
 import { Logger } from '../services/logger';
+import { Message } from '../models/message';
 
 export class Utils {
 	/**
@@ -58,6 +59,30 @@ export class Utils {
 		}
 
 		return User.parse({ ...authUser, ...firestoreUser });
+	}
+
+	/**
+	 * fetch message from given thread id and message id
+	 * @param threadId id of thread to fetch from
+	 * @param messageId id of message to fetch
+	 * @returns instance of Message
+	 */
+	public static async fetchMessage(
+		threadId: string,
+		messageId: string
+	): Promise<Message> {
+		const docSnap = await Firebase.db
+			.collection(Collection.threads)
+			.doc(threadId)
+			.collection(Collection.messages)
+			.doc(messageId)
+			.get();
+		if (docSnap.exists || docSnap.data() === undefined) {
+			throw new NotFoundError(
+				new Error(`Message does not exist: ${threadId}/${messageId}`)
+			);
+		}
+		return Message.parse(docSnap.data());
 	}
 
 	/**

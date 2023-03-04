@@ -1,6 +1,5 @@
 import { Room } from '../../models/room';
 import { Url } from '../../models/url';
-import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Utils } from '../../utils/utils';
 import { NonEmptyString } from '../../models/non-empty-string';
 import {
@@ -10,15 +9,13 @@ import {
 } from '../../constants';
 import { InternalError } from '../../models/error/internal-error';
 import { ERROR_MESSAGES } from '../../constants';
-import { CreateRoomRequest } from '../../models/requests/create-room-request';
+import { CreateThreadRequest } from '../../models/requests/thread/create-thread-request';
 import { Firebase } from '../../services/firebase';
+import { CreateThreadResponse } from '../../models/response/thread/create-thread-response';
 
 export const createThread = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
-			// validate request data
-			const requestData = CreateRoomRequest.parse(data);
-
 			// authorize user
 			const invokerId = Utils.isLoggedIn(context);
 
@@ -26,6 +23,10 @@ export const createThread = Firebase.functions.https.onCall(
 
 			Utils.isNotBanned(invoker);
 
+			// validate request data
+			const requestData = CreateThreadRequest.parse(data);
+
+			// authorize user again based on requestData
 			Utils.isMember(requestData.membersUid, invokerId);
 
 			// fetch members if room
@@ -85,7 +86,7 @@ export const createThread = Firebase.functions.https.onCall(
 			}
 
 			// parse response
-			return ConfirmationResponse.parse();
+			return CreateThreadResponse.parse({ room: newRoom });
 		} catch (error) {
 			return Utils.errorHandler(error);
 		}

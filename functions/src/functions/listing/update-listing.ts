@@ -2,7 +2,7 @@ import { Collection } from '../../models/collection-name';
 import { Listing, ListingStatus } from '../../models/listing';
 import { Firebase } from '../../services/firebase';
 import { Utils } from '../../utils/utils';
-import { UpdateListingRequest } from '../../models/requests/update-listing-request';
+import { UpdateListingRequest } from '../../models/requests/listing/update-listing-request';
 import { UpdateListingResponse } from '../../models/response/listing/update-listing-response';
 
 export const updateListing = Firebase.functions.https.onCall(

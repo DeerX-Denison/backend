@@ -1,6 +1,6 @@
 import { Collection } from '../../models/collection-name';
 import { Listing } from '../../models/listing';
-import { CreateListingRequest } from '../../models/requests/create-listing-request';
+import { CreateListingRequest } from '../../models/requests/listing/create-listing-request';
 import { Firebase } from '../../services/firebase';
 import { Utils } from '../../utils/utils';
 import { CreateListingResponse } from '../../models/response/listing/create-listing-response';

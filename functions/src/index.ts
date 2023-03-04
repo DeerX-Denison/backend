@@ -7,7 +7,7 @@ export { health } from './functions/misc/health';
 export { getUserProfile } from './functions/user/get-user-profile';
 export { createTestUser } from './functions/user/create-test-user';
 export { createThread } from './functions/thread/create-thread';
-export { default as readMessages } from './messages/readMessages';
+export { readMessages } from './functions/message/read-message';
 export { default as sendManualMessage } from './messages/sendManualMessage';
 export { default as createReport } from './report/createReport';
 export { createFCMToken } from './functions/user/create-fcm-token';

@@ -9,7 +9,7 @@ import { Utils } from '../../../src/utils/utils';
 import { FirebaseError } from '@firebase/util';
 import { Firebase } from '../../../src/services/firebase';
 import { Collection } from '../../../src/models/collection-name';
-import { UpdateListingRequest } from '../../../src/models/requests/update-listing-request';
+import { UpdateListingRequest } from '../../../src/models/requests/listing/update-listing-request';
 
 export const updateListing = async (ctx: Context, opts: any) => {
 	await ctx.firebase.signOut();

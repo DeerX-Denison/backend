@@ -1,7 +1,7 @@
 import { Room } from '../../models/room';
 import { Url } from '../../models/url';
 import { Message } from '../../models/message';
-import { CreateMessageRequest } from '../../models/requests/create-message-request';
+import { CreateMessageRequest } from '../../models/requests/message/create-message-request';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Utils } from '../../utils/utils';
 import { NonEmptyString } from '../../models/non-empty-string';

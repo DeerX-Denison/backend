@@ -1,8 +1,6 @@
 import { MessageData } from 'types';
-import Logger from '../Logger';
 import { Firebase } from '../services/firebase';
-
-const logger = new Logger();
+import { Logger } from '../services/logger';
 
 /**
  * utility function to fetch user info from a given uid
@@ -19,13 +17,13 @@ const fetchMessage: (
 			.doc(messageId)
 			.get();
 		if (!docSnap.exists) {
-			logger.log(`Message does not exist: ${threadId}/${messageId}`);
+			Logger.log(`Message does not exist: ${threadId}/${messageId}`);
 			return undefined;
 		}
 		const messageData = docSnap.data() as MessageData;
 		return messageData;
 	} catch (error) {
-		logger.error(error);
+		Logger.error(error);
 		return undefined;
 	}
 };

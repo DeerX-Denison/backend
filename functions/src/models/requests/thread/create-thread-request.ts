@@ -1,7 +1,7 @@
-import { Room } from '../room';
+import { Room } from '../../room';
 import { z } from 'zod';
 
-export const CreateRoomRequest = Room.omit({
+export const CreateThreadRequest = Room.omit({
 	thumbnail: true,
 	name: true,
 	members: true,
@@ -11,4 +11,4 @@ export const CreateRoomRequest = Room.omit({
 	latestSeenAt: true,
 });
 
-export type CreateRoomRequest = z.infer<typeof CreateRoomRequest>;
+export type CreateThreadRequest = z.infer<typeof CreateThreadRequest>;

@@ -3,6 +3,7 @@ import { NonEmptyString } from './non-empty-string';
 import { Timestamp } from './timestamp';
 import { Url } from './url';
 import { UserProfile } from './user';
+import { ZodTimestamp } from './zod-timestamp';
 
 export const Room = z.object({
 	id: NonEmptyString,
@@ -11,7 +12,7 @@ export const Room = z.object({
 	thumbnail: z.record(NonEmptyString, Url),
 	name: z.record(NonEmptyString, NonEmptyString),
 	latestMessage: NonEmptyString,
-	latestTime: z.instanceof(Timestamp),
+	latestTime: ZodTimestamp,
 	latestSenderUid: NonEmptyString,
 	latestSeenAt: z.record(
 		NonEmptyString,

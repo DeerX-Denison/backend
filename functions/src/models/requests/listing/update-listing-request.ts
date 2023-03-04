@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Listing } from '../listing';
+import { Listing } from '../../listing';
 
 export const UpdateListingRequest = Listing.pick({
 	id: true,

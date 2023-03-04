@@ -9,6 +9,26 @@ export enum MessageContentType {
 	'reference' = 'reference',
 }
 
+export const MessageSeenAt = z.record(
+	NonEmptyString,
+	z.union([z.instanceof(Timestamp), z.null()])
+);
+
+export type MessageSeenAt = z.infer<typeof MessageSeenAt>;
+
+export const MessageRefs = z.array(
+	z.object({
+		begin: z.number().min(0),
+		end: z.number().min(0),
+		data: z.object({
+			id: NonEmptyString,
+			thumbnail: Url,
+		}),
+	})
+);
+
+export type MessageRefs = z.infer<typeof MessageRefs>;
+
 export const Message = z.object({
 	id: NonEmptyString,
 	sender: UserProfile,
@@ -17,20 +37,8 @@ export const Message = z.object({
 	content: NonEmptyString,
 	membersUid: z.array(NonEmptyString).min(2),
 	threadName: z.record(NonEmptyString, NonEmptyString),
-	seenAt: z.record(
-		NonEmptyString,
-		z.union([z.instanceof(Timestamp), z.null()])
-	),
-	refs: z.array(
-		z.object({
-			begin: z.number().min(0),
-			end: z.number().min(0),
-			data: z.object({
-				id: NonEmptyString,
-				thumbnail: Url,
-			}),
-		})
-	),
+	seenAt: MessageSeenAt,
+	refs: MessageRefs,
 });
 
 export type Message = z.infer<typeof Message>;

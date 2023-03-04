@@ -1,5 +1,5 @@
-import { Message } from '../../models/message';
-import { Room } from '../../models/room';
+import { Message } from '../../message';
+import { Room } from '../../room';
 import { z } from 'zod';
 
 export const CreateMessageRequest = z.object({

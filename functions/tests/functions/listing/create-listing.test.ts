@@ -6,7 +6,7 @@ import { NonEmptyString } from '../../../src/models/non-empty-string';
 import { Environments } from '../../models/environments';
 import assert from 'assert';
 import { Utils } from '../../../src/utils/utils';
-import { CreateListingRequest } from '../../../src/models/requests/create-listing-request';
+import { CreateListingRequest } from '../../../src/models/requests/listing/create-listing-request';
 import { FirebaseError } from '@firebase/util';
 import { Firebase } from '../../../src/services/firebase';
 import { Collection } from '../../../src/models/collection-name';
