@@ -1,7 +1,7 @@
-import { Room } from '../../room';
+import { Thread } from '../../thread';
 import { z } from 'zod';
 
-export const CreateThreadRequest = Room.omit({
+export const CreateThreadRequest = Thread.omit({
 	thumbnail: true,
 	name: true,
 	members: true,

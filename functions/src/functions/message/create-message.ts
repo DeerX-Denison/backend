@@ -1,4 +1,4 @@
-import { Room } from '../../models/room';
+import { Thread } from '../../models/thread';
 import { Url } from '../../models/url';
 import { Message } from '../../models/message';
 import { CreateMessageRequest } from '../../models/requests/message/create-message-request';
@@ -13,12 +13,13 @@ import { Firebase } from '../../services/firebase';
 export const createMessage = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
-			// validate request data
-			const requestData = CreateMessageRequest.parse(data);
-
 			// authorize user
 			const invokerId = Utils.isLoggedIn(context);
 
+			// validate request data
+			const requestData = CreateMessageRequest.parse(data);
+
+			// authorize user again
 			const invoker = await Utils.fetchUser(invokerId);
 
 			Utils.isNotBanned(invoker);
@@ -40,10 +41,10 @@ export const createMessage = Firebase.functions.https.onCall(
 			const newMessage = Message.parse({
 				...requestData.message,
 				sender: invoker,
-				time: Firebase.serverTime(),
+				time: Firebase.localTime(),
 				seenAt: {
 					...requestData.message.seenAt,
-					[requestData.message.sender.uid]: Firebase.serverTime(),
+					[requestData.message.sender.uid]: Firebase.localTime(),
 				},
 			});
 
@@ -93,7 +94,7 @@ export const createMessage = Firebase.functions.https.onCall(
 				}
 			});
 
-			const updatedRoom = Room.parse({
+			const updatedRoom = Thread.parse({
 				...requestData.threadPreviewData,
 				thumbnail,
 				name,

@@ -11,6 +11,7 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from 'firebase/auth';
+import { Timestamp } from 'firebase-admin/firestore';
 
 export interface FirebaseClientsOpts {
 	environment: Environments;
@@ -28,6 +29,8 @@ export class FirebaseClient {
 	public signInWithEmailAndPassword;
 
 	public signOut;
+
+	public localTime;
 
 	constructor(opts: FirebaseClientsOpts) {
 		this._app = initializeApp({
@@ -48,8 +51,9 @@ export class FirebaseClient {
 		this._auth = getAuth(this._app);
 		this.signInWithEmailAndPassword = (email: string, password: string) =>
 			signInWithEmailAndPassword(this._auth, email, password);
-
 		this.signOut = () => signOut(this._auth);
+
+		this.localTime = Timestamp.now;
 
 		// connect to emulators
 		if (opts.environment === Environments.development) {

@@ -1,4 +1,4 @@
-import { Room } from '../../models/room';
+import { Thread } from '../../models/thread';
 import { Url } from '../../models/url';
 import { Utils } from '../../utils/utils';
 import { NonEmptyString } from '../../models/non-empty-string';
@@ -67,7 +67,7 @@ export const createThread = Firebase.functions.https.onCall(
 			});
 
 			// generate new room
-			const newRoom = Room.parse({
+			const newRoom = Thread.parse({
 				...requestData,
 				thumbnail,
 				name,

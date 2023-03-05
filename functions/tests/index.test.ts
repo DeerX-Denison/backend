@@ -18,6 +18,8 @@ import { getUserProfile } from './functions/user/get-user-profile.test';
 import { updateFCMToken } from './functions/user/update-fcm-token.test';
 import { updateUserProfile } from './functions/user/update-user-profile.test';
 import { createThread } from './functions/thread/create-thread.test';
+import { createMessage } from './functions/message/create-message.test';
+import data from '../src/user/users.json';
 
 const main = async (ctx: Context, opts: any) => {
 	assert(Config.createTestUserToken);
@@ -28,7 +30,7 @@ const main = async (ctx: Context, opts: any) => {
 	};
 	await healthCheck(ctx, {});
 
-	await createTestUser(ctx, {
+	const uid = await createTestUser(ctx, {
 		...opts,
 		...credentials,
 		token: Config.createTestUserToken,
@@ -57,7 +59,53 @@ const main = async (ctx: Context, opts: any) => {
 		token: 'test-fcm-token',
 	});
 
-	await createThread(ctx, { ...opts, ...credentials, id: 'test-thread-id' });
+	const otherUid = await createTestUser(ctx, {
+		...opts,
+		email: Config.testerEmails[1],
+		password: credentials.password,
+		token: Config.createTestUserToken,
+	});
+
+	await syncUser(ctx, {
+		...opts,
+		email: Config.testerEmails[1],
+		password: credentials.password,
+	});
+
+	const thread = await createThread(ctx, {
+		...opts,
+		...credentials,
+		id: 'test-thread-id',
+		membersUid: [uid, otherUid],
+	});
+
+	await createMessage(ctx, {
+		...opts,
+		...credentials,
+		threadPreviewData: { id: thread.id, membersUid: thread.membersUid },
+		message: {
+			id: 'test-message',
+			sender: {
+				uid,
+				email: Config.testerEmails[0],
+				displayName: (data as any)[Config.testerEmails[0]].name,
+				photoURL: (data as any)[Config.testerEmails[1]].img,
+			},
+			time: ctx.firebase.localTime(),
+			contentType: ['text'],
+			content: 'test message foo bar',
+			membersUid: thread.membersUid,
+			threadName: thread.name,
+			seenAt: {},
+			refs: [],
+		},
+	});
+
+	await deleteUser(ctx, {
+		...opts,
+		email: Config.testerEmails[1],
+		password: credentials.password,
+	});
 
 	const listingId = await createListing(ctx, {
 		...opts,

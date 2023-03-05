@@ -1,9 +1,8 @@
 import { Message } from '../../message';
-import { Room } from '../../room';
+import { Thread } from '../../thread';
 import { z } from 'zod';
-
 export const CreateMessageRequest = z.object({
-	threadPreviewData: Room.omit({
+	threadPreviewData: Thread.omit({
 		thumbnail: true,
 		name: true,
 		members: true,

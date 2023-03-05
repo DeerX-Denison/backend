@@ -1,8 +1,8 @@
-import { Room } from '../../../models/room';
+import { Thread } from '../../thread';
 import { z } from 'zod';
 
 export const CreateThreadResponse = z.object({
-	room: Room,
+	room: Thread,
 });
 
 export type CreateThreadResponse = z.infer<typeof CreateThreadResponse>;

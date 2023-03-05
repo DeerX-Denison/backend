@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { NonEmptyString } from './non-empty-string';
-import { Timestamp } from './timestamp';
 import { Url } from './url';
 import { UserProfile } from './user';
+import { ZodTimestamp } from './zod-timestamp';
 
 export enum MessageContentType {
 	'text' = 'text',
@@ -11,7 +11,7 @@ export enum MessageContentType {
 
 export const MessageSeenAt = z.record(
 	NonEmptyString,
-	z.union([z.instanceof(Timestamp), z.null()])
+	z.union([ZodTimestamp, z.null()])
 );
 
 export type MessageSeenAt = z.infer<typeof MessageSeenAt>;
@@ -32,7 +32,7 @@ export type MessageRefs = z.infer<typeof MessageRefs>;
 export const Message = z.object({
 	id: NonEmptyString,
 	sender: UserProfile,
-	time: z.instanceof(Timestamp),
+	time: ZodTimestamp,
 	contentType: z.array(z.nativeEnum(MessageContentType)).min(1),
 	content: NonEmptyString,
 	membersUid: z.array(NonEmptyString).min(2),

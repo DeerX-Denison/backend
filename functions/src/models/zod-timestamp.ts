@@ -8,6 +8,12 @@ export const ZodTimestamp = z
 		_seconds: z.number().optional(),
 		_nanoseconds: z.number().optional(),
 	})
+	.refine(
+		(obj) =>
+			(obj.seconds !== undefined && obj.nanoseconds !== undefined) ||
+			(obj._seconds !== undefined && obj._nanoseconds !== undefined),
+		'Neither is seconds or _seconds is defined'
+	)
 	.transform((obj) => {
 		if (obj.seconds !== undefined && obj.nanoseconds !== undefined) {
 			return new Timestamp(obj.seconds, obj.nanoseconds);

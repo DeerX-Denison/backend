@@ -3,11 +3,11 @@ import assert from 'assert';
 import { Utils } from '../../../src/utils/utils';
 import { FirebaseError } from '@firebase/util';
 
-export const createThread = async (ctx: Context, opts: any) => {
+export const createMessage = async (ctx: Context, opts: any) => {
 	await ctx.firebase.signOut();
 
 	try {
-		await ctx.firebase.functions('createThread')(opts);
+		await ctx.firebase.functions('createMessage')(opts);
 	} catch (error) {
 		assert(error instanceof FirebaseError);
 		assert(error.code === 'functions/permission-denied');
@@ -16,7 +16,7 @@ export const createThread = async (ctx: Context, opts: any) => {
 	await ctx.firebase.signInWithEmailAndPassword(opts.email, opts.password);
 
 	try {
-		await ctx.firebase.functions('createThread')({
+		await ctx.firebase.functions('createMessage')({
 			a: 'invalid data',
 		});
 	} catch (error) {
@@ -24,13 +24,11 @@ export const createThread = async (ctx: Context, opts: any) => {
 		assert(error.code === 'functions/invalid-argument');
 	}
 
-	const res = await ctx.firebase.functions('createThread')(opts);
+	const res = await ctx.firebase.functions('createMessage')(opts);
 
 	assert(Utils.isDictionary(res.data));
 
-	assert(Utils.isDictionary(res.data.room));
-
-	return res.data.room;
+	assert(Utils.identicalDictionary(res.data, { status: 'ok' }));
 };
 
 if (require.main === module) {
