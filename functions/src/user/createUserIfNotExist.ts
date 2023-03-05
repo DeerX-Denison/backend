@@ -1,4 +1,3 @@
-import * as functions from 'firebase-functions';
 import { AuthData } from 'firebase-functions/lib/common/providers/https';
 import { UserData } from 'types';
 import {
@@ -8,10 +7,10 @@ import {
 	DEFAULT_USER_DISPLAY_NAME,
 	DEFAULT_USER_PHOTO_URL,
 } from '../constants';
-import { db } from '../firebase.config';
 import Logger from '../Logger';
 import { getAllSubstrings } from '../utils';
 import userNameAndPhoto from './users.json';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 
@@ -84,7 +83,7 @@ const updateUser = (userInfo: AuthData) => {
 			email = DEFAULT_GUEST_EMAIL;
 		}
 	} catch (error) {
-		throw new functions.https.HttpsError(
+		throw new Firebase.functions.https.HttpsError(
 			'permission-denied',
 			'User does not have permission',
 			error
@@ -127,90 +126,99 @@ const updateUser = (userInfo: AuthData) => {
 	return updatedUser;
 };
 
-const createUserIfNotExist = functions.https.onCall(async (_data, context) => {
-	if (!context.auth) {
-		throw new functions.https.HttpsError(
-			'unauthenticated',
-			'User is not authenticated'
-		);
-	}
-	if (context.auth.token.email) {
-		if (context.auth.token.email_verified) {
-			if (
-				!(
-					context.auth.token.email.endsWith('@denison.edu') ||
-					context.auth.token.email === 'deerx.test@gmail.com' ||
-					context.auth.token.email === 'deerx.dev@gmail.com'
-				)
-			) {
+/**
+ * Deprecated. This function has been upgrade to "syncUser".
+ * It will be removed in future updates.
+ */
+const createUserIfNotExist = Firebase.functions.https.onCall(
+	async (_data, context) => {
+		if (!context.auth) {
+			throw new Firebase.functions.https.HttpsError(
+				'unauthenticated',
+				'User is not authenticated'
+			);
+		}
+		if (context.auth.token.email) {
+			if (context.auth.token.email_verified) {
+				if (
+					!(
+						context.auth.token.email.endsWith('@denison.edu') ||
+						context.auth.token.email === 'deerx.test@gmail.com' ||
+						context.auth.token.email === 'deerx.dev@gmail.com'
+					)
+				) {
+					logger.log(
+						`User login with invalid email: ${context.auth.uid}/${context.auth.token.email}`
+					);
+					throw new Firebase.functions.https.HttpsError(
+						'permission-denied',
+						'The user does not have permission'
+					);
+				}
+			} else {
 				logger.log(
-					`User login with invalid email: ${context.auth.uid}/${context.auth.token.email}`
+					`User login with unverified email: ${context.auth.uid}/${context.auth.token.email}`
 				);
-				throw new functions.https.HttpsError(
+				throw new Firebase.functions.https.HttpsError(
 					'permission-denied',
 					'The user does not have permission'
 				);
 			}
 		} else {
-			logger.log(
-				`User login with unverified email: ${context.auth.uid}/${context.auth.token.email}`
-			);
-			throw new functions.https.HttpsError(
-				'permission-denied',
-				'The user does not have permission'
-			);
+			if (context.auth.token.firebase.sign_in_provider !== 'anonymous') {
+				logger.log(
+					`Non-anonymous user login without email: ${context.auth.uid}/${context.auth.token.email}`
+				);
+				throw new Firebase.functions.https.HttpsError(
+					'permission-denied',
+					'The user does not have permission'
+				);
+			} else {
+				logger.log(`User login anonymously: ${context.auth.uid}`);
+			}
 		}
-	} else {
-		if (context.auth.token.firebase.sign_in_provider !== 'anonymous') {
-			logger.log(
-				`Non-anonymous user login without email: ${context.auth.uid}/${context.auth.token.email}`
-			);
-			throw new functions.https.HttpsError(
-				'permission-denied',
-				'The user does not have permission'
-			);
-		} else {
-			logger.log(`User login anonymously: ${context.auth.uid}`);
-		}
-	}
 
-	const updatedUser = updateUser(context.auth);
+		const updatedUser = updateUser(context.auth);
 
-	const docSnap = await db.collection('users').doc(context.auth.uid).get();
-	if (!docSnap.exists) {
-		try {
-			await db
-				.collection('users')
-				.doc(context.auth.uid)
-				.set({ ...updatedUser, disabled: false });
-			logger.log(`Created user: ${context.auth.uid}`);
-			return 'created';
-		} catch (error) {
-			logger.error(error);
-			logger.error(`Fail to create user: ${context.auth.uid}`);
-			return 'error';
-		}
-	} else {
-		const user = docSnap.data() as UserData;
-		if (userNeedsUpdate(user)) {
+		const docSnap = await Firebase.db
+			.collection('users')
+			.doc(context.auth.uid)
+			.get();
+		if (!docSnap.exists) {
 			try {
-				await db
+				await Firebase.db
 					.collection('users')
 					.doc(context.auth.uid)
-					.set({
-						...updatedUser,
-						disabled: user.disabled ? user.disabled : false,
-					});
-				logger.log(`Updated user: ${context.auth.uid}`);
-				return 'updated';
+					.set({ ...updatedUser, disabled: false });
+				logger.log(`Created user: ${context.auth.uid}`);
+				return 'created';
 			} catch (error) {
-				logger.log(error);
-				logger.error(`Fail to update user: ${context.auth.uid}`);
+				logger.error(error);
+				logger.error(`Fail to create user: ${context.auth.uid}`);
 				return 'error';
 			}
 		} else {
-			return 'exist';
+			const user = docSnap.data() as UserData;
+			if (userNeedsUpdate(user)) {
+				try {
+					await Firebase.db
+						.collection('users')
+						.doc(context.auth.uid)
+						.set({
+							...updatedUser,
+							disabled: user.disabled ? user.disabled : false,
+						});
+					logger.log(`Updated user: ${context.auth.uid}`);
+					return 'updated';
+				} catch (error) {
+					logger.log(error);
+					logger.error(`Fail to update user: ${context.auth.uid}`);
+					return 'error';
+				}
+			} else {
+				return 'exist';
+			}
 		}
 	}
-});
+);
 export default createUserIfNotExist;

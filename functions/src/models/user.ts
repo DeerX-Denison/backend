@@ -1,41 +1,29 @@
 import { z } from 'zod';
-
-export const uid = z.string().min(1);
-
-export const displayName = z.string().min(1).optional().nullable();
-
-export const email = z.string().min(1).email().optional().nullable();
-
-export const phoneNumber = z
-	.string()
-	.min(1)
-	.regex(/^\\+\d{7,16}$/)
-	.optional()
-	.nullable();
-
-export const photoURL = z.string().min(1).url().optional().nullable();
+import { Email } from './email';
+import { PhoneNumber } from './phone-number';
+import { NonEmptyString } from './non-empty-string';
 
 export const UserMetadata = z.object({
-	lastSignInTime: z.string().min(1).optional().nullable(),
-	creationTime: z.string().min(1).optional().nullable(),
-	lastRefreshTime: z.string().min(1).optional().nullable(),
+	lastSignInTime: NonEmptyString.optional().nullable(),
+	creationTime: NonEmptyString.optional().nullable(),
+	lastRefreshTime: NonEmptyString.optional().nullable(),
 });
 
 export const UserProviderData = z.object({
-	uid,
-	displayName,
-	email,
-	phoneNumber,
-	photoURL,
-	providerId: z.string().min(1),
+	uid: NonEmptyString,
+	displayName: NonEmptyString.optional().nullable(),
+	email: Email.optional().nullable(),
+	phoneNumber: PhoneNumber.optional().nullable(),
+	photoURL: NonEmptyString.url().optional().nullable(),
+	providerId: NonEmptyString,
 });
 
 export const UserMultiFactorInfo = z.object({
-	uid,
-	displayName,
-	enrollmentTime: z.string().min(1).optional(),
-	factorId: z.string().min(1),
-	phoneNumber,
+	uid: NonEmptyString,
+	displayName: NonEmptyString.optional().nullable(),
+	enrollmentTime: NonEmptyString.optional(),
+	factorId: NonEmptyString,
+	phoneNumber: PhoneNumber.optional().nullable(),
 });
 
 export const UserMultiFactorSettings = z.object({
@@ -54,25 +42,73 @@ export enum UserProfileStatus {
 	'public' = 'public',
 }
 
+export enum UserPronoun {
+	'CO' = 'CO',
+	'COS' = 'COS',
+	'E' = 'E',
+	'EY' = 'EY',
+	'EM' = 'EM',
+	'EIR' = 'EIR',
+	'FAE' = 'FAE',
+	'FAER' = 'FAER',
+	'HE' = 'HE',
+	'HIM' = 'HIM',
+	'HIS' = 'HIS',
+	'HER' = 'HER',
+	'HERS' = 'HERS',
+	'HIR' = 'HIR',
+	'IT' = 'IT',
+	'ITS' = 'ITS',
+	'MER' = 'MER',
+	'MERS' = 'MERS',
+	'NE' = 'NE',
+	'NIR' = 'NIR',
+	'NIRS' = 'NIRS',
+	'NEE' = 'NEE',
+	'NER' = 'NER',
+	'NERS' = 'NERS',
+	'PER' = 'PER',
+	'PERS' = 'PERS',
+	'SHE' = 'SHE',
+	'THEY' = 'THEY',
+	'THEM' = 'THEM',
+	'THEIRS' = 'THEIRS',
+	'THON' = 'THON',
+	'THONS' = 'THONS',
+	'VE' = 'VE',
+	'VER' = 'VER',
+	'VIS' = 'VIS',
+	'VI' = 'VI',
+	'VIR' = 'VIR',
+	'XE' = 'XE',
+	'XEM' = 'XEM',
+	'XYR' = 'XYR',
+	'ZE' = 'ZE',
+	'ZIR' = 'ZIR',
+	'ZIE' = 'ZIE',
+}
+
 export const User = z.object({
-	uid,
-	email,
+	uid: NonEmptyString,
+	email: Email,
 	emailVerified: z.boolean(),
-	displayName,
-	photoURL,
-	phoneNumber,
+	displayName: NonEmptyString.optional().nullable(),
+	photoURL: NonEmptyString.optional().nullable(),
+	pronouns: z.array(z.nativeEnum(UserPronoun)).optional().nullable(),
+	bio: NonEmptyString.optional().nullable(),
+	phoneNumber: PhoneNumber.optional().nullable(),
 	disabled: z.boolean(),
 	metadata: UserMetadata,
 	providerData: z.array(UserProviderData),
-	passwordHash: z.string().min(1).optional(),
-	passwordSalt: z.string().min(1).optional(),
-	tokensValidAfterTime: z.string().min(1).optional().nullable(),
-	tenantId: z.string().min(1).optional().nullable(),
+	passwordHash: NonEmptyString.optional(),
+	passwordSalt: NonEmptyString.optional(),
+	tokensValidAfterTime: NonEmptyString.optional().nullable(),
+	tenantId: NonEmptyString.optional().nullable(),
 	multiFactor: UserMultiFactorSettings.optional(),
 	role: z.nativeEnum(UserRole).optional(),
 	profileStatus: z.nativeEnum(UserProfileStatus).optional(),
-	followersId: z.array(z.string().min(1)).optional(),
-	followingId: z.array(z.string().min(1)).optional(),
+	followersId: z.array(NonEmptyString).optional(),
+	followingId: z.array(NonEmptyString).optional(),
 });
 
 export type User = z.infer<typeof User>;
@@ -82,6 +118,18 @@ export const UserProfile = User.pick({
 	email: true,
 	displayName: true,
 	photoURL: true,
+	bio: true,
+	pronouns: true,
 });
 
 export type UserProfile = z.infer<typeof UserProfile>;
+
+export const UserInfo = User.pick({
+	uid: true,
+	email: true,
+	displayName: true,
+	photoURL: true,
+	disabled: true,
+});
+
+export type UserInfo = z.infer<typeof UserInfo>;

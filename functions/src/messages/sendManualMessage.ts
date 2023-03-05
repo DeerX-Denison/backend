@@ -1,16 +1,15 @@
-import { messaging } from 'firebase-admin';
-import * as functions from 'firebase-functions';
 import { UserFCMTokenData } from 'types';
-import { db, msg } from '../firebase.config';
 import Logger from '../Logger';
+import { Firebase } from '../services/firebase';
+import { MulticastMessage } from 'firebase-admin/messaging';
 
 const logger = new Logger();
 
-const sendManualMessage = functions.https.onCall(
-	async (data: { delay: number }, context: functions.https.CallableContext) => {
+const sendManualMessage = Firebase.functions.https.onCall(
+	async (data: { delay: number }, context) => {
 		if (!context.auth) return 'unauthorized';
 		const { delay } = data;
-		const querySnap = await db
+		const querySnap = await Firebase.db
 			.collection('users')
 			.doc(context.auth.uid)
 			.collection('fcm_tokens')
@@ -20,7 +19,7 @@ const sendManualMessage = functions.https.onCall(
 		);
 		const tokens = tokensData.map((tokenData) => tokenData.token);
 
-		const message: messaging.MulticastMessage = {
+		const message: MulticastMessage = {
 			data: {
 				message: JSON.stringify({
 					content: 'hello world',
@@ -47,7 +46,7 @@ const sendManualMessage = functions.https.onCall(
 			logger.log(`sending message with delay: ${delay}`);
 			try {
 				const { responses, successCount, failureCount } =
-					await msg.sendMulticast(message);
+					await Firebase.msg.sendMulticast(message);
 				logger.log(`successCount: ${successCount}`);
 				logger.log(`failureCount: ${failureCount}`);
 				logger.log(responses);
@@ -63,7 +62,7 @@ const sendManualMessage = functions.https.onCall(
 					setTimeout(async () => {
 						try {
 							const { responses, successCount, failureCount } =
-								await msg.sendMulticast(message);
+								await Firebase.msg.sendMulticast(message);
 							logger.log(`successCount: ${successCount}`);
 							logger.log(`failureCount: ${failureCount}`);
 							logger.log(responses);

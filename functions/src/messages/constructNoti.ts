@@ -1,4 +1,4 @@
-import { messaging } from 'firebase-admin';
+import { MulticastMessage } from 'firebase-admin/messaging';
 import { MessageData, UserInfo } from 'types';
 
 /**
@@ -13,7 +13,7 @@ const constructNoti = (
 	if (message.contentType.includes('text')) {
 		const title = message.threadName[uid];
 		const body = message.content;
-		const noti: messaging.MulticastMessage = {
+		const noti: MulticastMessage = {
 			notification: {
 				title,
 				body,

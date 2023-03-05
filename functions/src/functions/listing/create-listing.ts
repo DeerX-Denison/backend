@@ -1,13 +1,11 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
-import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Collection } from '../../models/collection-name';
 import { Listing } from '../../models/listing';
-import { CreateListingRequest } from '../../models/requests/create-listing-request';
-import { Firebase } from '../../services/firebase-service';
+import { CreateListingRequest } from '../../models/requests/listing/create-listing-request';
+import { Firebase } from '../../services/firebase';
 import { Utils } from '../../utils/utils';
+import { CreateListingResponse } from '../../models/response/listing/create-listing-response';
 
-export const createListing = functions.https.onCall(
+export const createListing = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
 			// validate request data
@@ -21,13 +19,14 @@ export const createListing = functions.https.onCall(
 			Utils.isNotBanned(invoker);
 
 			// create new listing
-			const newListing = Listing.parse({
+			const newListing = Listing.omit({
+				updatedAt: true,
+				createdAt: true,
+			}).parse({
 				...requestData,
 				seller: invoker,
 				soldTo: null,
 				likedBy: [],
-				createdAt: admin.firestore.Timestamp.now(),
-				updatedAt: admin.firestore.Timestamp.now(),
 			});
 
 			// write to db
@@ -40,11 +39,11 @@ export const createListing = functions.https.onCall(
 				.doc(newListing.id)
 				.set({
 					...newListing,
-					updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-					createdAt: admin.firestore.FieldValue.serverTimestamp(),
+					createdAt: Firebase.serverTime(),
+					updatedAt: Firebase.serverTime(),
 				});
 
-			return ConfirmationResponse.parse();
+			return CreateListingResponse.parse({ id: newListing.id });
 		} catch (error) {
 			return Utils.errorHandler(error);
 		}

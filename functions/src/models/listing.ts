@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { NonEmptyString } from './non-empty-string';
-import { Timestamp } from './timestamp';
-import { Url } from './url';
 import { UserProfile } from './user';
+import { ZodTimestamp } from './zod-timestamp';
+import { Url } from './url';
 
 export enum ListingCategory {
 	'FURNITURE' = 'FURNITURE',
@@ -29,6 +29,16 @@ export enum ListingStatus {
 	'SOLD' = 'sold',
 }
 
+export const ListingImageMetadata = z.object({
+	uploader: NonEmptyString,
+	listingId: NonEmptyString,
+	imageId: NonEmptyString,
+	resized: NonEmptyString,
+	contentValidated: NonEmptyString,
+});
+
+export type ListingImageMetadata = z.infer<typeof ListingImageMetadata>;
+
 export const Listing = z.object({
 	id: NonEmptyString,
 	images: z.array(Url).max(10).min(1),
@@ -39,8 +49,8 @@ export const Listing = z.object({
 	condition: z.nativeEnum(ListingCondition),
 	description: NonEmptyString,
 	likedBy: z.array(NonEmptyString).min(0),
-	createdAt: Timestamp,
-	updatedAt: Timestamp,
+	createdAt: ZodTimestamp,
+	updatedAt: ZodTimestamp,
 	status: z.nativeEnum(ListingStatus),
 	soldTo: UserProfile.nullable().default(null),
 });

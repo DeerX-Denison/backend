@@ -1,7 +1,6 @@
 import { MessageData } from 'types';
-import { db } from '../firebase.config';
-import Logger from '../Logger';
-const logger = new Logger();
+import { Firebase } from '../services/firebase';
+import { Logger } from '../services/logger';
 
 /**
  * utility function to fetch user info from a given uid
@@ -11,20 +10,20 @@ const fetchMessage: (
 	messageId: string
 ) => Promise<MessageData | undefined> = async (threadId, messageId) => {
 	try {
-		const docSnap = await db
+		const docSnap = await Firebase.db
 			.collection('threads')
 			.doc(threadId)
 			.collection('messages')
 			.doc(messageId)
 			.get();
 		if (!docSnap.exists) {
-			logger.log(`Message does not exist: ${threadId}/${messageId}`);
+			Logger.log(`Message does not exist: ${threadId}/${messageId}`);
 			return undefined;
 		}
 		const messageData = docSnap.data() as MessageData;
 		return messageData;
 	} catch (error) {
-		logger.error(error);
+		Logger.error(error);
 		return undefined;
 	}
 };

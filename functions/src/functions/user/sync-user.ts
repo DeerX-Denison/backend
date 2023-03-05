@@ -1,4 +1,3 @@
-import * as functions from 'firebase-functions';
 import { Utils } from '../../utils/utils';
 import {
 	DEFAULT_USER_DISPLAY_NAME,
@@ -7,12 +6,12 @@ import {
 import userData from './users.json';
 import { User, UserProfile } from '../../models/user';
 import { z } from 'zod';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 import { Collection } from '../../models/collection-name';
 import { AuthError } from '../../models/error/auth-error';
 import { NotFoundError } from '../../models/error/not-found-error';
 
-export const syncUser = functions.https.onCall(async (_, context) => {
+export const syncUser = Firebase.functions.https.onCall(async (_, context) => {
 	try {
 		// authorize user
 		const invokerId = Utils.isLoggedIn(context);

@@ -1,11 +1,10 @@
-import * as functions from 'firebase-functions';
-import { DeleteListingRequest } from '../../models/requests/delete-listing-request';
+import { DeleteListingRequest } from '../../models/requests/listing/delete-listing-request';
 import { Collection } from '../../models/collection-name';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 import { Utils } from '../../utils/utils';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
 
-export const deleteListing = functions.https.onCall(
+export const deleteListing = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
 			// validate request data
@@ -34,6 +33,7 @@ export const deleteListing = functions.https.onCall(
 			await Promise.all(
 				listing.images.map(Utils.extractImageRefFromUrl).map(Utils.deleteImage)
 			);
+
 			return ConfirmationResponse.parse();
 		} catch (error) {
 			return Utils.errorHandler(error);

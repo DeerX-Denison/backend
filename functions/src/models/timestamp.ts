@@ -1,12 +1,7 @@
-import { z } from 'zod';
-import * as admin from 'firebase-admin';
+import { Timestamp as FirebaseTimestamp } from 'firebase-admin/firestore';
 
-export const Timestamp = z.union([
-	z.instanceof(admin.firestore.Timestamp),
-	z.object({
-		_nanoseconds: z.number(),
-		_seconds: z.number(),
-	}),
-]);
-
-export type Timestamp = z.infer<typeof Timestamp>;
+export class Timestamp extends FirebaseTimestamp {
+	constructor(seconds: number, nanoseconds: number) {
+		super(seconds, nanoseconds);
+	}
+}

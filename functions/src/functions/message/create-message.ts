@@ -1,26 +1,25 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
-import { db } from '../../firebase.config';
-import { Room } from '../../models/room';
+import { Thread } from '../../models/thread';
 import { Url } from '../../models/url';
 import { Message } from '../../models/message';
-import { CreateMessageRequest } from '../../models/requests/create-message-request';
+import { CreateMessageRequest } from '../../models/requests/message/create-message-request';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Utils } from '../../utils/utils';
 import { NonEmptyString } from '../../models/non-empty-string';
 import { DEFAULT_USER_PHOTO_URL, DEFAULT_MESSAGE_NAME } from '../../constants';
 import { InternalError } from '../../models/error/internal-error';
 import { ERROR_MESSAGES } from '../../constants';
+import { Firebase } from '../../services/firebase';
 
-export const createMessage = functions.https.onCall(
+export const createMessage = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
-			// validate request data
-			const requestData = CreateMessageRequest.parse(data);
-
 			// authorize user
 			const invokerId = Utils.isLoggedIn(context);
 
+			// validate request data
+			const requestData = CreateMessageRequest.parse(data);
+
+			// authorize user again
 			const invoker = await Utils.fetchUser(invokerId);
 
 			Utils.isNotBanned(invoker);
@@ -42,29 +41,28 @@ export const createMessage = functions.https.onCall(
 			const newMessage = Message.parse({
 				...requestData.message,
 				sender: invoker,
-				time: admin.firestore.Timestamp.now(),
+				time: Firebase.localTime(),
 				seenAt: {
 					...requestData.message.seenAt,
-					[requestData.message.sender.uid]: admin.firestore.Timestamp.now(),
+					[requestData.message.sender.uid]: Firebase.localTime(),
 				},
 			});
 
 			// create new message in db
-			const batch = db.batch();
+			const batch = Firebase.db.batch();
 
 			batch.set(
-				db
+				Firebase.db
 					.collection('threads')
 					.doc(requestData.threadPreviewData.id)
 					.collection('messages')
 					.doc(requestData.message.id),
 				{
 					...newMessage,
-					time: admin.firestore.FieldValue.serverTimestamp(),
+					time: Firebase.serverTime(),
 					seenAt: {
 						...newMessage.seenAt,
-						[requestData.message.sender.uid]:
-							admin.firestore.FieldValue.serverTimestamp(),
+						[requestData.message.sender.uid]: Firebase.serverTime(),
 					},
 				}
 			);
@@ -96,7 +94,7 @@ export const createMessage = functions.https.onCall(
 				}
 			});
 
-			const updatedRoom = Room.parse({
+			const updatedRoom = Thread.parse({
 				...requestData.threadPreviewData,
 				thumbnail,
 				name,
@@ -108,14 +106,13 @@ export const createMessage = functions.https.onCall(
 			});
 
 			batch.update(
-				db.collection('threads').doc(requestData.threadPreviewData.id),
+				Firebase.db.collection('threads').doc(requestData.threadPreviewData.id),
 				{
 					...updatedRoom,
-					latestTime: admin.firestore.FieldValue.serverTimestamp(),
+					latestTime: Firebase.serverTime(),
 					latestSeenAt: {
 						...newMessage.seenAt,
-						[requestData.message.sender.uid]:
-							admin.firestore.FieldValue.serverTimestamp(),
+						[requestData.message.sender.uid]: Firebase.serverTime(),
 					},
 				}
 			);

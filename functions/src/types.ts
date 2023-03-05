@@ -1,3 +1,5 @@
+import { Timestamp } from './models/timestamp';
+
 export type UserInfo = {
 	uid: string;
 	email: string | undefined | null;
@@ -109,8 +111,8 @@ export type ListingData = {
 	seller: ListingSeller;
 	condition: ListingCondition;
 	description: ListingDescription;
-	readonly createdAt: FirebaseFirestore.Timestamp | undefined;
-	readonly updatedAt: FirebaseFirestore.Timestamp | undefined;
+	readonly createdAt: Timestamp | undefined;
+	readonly updatedAt: Timestamp | undefined;
 	status: ListingStatus;
 	likedBy: string[];
 	soldTo?: UserInfo;
@@ -134,7 +136,7 @@ export type ReportData = {
 	evidence: ListingData | MessageData;
 	reporter: UserInfo;
 	reportedUid: string;
-	createdAt: FirebaseFirestore.Timestamp;
+	createdAt: Timestamp;
 };
 // app types
 export type Selection = {
@@ -148,11 +150,11 @@ export type ThreadId = string;
 export type ThreadMembers = UserInfo;
 export type ThreadThumbnail = { [uid: string]: string | undefined };
 export type ThreadLatestMessages = string | undefined | null;
-export type ThreadLatestTime = FirebaseFirestore.Timestamp | undefined | null;
+export type ThreadLatestTime = Timestamp | undefined | null;
 export type ThreadName = { [key: string]: string | undefined };
 export type ThreadLatestSenderUid = string | null | undefined;
 export type ThreadLatestSeenAt = {
-	[uid: string]: FirebaseFirestore.Timestamp | undefined | null;
+	[uid: string]: Timestamp | undefined | null;
 };
 export type ThreadPreviewData = {
 	id: ThreadId;
@@ -169,9 +171,9 @@ export type ThreadPreviewDataSv = Omit<ThreadPreviewData, 'name'>;
 
 export type MessageId = string;
 export type MessageSender = UserInfo;
-export type MessageTime = FirebaseFirestore.Timestamp;
+export type MessageTime = Timestamp;
 export type MessageSeenAt = {
-	[key: string]: FirebaseFirestore.Timestamp | null;
+	[key: string]: Timestamp | null;
 };
 
 //add below more further on: image, listing reference, etc.
@@ -230,12 +232,12 @@ export type WishlistData = {
 	name: ListingName;
 	price: ListingPrice;
 	seller: ListingSeller;
-	addedAt: FirebaseFirestore.Timestamp;
+	addedAt: Timestamp;
 	searchableKeyword: string[];
 };
 
 export type UserFCMTokenData = {
 	token: string;
 	device: string;
-	updatedAt: FirebaseFirestore.Timestamp;
+	updatedAt: Timestamp;
 };

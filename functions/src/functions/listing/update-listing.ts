@@ -1,13 +1,11 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
-import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { Collection } from '../../models/collection-name';
 import { Listing, ListingStatus } from '../../models/listing';
-import { Firebase } from '../../services/firebase-service';
+import { Firebase } from '../../services/firebase';
 import { Utils } from '../../utils/utils';
-import { UpdateListingRequest } from '../../models/requests/update-listing-request';
+import { UpdateListingRequest } from '../../models/requests/listing/update-listing-request';
+import { UpdateListingResponse } from '../../models/response/listing/update-listing-response';
 
-export const updateListing = functions.https.onCall(
+export const updateListing = Firebase.functions.https.onCall(
 	async (data: unknown, context) => {
 		try {
 			// validate request data
@@ -27,7 +25,10 @@ export const updateListing = functions.https.onCall(
 			Utils.isSelf(invoker.uid, listing.seller.uid);
 
 			// generate updated listing
-			const updatedListing = Listing.omit({ createdAt: true }).parse({
+			const updatedListing = Listing.omit({
+				createdAt: true,
+				updatedAt: true,
+			}).parse({
 				...listing,
 				...requestData,
 				seller: invoker,
@@ -43,7 +44,7 @@ export const updateListing = functions.https.onCall(
 				.doc(updatedListing.id)
 				.update({
 					...updatedListing,
-					updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+					updatedAt: Firebase.serverTime(),
 				});
 
 			// check for removed images to delete from storage
@@ -57,7 +58,7 @@ export const updateListing = functions.https.onCall(
 					.map(Utils.deleteImage)
 			);
 
-			return ConfirmationResponse.parse();
+			return UpdateListingResponse.parse({ id: updatedListing.id });
 		} catch (error) {
 			return Utils.errorHandler(error);
 		}

@@ -1,4 +1,4 @@
-import { FirebaseError } from '@firebase/util';
+import { FirebaseError, uuidv4 } from '@firebase/util';
 import { DEFAULT_GUEST_DISPLAY_NAME, DEFAULT_GUEST_EMAIL } from '../constants';
 import { CallableContext } from 'firebase-functions/v1/https';
 import { Listing } from '../models/listing';
@@ -9,9 +9,11 @@ import { InternalError } from '../models/error/internal-error';
 import { NotFoundError } from '../models/error/not-found-error';
 import { ValidationError } from '../models/error/validation-error';
 import { User } from '../models/user';
-import { Firebase } from '../services/firebase-service';
+import { Firebase } from '../services/firebase';
 import { AuthData } from 'firebase-functions/lib/common/providers/tasks';
 import { Config } from '../config';
+import { Logger } from '../services/logger';
+import { Message } from '../models/message';
 
 export class Utils {
 	/**
@@ -57,6 +59,30 @@ export class Utils {
 		}
 
 		return User.parse({ ...authUser, ...firestoreUser });
+	}
+
+	/**
+	 * fetch message from given thread id and message id
+	 * @param threadId id of thread to fetch from
+	 * @param messageId id of message to fetch
+	 * @returns instance of Message
+	 */
+	public static async fetchMessage(
+		threadId: string,
+		messageId: string
+	): Promise<Message> {
+		const docSnap = await Firebase.db
+			.collection(Collection.threads)
+			.doc(threadId)
+			.collection(Collection.messages)
+			.doc(messageId)
+			.get();
+		if (docSnap.exists || docSnap.data() === undefined) {
+			throw new NotFoundError(
+				new Error(`Message does not exist: ${threadId}/${messageId}`)
+			);
+		}
+		return Message.parse(docSnap.data());
 	}
 
 	/**
@@ -139,7 +165,7 @@ export class Utils {
 	 * validate invoker to not be anonymous user
 	 */
 	public static isAnonymousUser(context: CallableContext) {
-		return context.auth?.token.firebase.sign_in_provider === 'anonymous';
+		return context.auth?.token?.firebase?.sign_in_provider === 'anonymous';
 	}
 
 	/**
@@ -162,5 +188,50 @@ export class Utils {
 	 */
 	public static isMember(membersUid: string[], invokerUid: string) {
 		return membersUid.includes(invokerUid);
+	}
+
+	/**
+	 * Check if unknown input value is dictionary
+	 * @param o input unknown value to be checked
+	 * @returns boolean if input is a dictionary
+	 */
+	public static isDictionary(o: unknown): o is Record<string, unknown> {
+		return typeof o === 'object' && o !== null && !Array.isArray(o);
+	}
+
+	/**
+	 * check 2 diciontary to be identical. Identical means
+	 * similar key disregarding order, and similar values.
+	 * Only checks raw data of dictionary, will not check
+	 * for methods of classes.
+	 * @param d1 dictionary 1 to check
+	 * @param d2 dictionary 2 to check
+	 * @returns boolean
+	 */
+	public static identicalDictionary(d1: unknown, d2: unknown): boolean {
+		return (
+			this.isDictionary(d1) &&
+			this.isDictionary(d2) &&
+			Object.entries(d1).sort().toString() ===
+				Object.entries(d2).sort().toString()
+		);
+	}
+
+	/**
+	 * handle error thrown in cloud functions
+	 * @param error error throw while executing functions
+	 */
+	public static cloudFunctionHandler(error: unknown) {
+		Logger.error(error);
+		if (error instanceof ZodError) return new ValidationError(error);
+		return error;
+	}
+
+	/**
+	 * randomly generate a string
+	 * @returns random string id
+	 */
+	public static randomId(): string {
+		return uuidv4();
 	}
 }

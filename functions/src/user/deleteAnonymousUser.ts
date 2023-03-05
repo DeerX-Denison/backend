@@ -1,31 +1,29 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
 import { ERROR_MESSAGES } from '../constants';
-import { db } from '../firebase.config';
 import Logger from '../Logger';
 import { isLoggedIn, isNotBanned } from '../utils';
+import { Firebase } from '../services/firebase';
 
 const logger = new Logger();
 const main = async ({ uid }: { uid: string }) => {
 	try {
-		await admin.auth().deleteUser(uid);
+		await Firebase.auth.deleteUser(uid);
 		logger.log(`Deleted user from auth: ${uid}`);
 	} catch (error) {
 		logger.error(error);
 		logger.error(`Fail to delete anonymous user from auth: ${uid}`);
-		throw new functions.https.HttpsError(
+		throw new Firebase.functions.https.HttpsError(
 			'internal',
 			ERROR_MESSAGES.failDeleteAnonUser
 		);
 	}
 
 	try {
-		await admin.firestore().recursiveDelete(db.collection('users').doc(uid));
+		await Firebase.db.recursiveDelete(Firebase.db.collection('users').doc(uid));
 		logger.log(`Recursively deleted member id ${uid}`);
 	} catch (error) {
 		logger.error(error);
 		logger.error(`Fail to recursively delete anonymous user from db: ${uid}`);
-		throw new functions.https.HttpsError(
+		throw new Firebase.functions.https.HttpsError(
 			'internal',
 			ERROR_MESSAGES.failDeleteAnonUser
 		);
@@ -33,7 +31,7 @@ const main = async ({ uid }: { uid: string }) => {
 
 	let threadIds: string[];
 	try {
-		const querySnap = await db
+		const querySnap = await Firebase.db
 			.collection('threads')
 			.where('membersUid', 'array-contains', uid)
 			.get();
@@ -41,7 +39,7 @@ const main = async ({ uid }: { uid: string }) => {
 	} catch (error) {
 		logger.error(error);
 		logger.error(`Fail to query threads from db: ${uid}`);
-		throw new functions.https.HttpsError(
+		throw new Firebase.functions.https.HttpsError(
 			'internal',
 			ERROR_MESSAGES.failDeleteAnonUser
 		);
@@ -49,9 +47,9 @@ const main = async ({ uid }: { uid: string }) => {
 
 	threadIds.forEach(async (threadId) => {
 		try {
-			await admin
-				.firestore()
-				.recursiveDelete(db.collection('threads').doc(threadId));
+			await Firebase.db.recursiveDelete(
+				Firebase.db.collection('threads').doc(threadId)
+			);
 			logger.log(`Recursively deleted thread ids ${threadId}`);
 		} catch (error) {
 			logger.error(error);
@@ -61,7 +59,7 @@ const main = async ({ uid }: { uid: string }) => {
 
 	let listingIds: string[];
 	try {
-		const querySnap = await db
+		const querySnap = await Firebase.db
 			.collection('guest_listings')
 			.where('seller.uid', '==', uid)
 			.get();
@@ -69,15 +67,15 @@ const main = async ({ uid }: { uid: string }) => {
 	} catch (error) {
 		logger.error(error);
 		logger.error(`Fail to query guest listings from db: ${uid}`);
-		throw new functions.https.HttpsError(
+		throw new Firebase.functions.https.HttpsError(
 			'internal',
 			ERROR_MESSAGES.failDeleteAnonUser
 		);
 	}
 
-	const listingBatch = db.batch();
+	const listingBatch = Firebase.db.batch();
 	listingIds.forEach((id) =>
-		listingBatch.delete(db.collection('guest_listings').doc(id))
+		listingBatch.delete(Firebase.db.collection('guest_listings').doc(id))
 	);
 
 	try {
@@ -86,15 +84,19 @@ const main = async ({ uid }: { uid: string }) => {
 	} catch (error) {
 		logger.error(error);
 		logger.error(`Fail to delete queried listings from db: ${uid}`);
-		throw new functions.https.HttpsError(
+		throw new Firebase.functions.https.HttpsError(
 			'internal',
 			ERROR_MESSAGES.failDeleteAnonUser
 		);
 	}
 };
 
-const deleteAnonymousUser = functions.https.onCall(
-	async (_data, context: functions.https.CallableContext) => {
+/**
+ * Deprecated. The app is no longer supporting anonymous sign in.
+ * It will be removed in future updates.
+ */
+const deleteAnonymousUser = Firebase.functions.https.onCall(
+	async (_data, context) => {
 		const invokerUid = isLoggedIn(context);
 		const invoker = await isNotBanned(invokerUid);
 		await main({ uid: invoker.uid });

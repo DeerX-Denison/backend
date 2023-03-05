@@ -1,6 +1,6 @@
-import * as functions from 'firebase-functions';
+import { HttpsError } from 'firebase-functions/v1/https';
 
-export class NotFoundError extends functions.https.HttpsError {
+export class NotFoundError extends HttpsError {
 	details: unknown;
 
 	constructor(error?: unknown) {
