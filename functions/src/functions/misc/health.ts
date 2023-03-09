@@ -1,3 +1,3 @@
-import { Firebase } from '../../services/firebase';
+import { CloudFunction } from '../../services/cloud-functions';
 
-export const health = Firebase.functions.https.onCall(() => 'ok');
+export const health = CloudFunction.onCall(() => 'ok');

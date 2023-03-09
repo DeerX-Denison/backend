@@ -7,6 +7,10 @@ import { getStorage } from 'firebase-admin/storage';
 import { getAuth } from 'firebase-admin/auth';
 import { getMessaging } from 'firebase-admin/messaging';
 import { Timestamp } from '../models/timestamp';
+export { CallableContext } from 'firebase-functions/v1/https';
+export { ObjectMetadata } from 'firebase-functions/lib/v1/providers/storage';
+export { WriteBatch, Transaction } from 'firebase-admin/firestore';
+export { UserRecord } from 'firebase-admin/auth';
 
 const projectConfig = {
 	projectId: secrets.projectId,

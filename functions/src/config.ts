@@ -56,9 +56,36 @@ export class Config {
 		: 720;
 
 	/**
+	 * Height of profile image to resize image to
+	 * Defaults to 320
+	 */
+	public static profileImageHeight = process.env.PROFILE_IMAGE_HEIGHT
+		? parseInt(process.env.PROFILE_IMAGE_HEIGHT)
+		: 320;
+
+	/**
 	 * Default photo URL of user when their photo url is nullish
 	 */
 	public static defaultUserPhotoURL =
 		process.env.DEFAULT_USER_PHOTO_URL ??
 		'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg';
+
+	/**
+	 * List of valid listing image content types
+	 */
+	public static listingImageValidContentTypes = [
+		'image/jpeg',
+		'image/png',
+		'image/heif',
+		'image/heic',
+		'application/octet-stream',
+	];
+
+	public static defaultMessageName = 'New conversation';
+
+	public static defaultSelfMessageName = 'Message to self';
+
+	public static newRoomMessage = 'New message';
+
+	public static defaultUserDisplayName = 'New user';
 }

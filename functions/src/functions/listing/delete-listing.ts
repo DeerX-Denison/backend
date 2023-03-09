@@ -1,42 +1,30 @@
 import { DeleteListingRequest } from '../../models/requests/listing/delete-listing-request';
-import { Collection } from '../../models/collection-name';
-import { Firebase } from '../../services/firebase';
-import { Utils } from '../../utils/utils';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
+import { User } from '../../models/user/user';
+import { Listing } from '../../models/listing/listing';
+import { CloudFunction } from '../../services/cloud-functions';
+import { CloudStorage } from '../../services/cloud-storage';
 
-export const deleteListing = Firebase.functions.https.onCall(
+export const deleteListing = CloudFunction.onCall(
 	async (data: unknown, context) => {
-		try {
-			// validate request data
-			const requestData = DeleteListingRequest.parse(data);
+		const invokerId = User.isLoggedIn(context);
 
-			// authorize user
-			const invokerId = Utils.isLoggedIn(context);
+		const invoker = await User.get(invokerId);
 
-			const invoker = await Utils.fetchUser(invokerId);
+		User.isNotBanned(invoker);
 
-			Utils.isNotBanned(invoker);
+		const requestData = DeleteListingRequest.parse(data);
 
-			const isGuest = Utils.isGuest(invoker);
+		const listing = await Listing.get(requestData.id);
 
-			const listing = await Utils.fetchListing(requestData.id, isGuest);
+		User.isSeller(invoker, listing);
 
-			Utils.isSelf(invoker.uid, listing.seller.uid);
+		const imageRefs = listing.images.map(CloudStorage.extractObjectRefFromUrl);
 
-			// delete listing from db
-			await Firebase.db
-				.collection(isGuest ? Collection.guest_listings : Collection.listings)
-				.doc(listing.id)
-				.delete();
+		await Promise.all(imageRefs.map(CloudStorage.delete));
 
-			// removed images from storage
-			await Promise.all(
-				listing.images.map(Utils.extractImageRefFromUrl).map(Utils.deleteImage)
-			);
+		await Listing.delete(listing.id);
 
-			return ConfirmationResponse.parse();
-		} catch (error) {
-			return Utils.errorHandler(error);
-		}
+		return ConfirmationResponse.parse();
 	}
 );

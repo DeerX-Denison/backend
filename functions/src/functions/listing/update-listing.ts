@@ -1,66 +1,29 @@
-import { Collection } from '../../models/collection-name';
-import { Listing, ListingStatus } from '../../models/listing';
-import { Firebase } from '../../services/firebase';
-import { Utils } from '../../utils/utils';
+import { Listing } from '../../models/listing/listing';
 import { UpdateListingRequest } from '../../models/requests/listing/update-listing-request';
 import { UpdateListingResponse } from '../../models/response/listing/update-listing-response';
+import { User } from '../../models/user/user';
+import { CloudFunction } from '../../services/cloud-functions';
 
-export const updateListing = Firebase.functions.https.onCall(
+export const updateListing = CloudFunction.onCall(
 	async (data: unknown, context) => {
-		try {
-			// validate request data
-			const requestData = UpdateListingRequest.parse(data);
+		const invokerId = User.isLoggedIn(context);
 
-			// authorize user
-			const invokerId = Utils.isLoggedIn(context);
+		const invoker = await User.get(invokerId);
 
-			const invoker = await Utils.fetchUser(invokerId);
+		User.isNotBanned(invoker);
 
-			Utils.isNotBanned(invoker);
+		const requestData = UpdateListingRequest.parse(data);
 
-			const isGuest = Utils.isGuest(invoker);
+		const listing = await Listing.get(requestData.id);
 
-			const listing = await Utils.fetchListing(requestData.id, isGuest);
+		User.isSeller(invoker, listing);
 
-			Utils.isSelf(invoker.uid, listing.seller.uid);
+		await Listing.update(listing.id, {
+			...listing,
+			...requestData,
+			seller: invoker,
+		});
 
-			// generate updated listing
-			const updatedListing = Listing.omit({
-				createdAt: true,
-				updatedAt: true,
-			}).parse({
-				...listing,
-				...requestData,
-				seller: invoker,
-			});
-
-			if (updatedListing.status !== ListingStatus.SOLD) {
-				updatedListing.soldTo = null;
-			}
-
-			// write to db
-			await Firebase.db
-				.collection(isGuest ? Collection.guest_listings : Collection.listings)
-				.doc(updatedListing.id)
-				.update({
-					...updatedListing,
-					updatedAt: Firebase.serverTime(),
-				});
-
-			// check for removed images to delete from storage
-			const deletedImagesUrl = listing.images.filter(
-				(url) => !updatedListing.images.includes(url)
-			);
-
-			await Promise.all(
-				deletedImagesUrl
-					.map(Utils.extractImageRefFromUrl)
-					.map(Utils.deleteImage)
-			);
-
-			return UpdateListingResponse.parse({ id: updatedListing.id });
-		} catch (error) {
-			return Utils.errorHandler(error);
-		}
+		return UpdateListingResponse.parse({ id: requestData.id });
 	}
 );

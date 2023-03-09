@@ -1,55 +1,28 @@
-import { ERROR_MESSAGES } from '../../constants';
-import { Logger } from '../../services/logger';
-import { Firebase } from '../../services/firebase';
-import { Utils } from '../../utils/utils';
 import { UpdateUserProfileRequest } from '../../models/requests/user/update-user-profile-request';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
-import { Collection } from '../../models/collection-name';
+import { CloudFunction } from '../../services/cloud-functions';
+import { User, UserData } from '../../models/user/user';
 
-export const updateUserProfile = Firebase.functions.https.onCall(
+export const updateUserProfile = CloudFunction.onCall(
 	async (data: unknown, context) => {
-		try {
-			console.log(data);
+		const invokerUid = User.isLoggedIn(context);
 
-			// parse incoming data
-			const requestData = UpdateUserProfileRequest.parse(data);
+		const invoker = await User.get(invokerUid);
 
-			// authorize user
-			const invokerUid = Utils.isLoggedIn(context);
+		User.isNotBanned(invoker);
 
-			const invoker = await Utils.fetchUser(invokerUid);
+		const requestData = UpdateUserProfileRequest.parse(data);
 
-			Utils.isNotBanned(invoker);
+		const updateValue: Partial<UserData> = {};
 
-			// update user profile
-			const updateValue: Record<string, string | string[]> = {};
-			if (requestData.imageUrl) updateValue['photoURL'] = requestData.imageUrl;
-			if (requestData.bio) updateValue['bio'] = requestData.bio;
-			if (requestData.pronouns) updateValue['pronouns'] = requestData.pronouns;
+		if (requestData.imageUrl) updateValue['photoURL'] = requestData.imageUrl;
 
-			try {
-				await Firebase.db
-					.collection(Collection.users)
-					.doc(invoker.uid)
-					.update(updateValue);
-				Logger.log(`Updated user profile in database: ${invoker.uid}`);
-				if (requestData.imageUrl) {
-					await Firebase.auth.updateUser(invoker.uid, {
-						photoURL: requestData.imageUrl,
-					});
-					Logger.log(`Updated user profile in firebase: ${invoker.uid}`);
-				}
-			} catch (error) {
-				Logger.error(error);
-				Logger.error(`Fail to update user profile: ${invoker.uid}`);
-				throw new Firebase.functions.https.HttpsError(
-					'internal',
-					ERROR_MESSAGES.failUpdateUserProfile
-				);
-			}
-			return ConfirmationResponse.parse();
-		} catch (error) {
-			throw Utils.cloudFunctionHandler(error);
-		}
+		if (requestData.bio) updateValue['bio'] = requestData.bio;
+
+		if (requestData.pronouns) updateValue['pronouns'] = requestData.pronouns;
+
+		await User.update(invoker.uid, updateValue);
+
+		return ConfirmationResponse.parse();
 	}
 );

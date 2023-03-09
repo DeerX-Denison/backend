@@ -1,8 +1,8 @@
-import { Message } from '../../message';
-import { Thread } from '../../thread';
+import { ThreadSchema } from '../../thread/thread';
+import { MessageSchema } from '../../message/message';
 import { z } from 'zod';
 export const CreateMessageRequest = z.object({
-	threadPreviewData: Thread.omit({
+	threadPreviewData: ThreadSchema.omit({
 		thumbnail: true,
 		name: true,
 		members: true,
@@ -11,7 +11,7 @@ export const CreateMessageRequest = z.object({
 		latestSenderUid: true,
 		latestSeenAt: true,
 	}),
-	message: Message,
+	message: MessageSchema,
 });
 
 export type CreateMessageRequest = z.infer<typeof CreateMessageRequest>;

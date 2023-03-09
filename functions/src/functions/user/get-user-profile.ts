@@ -1,27 +1,20 @@
-import { Firebase } from '../../services/firebase';
-import { Utils } from '../../utils/utils';
 import { GetUserProfileRequest } from '../../models/requests/user/get-user-profile-request';
 import { GetUserProfileResponse } from '../../models/response/user/get-user-profile-response';
+import { CloudFunction } from '../../services/cloud-functions';
+import { User } from '../../models/user/user';
 
-export const getUserProfile = Firebase.functions.https.onCall(
+export const getUserProfile = CloudFunction.onCall(
 	async (data: unknown, context) => {
-		try {
-			// parse incoming data
-			const requestData = GetUserProfileRequest.parse(data);
+		const invokerId = User.isLoggedIn(context);
 
-			// authorize user
-			const invokerId = Utils.isLoggedIn(context);
+		const invoker = await User.get(invokerId);
 
-			const invoker = await Utils.fetchUser(invokerId);
+		User.isNotBanned(invoker);
 
-			Utils.isNotBanned(invoker);
+		const requestData = GetUserProfileRequest.parse(data);
 
-			// fetch target user
-			const targetUser = await Utils.fetchUser(requestData.uid);
+		const targetUser = await User.get(requestData.uid);
 
-			return GetUserProfileResponse.parse(targetUser);
-		} catch (error) {
-			throw Utils.cloudFunctionHandler(error);
-		}
+		return GetUserProfileResponse.parse(targetUser);
 	}
 );

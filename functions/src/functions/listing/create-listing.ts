@@ -1,51 +1,26 @@
-import { Collection } from '../../models/collection-name';
-import { Listing } from '../../models/listing';
+import { Listing } from '../../models/listing/listing';
 import { CreateListingRequest } from '../../models/requests/listing/create-listing-request';
-import { Firebase } from '../../services/firebase';
-import { Utils } from '../../utils/utils';
 import { CreateListingResponse } from '../../models/response/listing/create-listing-response';
+import { User } from '../../models/user/user';
+import { CloudFunction } from '../../services/cloud-functions';
 
-export const createListing = Firebase.functions.https.onCall(
+export const createListing = CloudFunction.onCall(
 	async (data: unknown, context) => {
-		try {
-			// validate request data
-			const requestData = CreateListingRequest.parse(data);
+		const invokerId = User.isLoggedIn(context);
 
-			// authorize user
-			const invokerId = Utils.isLoggedIn(context);
+		const invoker = await User.get(invokerId);
 
-			const invoker = await Utils.fetchUser(invokerId);
+		User.isNotBanned(invoker);
 
-			Utils.isNotBanned(invoker);
+		const requestData = CreateListingRequest.parse(data);
 
-			// create new listing
-			const newListing = Listing.omit({
-				updatedAt: true,
-				createdAt: true,
-			}).parse({
-				...requestData,
-				seller: invoker,
-				soldTo: null,
-				likedBy: [],
-			});
+		const listingId = await Listing.create({
+			...requestData,
+			seller: invoker,
+			soldTo: null,
+			likedBy: [],
+		});
 
-			// write to db
-			await Firebase.db
-				.collection(
-					Utils.isGuest(invoker)
-						? Collection.guest_listings
-						: Collection.listings
-				)
-				.doc(newListing.id)
-				.set({
-					...newListing,
-					createdAt: Firebase.serverTime(),
-					updatedAt: Firebase.serverTime(),
-				});
-
-			return CreateListingResponse.parse({ id: newListing.id });
-		} catch (error) {
-			return Utils.errorHandler(error);
-		}
+		return CreateListingResponse.parse({ id: listingId });
 	}
 );

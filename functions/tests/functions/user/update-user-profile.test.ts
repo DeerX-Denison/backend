@@ -7,7 +7,7 @@ import { Environments } from '../../models/environments';
 import { Utils } from '../../../src/utils/utils';
 import assert from 'assert';
 import { FirebaseError } from '@firebase/util';
-import { UserPronoun } from '../../../src/models/user';
+import { UserPronoun } from '../../../src/models/user/user-pronouns';
 import { Config } from '../../../src/config';
 import { createTestUser } from './create-test-user.test';
 import { syncUser } from './sync-user.test';

@@ -1,44 +1,22 @@
-import { UserRecord } from 'firebase-functions/v1/auth';
-import { Firebase } from '../../services/firebase';
 import { CreateTestUserRequest } from '../../models/requests/user/create-test-user-request';
 import { Config } from '../../config';
-import { InternalError } from '../../models/error/internal-error';
 import { CreateTestUserResponse } from '../../models/response/user/create-test-user-response';
 import { AuthError } from '../../models/error/auth-error';
+import { CloudFunction } from '../../services/cloud-functions';
+import { User } from '../../models/user/user';
 
-export const createTestUser = Firebase.functions
-	.region(...Config.regions)
-	.https.onCall(async (data: unknown) => {
-		try {
-			// parse incoming data
-			const requestData = CreateTestUserRequest.parse(data);
+export const createTestUser = CloudFunction.onCall(async (data: unknown) => {
+	const requestData = CreateTestUserRequest.parse(data);
 
-			// authorize request
-			if (Config.createTestUserToken === undefined) throw new AuthError();
+	if (Config.createTestUserToken === undefined) throw new AuthError();
 
-			if (requestData.token !== Config.createTestUserToken)
-				throw new AuthError();
+	if (requestData.token !== Config.createTestUserToken) throw new AuthError();
 
-			// create user
-			let userRecord: UserRecord;
-			try {
-				userRecord = await Firebase.auth.createUser({
-					email: requestData.email,
-					password: requestData.password,
-					emailVerified: true,
-				});
-			} catch (error) {
-				throw new InternalError(error);
-			}
+	const userRecord = await User.create(requestData.email, requestData.password);
 
-			// parse response
-			return CreateTestUserResponse.parse({
-				uid: userRecord.uid,
-				email: requestData.email,
-				password: requestData.password,
-			});
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
+	return CreateTestUserResponse.parse({
+		uid: userRecord.uid,
+		email: requestData.email,
+		password: requestData.password,
 	});
+});

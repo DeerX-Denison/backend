@@ -1,4 +1,4 @@
-import { UserPronoun } from '../../../models/user';
+import { UserPronoun } from '../../user/user-pronouns';
 import { NonEmptyString } from '../../non-empty-string';
 import { z } from 'zod';
 

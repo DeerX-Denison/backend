@@ -20,7 +20,6 @@ export { default as fetchCoreTeamInfos } from './user/fetchCoreTeamInfos';
 export { sendSignInEmail } from './functions/misc/send-sign-in-email';
 export { updateFCMToken } from './functions/user/update-fcm-token';
 export { updateUserProfile } from './functions/user/update-user-profile';
+export { onUploadFile } from './functions/on-upload-file';
 export { default as createWishlist } from './wishlist/createWishlist';
 export { default as deleteWishlist } from './wishlist/deleteWishlist';
-export { onUploadListingImage } from './functions/images/on-upload-listing-image';
-export { uploadProfileImageHandler } from './functions/images/on-upload-profile-image';
