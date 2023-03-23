@@ -6,10 +6,11 @@ import { ListingCategory } from './listing-category';
 import { ListingCondition } from './listing-condition';
 import { ListingStatus } from './listing-status';
 import { TimestampSchema } from '../timestamp';
-import { Firebase } from '../../services/firebase';
+import { FieldValue, Firebase } from '../../services/firebase';
 import { Collection } from '../collection-name';
 import { NotFoundError } from '../error/not-found-error';
 import { CloudStorage } from '../../services/cloud-storage';
+import { ModelOptions } from '../../models/model-options';
 
 export const ListingSchema = z.object({
 	id: NonEmptyString,
@@ -80,26 +81,48 @@ export class Listing {
 	 */
 	public static async update(
 		id: string,
-		data: Omit<ListingData, 'createdAt' | 'updatedAt'>
+		data: Partial<
+			Omit<ListingData, 'createdAt' | 'updatedAt' | 'likedBy'> & {
+				likedBy: FieldValue | string[];
+			}
+		>,
+		opts: ModelOptions = {}
 	): Promise<void> {
 		if (data.status !== ListingStatus.SOLD) {
 			data.soldTo = null;
 		}
-		const updatedData = this.parse(data);
-		await Firebase.db
-			.collection(Collection.listings)
-			.doc(id)
-			.update({ ...updatedData, updatedAt: Firebase.serverTime() });
-
-		const deletedImagesUrl = data.images.filter(
-			(url) => !data.images.includes(url)
-		);
-
-		const deletedImageRefs = deletedImagesUrl.map(
-			CloudStorage.extractObjectRefFromUrl
-		);
-
-		await Promise.all(deletedImageRefs.map(CloudStorage.delete));
+		// TODO: improve input data params
+		// =========
+		if (data.seller) {
+			data.seller = UserProfileSchema.parse(data.seller);
+		}
+		// =========
+		const updatedData = {
+			...data,
+			updatedAt: Firebase.serverTime(),
+		};
+		// TODO: migrate delete image logic to trigger functions
+		// =========
+		if (data.images) {
+			const deletedImagesUrl = data.images.filter(
+				(url) => !data.images?.includes(url)
+			);
+			const deletedImageRefs = deletedImagesUrl.map(
+				CloudStorage.extractObjectRefFromUrl
+			);
+			await Promise.all(deletedImageRefs.map(CloudStorage.delete));
+		}
+		// =========
+		const listingRef = Firebase.db.collection(Collection.listings).doc(id);
+		if (opts.batch) {
+			opts.batch.update(listingRef, updatedData);
+			return;
+		}
+		if (opts.transaction) {
+			opts.transaction.update(listingRef, updatedData);
+			return;
+		}
+		await listingRef.update(updatedData);
 	}
 
 	/**

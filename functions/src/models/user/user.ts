@@ -9,7 +9,7 @@ import { UserRole } from './user-role';
 import { UserProfileStatus } from './user-profile-status';
 import { Collection } from '../collection-name';
 import { NotFoundError } from '../error/not-found-error';
-import { ListingData } from '../listing/listing';
+import { Listing, ListingData } from '../listing/listing';
 import { MessageData } from '../message/message';
 import { UserProviderDataSchema } from './user-provider-data';
 import userNameAndPhoto from '../../user/users.json';
@@ -19,6 +19,7 @@ import { ModelOptions } from '../model-options';
 import { Utils } from '../../utils/utils';
 import userData from '../../user/users.json';
 import { UserProfileSchema } from './user-profile';
+import { Wishlist, WishlistData } from '../wishlist/wishlist';
 
 export const UserSchema = UserProfileSchema.extend({
 	emailVerified: z.boolean(),
@@ -134,6 +135,46 @@ export class User {
 	}
 
 	/**
+	 * add a wishlist to a particular user
+	 * @param uid uid of user to add input wishlist to
+	 * @param wishlist input wishlist to add to
+	 * @returns A promise that resolves if wishlist is added to input user
+	 */
+	public static async addWishlist(
+		uid: string,
+		wishlist: WishlistData
+	): Promise<void> {
+		const batch = Firebase.db.batch();
+		await Wishlist.create(uid, wishlist, { batch });
+		await Listing.update(
+			wishlist.id,
+			{ likedBy: Firebase.arrayUnion(uid) },
+			{ batch }
+		);
+		await batch.commit();
+	}
+
+	/**
+	 * remove a wishlist to a particular user
+	 * @param uid uid of user to add input wishlist to
+	 * @param wishlistId input wishlist id to remove to
+	 * @returns A promise that resolves if wishlist is removed from input user
+	 */
+	public static async removeWishlist(
+		uid: string,
+		wishlistId: string
+	): Promise<void> {
+		const batch = Firebase.db.batch();
+		await Wishlist.delete(uid, wishlistId, { batch });
+		await Listing.update(
+			wishlistId,
+			{ likedBy: Firebase.arrayRemove(uid) },
+			{ batch }
+		);
+		await batch.commit();
+	}
+
+	/**
 	 * sync user data from firebase auth to firestore
 	 * @param email input user email to sync user data
 	 */
@@ -174,12 +215,9 @@ export class User {
 	): Promise<UserData> {
 		const authUser = await Firebase.auth.getUser(uid);
 		const documentReference = Firebase.db.collection(Collection.users).doc(uid);
-		let documentSnapshot;
-		if (opts.transaction) {
-			documentSnapshot = await opts.transaction.get(documentReference);
-		} else {
-			documentSnapshot = await documentReference.get();
-		}
+		const documentSnapshot = opts.transaction
+			? await opts.transaction.get(documentReference)
+			: await documentReference.get();
 		if (!documentSnapshot.exists || documentSnapshot.data() === undefined)
 			throw new NotFoundError(new Error('User not exist'));
 		return this.parse({ ...authUser, ...documentSnapshot.data() });
@@ -203,6 +241,13 @@ export class User {
 		});
 	}
 
+	/**
+	 * update a user with input uid and input data
+	 * @param uid uid of user to update
+	 * @param data new user data to update
+	 * @param opts update options
+	 * @returns void
+	 */
 	public static async update(
 		uid: string,
 		data: Partial<Omit<UserData, 'id'>>,

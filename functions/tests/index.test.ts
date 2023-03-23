@@ -20,6 +20,8 @@ import { updateUserProfile } from './functions/user/update-user-profile.test';
 import { createThread } from './functions/thread/create-thread.test';
 import { createMessage } from './functions/message/create-message.test';
 import data from '../src/user/users.json';
+import { createWishlist } from './functions/wishlist/create-wishlist.test';
+import { deleteWishlist } from './functions/wishlist/delete-wishlist.test';
 
 const main = async (ctx: Context, opts: any) => {
 	assert(Config.createTestUserToken);
@@ -123,6 +125,17 @@ const main = async (ctx: Context, opts: any) => {
 		description: 'test description',
 		status: 'posted',
 	});
+
+	await createWishlist(ctx, {
+		...opts,
+		...credentials,
+		id: listingId,
+		thumbnail: 'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg',
+		name: 'test listing',
+		price: '123',
+	});
+
+	await deleteWishlist(ctx, { ...opts, ...credentials, id: listingId });
 
 	await updateListing(ctx, {
 		...opts,

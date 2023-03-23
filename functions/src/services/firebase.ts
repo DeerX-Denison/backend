@@ -11,6 +11,7 @@ export { CallableContext } from 'firebase-functions/v1/https';
 export { ObjectMetadata } from 'firebase-functions/lib/v1/providers/storage';
 export { WriteBatch, Transaction } from 'firebase-admin/firestore';
 export { UserRecord } from 'firebase-admin/auth';
+export { FieldValue };
 
 const projectConfig = {
 	projectId: secrets.projectId,

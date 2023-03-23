@@ -5,4 +5,5 @@ export enum Collection {
 	'messages' = 'messages',
 	'guest_listings' = 'guest_listings',
 	'fcm_tokens' = 'fcm_tokens',
+	'wishlist' = 'wishlist',
 }
