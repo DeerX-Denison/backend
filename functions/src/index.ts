@@ -9,7 +9,7 @@ export { createTestUser } from './functions/user/create-test-user';
 export { createThread } from './functions/thread/create-thread';
 export { readMessages } from './functions/message/read-message';
 export { default as sendManualMessage } from './messages/sendManualMessage';
-export { default as createReport } from './report/createReport';
+export { createReport } from './functions/report/create-report';
 export { createFCMToken } from './functions/user/create-fcm-token';
 export { default as createUserIfNotExist } from './user/createUserIfNotExist';
 export { default as deleteAnonymousUser } from './user/deleteAnonymousUser';

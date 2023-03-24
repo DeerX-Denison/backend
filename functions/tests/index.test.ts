@@ -22,6 +22,7 @@ import { createMessage } from './functions/message/create-message.test';
 import data from '../src/user/users.json';
 import { createWishlist } from './functions/wishlist/create-wishlist.test';
 import { deleteWishlist } from './functions/wishlist/delete-wishlist.test';
+import { createReport } from './functions/report/create-report.test';
 
 const main = async (ctx: Context, opts: any) => {
 	assert(Config.createTestUserToken);
@@ -124,6 +125,28 @@ const main = async (ctx: Context, opts: any) => {
 		condition: 'BRAND NEW',
 		description: 'test description',
 		status: 'posted',
+	});
+
+	await createReport(ctx, {
+		...opts,
+		...credentials,
+		id: listingId,
+		type: 'listing',
+		detail: 'test-report-detail',
+		expectedEvidence: {
+			id: 'test-listing-id',
+			images: [
+				'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg',
+				'https://i.ibb.co/JKS8DzC/default-profile-photo.jpg',
+				'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg',
+			],
+			name: 'test listing',
+			price: '123',
+			category: ['FASHION', 'ELECTRONIC'],
+			condition: 'BRAND NEW',
+			description: 'test description',
+			status: 'posted',
+		},
 	});
 
 	await createWishlist(ctx, {
