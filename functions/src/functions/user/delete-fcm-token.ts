@@ -1,44 +1,21 @@
-import { Firebase } from '../../services/firebase';
-import { Config } from '../../config';
-import { InternalError } from '../../models/error/internal-error';
-import { Utils } from '../../utils/utils';
-import { Logger } from '../../services/logger';
 import { ConfirmationResponse } from '../../models/response/confirmation-response';
 import { DeleteFCMTokenRequest } from '../../models/requests/user/delete-fcm-token-request';
-import { AuthError } from '../../models/error/auth-error';
+import { CloudFunction } from '../../services/cloud-functions';
+import { User } from '../../models/user/user';
+import { FCMToken } from '../../models/fcm-token/fcm-token';
 
-export const deleteFCMToken = Firebase.functions
-	.region(...Config.regions)
-	.https.onCall(async (data: unknown, context) => {
-		try {
-			// parse incoming data
-			const requestData = DeleteFCMTokenRequest.parse(data);
+export const deleteFCMToken = CloudFunction.onCall(
+	async (data: unknown, context) => {
+		const invokerId = User.isLoggedIn(context);
 
-			// authorize user
-			const invokerId = Utils.isLoggedIn(context);
+		const invoker = await User.get(invokerId);
 
-			if (invokerId !== requestData.uid) throw new AuthError();
+		const requestData = DeleteFCMTokenRequest.parse(data);
 
-			const invoker = await Utils.fetchUser(invokerId);
+		User.isNotBanned(invoker);
 
-			Utils.isNotBanned(invoker);
+		await FCMToken.delete(invoker.uid, requestData.deviceId);
 
-			// update database
-			try {
-				await Firebase.db
-					.collection('users')
-					.doc(invoker.uid)
-					.collection('fcm_tokens')
-					.doc(requestData.deviceId)
-					.delete();
-				Logger.log(`Deleted FCM Token: ${invoker.uid}/${requestData.deviceId}`);
-			} catch (error) {
-				throw new InternalError();
-			}
-
-			// parse response
-			return ConfirmationResponse.parse();
-		} catch (error) {
-			throw Utils.cloudFunctionHandler(error);
-		}
-	});
+		return ConfirmationResponse.parse();
+	}
+);

@@ -1,70 +1,22 @@
-import { Utils } from '../../utils/utils';
-import {
-	DEFAULT_USER_DISPLAY_NAME,
-	DEFAULT_USER_PHOTO_URL,
-} from '../../constants';
-import userData from './users.json';
-import { User, UserProfile } from '../../models/user';
-import { z } from 'zod';
-import { Firebase } from '../../services/firebase';
-import { Collection } from '../../models/collection-name';
-import { AuthError } from '../../models/error/auth-error';
+import { User, UserData } from '../../models/user/user';
 import { NotFoundError } from '../../models/error/not-found-error';
+import { CloudFunction } from '../../services/cloud-functions';
 
-export const syncUser = Firebase.functions.https.onCall(async (_, context) => {
+export const syncUser = CloudFunction.onCall(async (_, context) => {
+	const invokerId = User.isLoggedIn(context);
+
+	// get user, if user not exist, create user in firestore
+	let invoker: UserData;
 	try {
-		// authorize user
-		const invokerId = Utils.isLoggedIn(context);
-
-		if (Utils.isAnonymousUser(context)) throw new AuthError();
-
-		let invoker: User;
-		try {
-			invoker = await Utils.fetchUser(invokerId);
-			if (invoker) Utils.isNotBanned(invoker);
-		} catch (error) {
-			if (!(error instanceof NotFoundError)) throw error;
-		}
-
-		// generate udpated user
-		const email = Utils.validEmail(context.auth);
-
-		const communityId = email.split('@')[0];
-
-		const searchableKeyword = Utils.getAllSubstrings(communityId);
-
-		const displayName =
-			email in userData
-				? (userData as any)[email].name
-				: DEFAULT_USER_DISPLAY_NAME;
-
-		const photoURL =
-			email in userData ? (userData as any)[email].img : DEFAULT_USER_PHOTO_URL;
-
-		const updatedUser = UserProfile.extend({
-			searchableKeyword: z.array(z.string().min(1)),
-		}).parse({
-			uid: invokerId,
-			email,
-			displayName,
-			photoURL,
-			searchableKeyword,
-		});
-
-		// update firestore and auth db with synced user if invoker exist
-		await Firebase.db
-			.collection(Collection.users)
-			.doc(invokerId)
-			.set(updatedUser);
-
-		await Firebase.auth.updateUser(invokerId, {
-			...updatedUser,
-			email: updatedUser.email ? updatedUser.email : undefined,
-		});
-
-		return 'updated';
+		invoker = await User.get(invokerId);
+		if (invoker) User.isNotBanned(invoker);
 	} catch (error) {
-		console.error(error);
-		return 'error';
+		if (!(error instanceof NotFoundError)) throw error;
 	}
+
+	const email = User.validEmail(context.auth);
+
+	await User.sync(invokerId, email);
+
+	return 'updated';
 });

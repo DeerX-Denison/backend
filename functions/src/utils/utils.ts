@@ -1,19 +1,20 @@
 import { FirebaseError, uuidv4 } from '@firebase/util';
-import { DEFAULT_GUEST_DISPLAY_NAME, DEFAULT_GUEST_EMAIL } from '../constants';
+import os from 'os';
 import { CallableContext } from 'firebase-functions/v1/https';
-import { Listing } from '../models/listing';
+import { Listing } from '../models/listing/listing';
 import { ZodError } from 'zod';
 import { Collection } from '../models/collection-name';
 import { AuthError } from '../models/error/auth-error';
 import { InternalError } from '../models/error/internal-error';
 import { NotFoundError } from '../models/error/not-found-error';
 import { ValidationError } from '../models/error/validation-error';
-import { User } from '../models/user';
+import { User } from '../models/user/user';
 import { Firebase } from '../services/firebase';
 import { AuthData } from 'firebase-functions/lib/common/providers/tasks';
 import { Config } from '../config';
 import { Logger } from '../services/logger';
-import { Message } from '../models/message';
+import { Message } from '../models/message/message';
+import path from 'path';
 
 export class Utils {
 	/**
@@ -86,23 +87,6 @@ export class Utils {
 	}
 
 	/**
-	 * validate user is not banned
-	 */
-	public static isNotBanned(invoker: User): void {
-		if (invoker.disabled) throw new AuthError();
-	}
-
-	/**
-	 * validate user is guest
-	 */
-	public static isGuest(invoker: User): boolean {
-		return (
-			invoker.displayName === DEFAULT_GUEST_DISPLAY_NAME &&
-			invoker.email === DEFAULT_GUEST_EMAIL
-		);
-	}
-
-	/**
 	 * validate invokerUid matches targetUid
 	 */
 	public static isSelf(invokerUid: string, targetUid: string) {
@@ -125,15 +109,6 @@ export class Utils {
 			throw new NotFoundError(`Listing not found: ${listingId}`);
 
 		return Listing.parse(docSnap.data());
-	}
-
-	/**
-	 * extract imageRef from provided imageUrl
-	 */
-	public static extractImageRefFromUrl(imageUrl: string): string {
-		return imageUrl
-			.substring(imageUrl.lastIndexOf('/') + 1, imageUrl.lastIndexOf('?'))
-			.replace(/%2F/g, '/');
 	}
 
 	/**
@@ -233,5 +208,14 @@ export class Utils {
 	 */
 	public static randomId(): string {
 		return uuidv4();
+	}
+
+	/**
+	 * generate a temp path for file with input file name
+	 * @param fileName name of file at temp path
+	 * @returns temp path to file with input file name
+	 */
+	public static tempPath(fileName: string): string {
+		return path.join(os.tmpdir(), fileName);
 	}
 }

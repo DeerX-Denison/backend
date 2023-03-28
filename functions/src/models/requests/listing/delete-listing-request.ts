@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { Listing } from '../../listing';
+import { ListingSchema } from '../../listing/listing';
 
-export const DeleteListingRequest = Listing.pick({
+export const DeleteListingRequest = ListingSchema.pick({
 	id: true,
 });
 
