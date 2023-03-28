@@ -3,7 +3,7 @@ import { ObjectMetadata } from '../../services/firebase';
 import { Config } from '../../config';
 import { ListingImageMetadata } from '../../models/image/listing-image-metadata';
 import { CloudStorage } from '../../services/cloud-storage';
-import { Utils } from '../../utils/utils';
+import { Utils } from '../../utils';
 import fs from 'fs/promises';
 import { Image } from '../../services/image';
 import { CloudVision } from '../../services/cloud-vision';

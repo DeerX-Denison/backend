@@ -3,7 +3,7 @@ import assert from 'assert';
 import { FirebaseError } from '@firebase/util';
 import { Firebase } from '../../../src/services/firebase';
 import { Collection } from '../../../src/models/collection-name';
-import { Utils } from '../../../src/utils/utils';
+import { Utils } from '../../../src/utils';
 
 export const createWishlist = async (ctx: Context, opts: any) => {
 	await ctx.firebase.signOut();

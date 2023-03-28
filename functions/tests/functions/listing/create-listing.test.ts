@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { NonEmptyString } from '../../../src/models/non-empty-string';
 import { Environments } from '../../models/environments';
 import assert from 'assert';
-import { Utils } from '../../../src/utils/utils';
+import { Utils } from '../../../src/utils';
 import { CreateListingRequest } from '../../../src/models/requests/listing/create-listing-request';
 import { FirebaseError } from '@firebase/util';
 import { Firebase } from '../../../src/services/firebase';

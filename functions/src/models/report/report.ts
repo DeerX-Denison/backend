@@ -7,7 +7,7 @@ import { MessageSchema } from '../message/message';
 import { ModelOptions } from '../model-options';
 import { Firebase } from '../../services/firebase';
 import { Collection } from '../collection-name';
-import { Utils } from '../../utils/utils';
+import { Utils } from '../../utils';
 
 export enum ReportType {
 	'listing' = 'listing',

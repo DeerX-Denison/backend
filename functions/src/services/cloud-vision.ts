@@ -4,7 +4,7 @@ import { google } from '@google-cloud/vision/build/protos/protos';
 import vision from '@google-cloud/vision';
 import { InternalError } from '../models/error/internal-error';
 import { Logger } from './logger';
-import { Utils } from '../utils/utils';
+import { Utils } from '../utils';
 import { CloudStorage } from './cloud-storage';
 import { ListingImageMetadata } from '../models/image/listing-image-metadata';
 

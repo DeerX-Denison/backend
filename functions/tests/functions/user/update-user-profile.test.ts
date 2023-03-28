@@ -4,14 +4,14 @@ import { FirebaseClient } from '../../service/firebase-client';
 import { z } from 'zod';
 import { NonEmptyString } from '../../../src/models/non-empty-string';
 import { Environments } from '../../models/environments';
-import { Utils } from '../../../src/utils/utils';
+import { Utils } from '../../../src/utils';
 import assert from 'assert';
 import { FirebaseError } from '@firebase/util';
 import { UserPronoun } from '../../../src/models/user/user-pronouns';
 import { Config } from '../../../src/config';
 import { createTestUser } from './create-test-user.test';
 import { syncUser } from './sync-user.test';
-import userData from '../../../src/user/users.json';
+import userData from '../../../src/functions/user/users.json';
 import { deleteUser } from './delete-user.test';
 
 export const updateUserProfile = async (ctx: Context, opts: any) => {

@@ -1,6 +1,6 @@
 import { Context } from '../../models/context';
 import assert from 'assert';
-import { Utils } from '../../../src/utils/utils';
+import { Utils } from '../../../src/utils';
 import { FirebaseError } from '@firebase/util';
 
 export const createMessage = async (ctx: Context, opts: any) => {

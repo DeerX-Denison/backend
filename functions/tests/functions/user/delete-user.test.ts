@@ -4,7 +4,7 @@ import { FirebaseClient } from '../../service/firebase-client';
 import { z } from 'zod';
 import { NonEmptyString } from '../../../src/models/non-empty-string';
 import { Environments } from '../../models/environments';
-import { Utils } from '../../../src/utils/utils';
+import { Utils } from '../../../src/utils';
 import assert from 'assert';
 import { FirebaseError } from '@firebase/util';
 

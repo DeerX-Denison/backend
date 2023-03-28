@@ -19,7 +19,7 @@ import { updateFCMToken } from './functions/user/update-fcm-token.test';
 import { updateUserProfile } from './functions/user/update-user-profile.test';
 import { createThread } from './functions/thread/create-thread.test';
 import { createMessage } from './functions/message/create-message.test';
-import data from '../src/user/users.json';
+import data from '../src/functions/user/users.json';
 import { createWishlist } from './functions/wishlist/create-wishlist.test';
 import { deleteWishlist } from './functions/wishlist/delete-wishlist.test';
 import { createReport } from './functions/report/create-report.test';

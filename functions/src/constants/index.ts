@@ -1,23 +1,3 @@
-export const LISTING_IMAGE_HEIGHT = 720;
-export const NEW_ROOM_MESSAGE = 'New message';
-export const DEFAULT_USER_PHOTO_URL =
-	'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg';
-export const DEFAULT_USER_DISPLAY_NAME = 'New User';
-export const DEFAULT_GUEST_PHOTO_URL =
-	'https://i.ibb.co/JKS8DzC/default-profile-photo.jpg';
-
-// make sure this match FE
-export const DEFAULT_GUEST_DISPLAY_NAME = 'Guest User';
-
-// make sure this match FE
-export const DEFAULT_GUEST_EMAIL = 'guest-user-email@deerx.web.app';
-
-export const INVALID_IMAGE_CONTENT_IMAGE_URL =
-	'https://i.ibb.co/M66vK2N/deerx-invalid-image-content.jpg';
-export const DEFAULT_MESSAGE_NAME = 'New conversation';
-export const DEFAULT_SELF_MESSAGE_NAME = 'Message to self';
-export const DEFAULT_MESSAGE_THUMBNAIL =
-	'https://i.ibb.co/Y26TN8k/denison-icon-red.jpg';
 export const ERROR_MESSAGES = {
 	unauthenticated: 'User Not Authenticated',
 	bannedUser: 'Your Account Was Banned',

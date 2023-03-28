@@ -6,7 +6,7 @@ import { NonEmptyString } from '../../../src/models/non-empty-string';
 import { Environments } from '../../models/environments';
 import { Firebase } from '../../../src/services/firebase';
 import { Collection } from '../../../src/models/collection-name';
-import { Utils } from '../../../src/utils/utils';
+import { Utils } from '../../../src/utils';
 import assert from 'assert';
 import { FirebaseError } from '@firebase/util';
 

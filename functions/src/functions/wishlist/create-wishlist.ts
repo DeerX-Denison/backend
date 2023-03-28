@@ -4,7 +4,7 @@ import { CloudFunction } from '../../services/cloud-functions';
 import { Wishlist } from '../../models/wishlist/wishlist';
 import { CreateWishlistResponse } from '../../models/response/wishlist/create-wishlist-response';
 import { Firebase } from '../../services/firebase';
-import { Utils } from '../../utils/utils';
+import { Utils } from '../../utils';
 
 export const createWishlist = CloudFunction.onCall(
 	async (data: unknown, context) => {

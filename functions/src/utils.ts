@@ -1,19 +1,19 @@
 import { FirebaseError, uuidv4 } from '@firebase/util';
 import os from 'os';
 import { CallableContext } from 'firebase-functions/v1/https';
-import { Listing } from '../models/listing/listing';
+import { Listing } from './models/listing/listing';
 import { ZodError } from 'zod';
-import { Collection } from '../models/collection-name';
-import { AuthError } from '../models/error/auth-error';
-import { InternalError } from '../models/error/internal-error';
-import { NotFoundError } from '../models/error/not-found-error';
-import { ValidationError } from '../models/error/validation-error';
-import { User } from '../models/user/user';
-import { Firebase } from '../services/firebase';
+import { Collection } from './models/collection-name';
+import { AuthError } from './models/error/auth-error';
+import { InternalError } from './models/error/internal-error';
+import { NotFoundError } from './models/error/not-found-error';
+import { ValidationError } from './models/error/validation-error';
+import { User } from './models/user/user';
+import { Firebase } from './services/firebase';
 import { AuthData } from 'firebase-functions/lib/common/providers/tasks';
-import { Config } from '../config';
-import { Logger } from '../services/logger';
-import { Message } from '../models/message/message';
+import { Config } from './config';
+import { Logger } from './services/logger';
+import { Message } from './models/message/message';
 import path from 'path';
 
 export class Utils {

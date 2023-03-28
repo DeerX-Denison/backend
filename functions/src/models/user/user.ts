@@ -12,12 +12,11 @@ import { NotFoundError } from '../error/not-found-error';
 import { Listing, ListingData } from '../listing/listing';
 import { MessageData } from '../message/message';
 import { UserProviderDataSchema } from './user-provider-data';
-import userNameAndPhoto from '../../user/users.json';
+import userNameAndPhoto from '../../functions/user/users.json';
 import { Config } from '../../config';
 import { ThreadData } from '../thread/thread';
 import { ModelOptions } from '../model-options';
-import { Utils } from '../../utils/utils';
-import userData from '../../user/users.json';
+import { Utils } from '../../utils';
 import { UserProfileSchema } from './user-profile';
 import { Wishlist, WishlistData } from '../wishlist/wishlist';
 
@@ -182,12 +181,12 @@ export class User {
 		const communityId = this.getCommunityId(email);
 		const searchableKeyword = Utils.getAllSubstrings(communityId);
 		const displayName =
-			email in userData
-				? (userData as any)[email].name
+			email in userNameAndPhoto
+				? (userNameAndPhoto as any)[email].name
 				: Config.defaultUserDisplayName;
 		const photoURL =
-			email in userData
-				? (userData as any)[email].img
+			email in userNameAndPhoto
+				? (userNameAndPhoto as any)[email].img
 				: Config.defaultUserPhotoURL;
 		const updatedUser = UserProfileSchema.extend({
 			searchableKeyword: z.array(NonEmptyString),

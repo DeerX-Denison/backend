@@ -3,7 +3,7 @@ import { OnUploadProfileImageResponse } from '../../models/response/images/on-up
 import { CloudStorage } from '../../services/cloud-storage';
 import { ProfileImageMetadata } from '../../models/image/profile-image-metadata';
 import { User } from '../../models/user/user';
-import { Utils } from '../../utils/utils';
+import { Utils } from '../../utils';
 import { Config } from '../../config';
 import { Image } from '../../services/image';
 import fs from 'fs/promises';

@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { NonEmptyString } from '../../../src/models/non-empty-string';
 import { Environments } from '../../models/environments';
 import assert from 'assert';
-import { Utils } from '../../../src/utils/utils';
+import { Utils } from '../../../src/utils';
 
 export const createTestUser = async (ctx: Context, opts: any) => {
 	const res = await ctx.firebase.functions('createTestUser')(opts);

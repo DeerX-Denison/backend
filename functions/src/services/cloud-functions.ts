@@ -1,6 +1,6 @@
 import { Config } from '../config';
 import { CallableContext, Firebase } from '../services/firebase';
-import { Utils } from '../utils/utils';
+import { Utils } from '../utils';
 
 export class CloudFunction {
 	public static onCall = (

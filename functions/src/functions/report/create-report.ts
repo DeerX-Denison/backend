@@ -3,7 +3,7 @@ import { CreateReportRequest } from '../../models/requests/report/create-report-
 import { User } from '../../models/user/user';
 import { CloudFunction } from '../../services/cloud-functions';
 import { Firebase } from '../../services/firebase';
-import { Utils } from '../../utils/utils';
+import { Utils } from '../../utils';
 import { ReportType, Report } from '../../models/report/report';
 import { Listing } from '../../models/listing/listing';
 import { Message } from '../../models/message/message';
