@@ -88,4 +88,8 @@ export class Config {
 	public static newRoomMessage = 'New message';
 
 	public static defaultUserDisplayName = 'New user';
+
+	public static emailSender = 'le_w1@denison.edu';
+
+	public static templateSignInEmailId = 'd-7798012883224050a5eb813d9afa4bcb';
 }
